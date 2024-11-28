@@ -1,0 +1,31 @@
+<app-navbar></app-navbar>
+
+
+<div class="container">
+  <div class="row">
+    <h1 class="display-5 pt-3" *ngIf="context == 'child' && selectedChild">Modifica ragazz{{selectedChild.gender == 'F'
+      ? 'a' : 'o' }}</h1>
+    <h1 class="display-5 pt-3" *ngIf="context == 'parent' && selectedParent">Modifica genitore</h1>
+
+    <!-- Display child basic info (surname, name, resicense) -->
+    <app-people-parent-display (parentChange)="updateParent($event)" (isValid)="updateValidParent($event)"
+      title="Genitore" *ngIf="context == 'parent' && selectedParent"
+      [inputParent]="selectedParent"></app-people-parent-display>
+
+    <!-- Display child basic info (surname, name, resicense) -->
+    <app-people-child-display (childChange)="updateChild($event)" (isValid)="updateValidChild($event)" title="Ragazzo"
+      *ngIf="context == 'child' && selectedChild" [inputChild]="selectedChild"></app-people-child-display>
+
+    <!-- Display address -->
+    <app-people-address-display (addressChange)="updateAddress($event)" (isValid)="updateValidAddress($event)"
+      title="Residenza" *ngIf="context == 'child' && address"
+      [inputAddress]="address"></app-people-address-display>
+
+    <div class="d-flex justify-content-end pt-3" *ngIf="selectedChild || selectedParent">
+      <button class="btn btn-primary btn-lg" (click)="update()"
+        [disabled]="(!validParent && selectedParent) || ((!validChild || !validAddress) && selectedChild)">Salva</button>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

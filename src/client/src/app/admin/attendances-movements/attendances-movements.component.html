@@ -1,0 +1,137 @@
+<app-navbar></app-navbar>
+<div class="container">
+  <div class="row">
+    <div class="pt-3">
+      <h1 class="display-5">Cronologia movimenti</h1>
+      <p>Visualizzazione dei movimeni di <b>{{child.surname}} {{child.name}}</b></p>
+    </div>
+
+    <div class="mb-0">
+      <table class="table table-striped table-hover align-middle bg-white">
+        <thead class="bg-light">
+          <tr>
+            <th>Data</th>
+            <th></th>
+            <th>Note</th>
+            <th class="text-end"></th>
+          </tr>
+        </thead>
+        <tbody *ngIf="movements.length > 0">
+          <tr *ngFor="let movement of movements">
+            <td>
+              <p>{{movement.time| date: 'dd/MM/yyyy HH:mm'}}</p>
+            </td>
+            <td>
+              <h4><i class="bi" title="{{movement.type == 'Join' ? 'Entrata in ritardo' : 'Uscita in anticipo'}}"
+                  ngClass="{{movement.type == 'Join' ? 'bi-box-arrow-in-left text-success' : 'bi-box-arrow-right text-danger'}}"></i>
+              </h4>
+            </td>
+            <td>
+              <p>{{movement.notes}}</p>
+            </td>
+            <td class="text-end">
+              <h4>
+                <!-- <i title="Entrata in ritardo" class="bi bi-box-arrow-in-left text-success" data-bs-toggle="modal"
+                  data-bs-target="#addMovementModal" (click)="manageMovement(attendance, 'Join')"></i>
+                <i title="Uscita in anticipo" class="bi bi-box-arrow-right ms-1 text-danger" data-bs-toggle="modal"
+                  data-bs-target="#addMovementModal" (click)="manageMovement(attendance, 'Left')"></i>
+                <a class="ms-1 text-secondary" title="Visualizza storico"><i class="bi bi-journal-text"></i></a> -->
+                <a data-bs-toggle="modal" data-bs-target="#addMovementModal" class="ms-1" title="Modifica"><i
+                    class="bi bi-pencil-square text-secondary" (click)="setMovementToEdit(movement)"></i></a>
+                <a class="ms-1 text-danger" title="Elimina" data-bs-toggle="modal" data-bs-target="#deletePersonModal"
+                  (click)="setMovementToDelete(movement)"><i class="bi bi-file-earmark-x"></i></a>
+              </h4>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <app-loading *ngIf="loading" class="p-5"></app-loading>
+    <p class="text-muted text-center" *ngIf="movements.length == 0 && !loading">Nessun movimento
+    </p>
+
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="addMovementModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="addMovementModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="addMovementModalLabel">Registra una nuova azione</h1>
+      </div>
+      <div class="modal-body">
+        <!-- <p>{{selectedAttendanceForMovement | json}}</p> -->
+        <p>Stai per aggiornare informazioni su <b>{{child.surname}} {{child.name}}</b></p>
+        <form [formGroup]="editMovementForm">
+          <div class="mb-3">
+            <div class="form-group">
+              <label for="type" class="form-label form-required">Tipo di azione</label>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" id="typeJoin" name="type" formControlName="type"
+                  value="Join">
+                <label class="form-check-label" for="typeJoin">
+                  Entrata in ritardo
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" id="typeLeave" name="type" formControlName="type"
+                  value="Left">
+                <label class="form-check-label" for="typeLeave">
+                  Uscita anticipata
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="form-group">
+              <label for="time" class="form-label form-required">Orario</label>
+              <input type="time" id="time" class="form-control" name="time" formControlName="time" required
+                [ngClass]="{'is-invalid': editMovementForm.get('time')?.touched && !editMovementForm.get('time')?.valid}">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="form-group">
+              <label for="notes" class="form-label">Note</label>
+              <textarea class="form-control" name="notes" id="notes" formControlName="notes"
+                placeholder="Note aggiuntive"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+          (click)="editMovementForm.reset()">Annulla</button>
+        <button type="button" class="btn btn-success" (click)="editMovement()" data-bs-dismiss="modal"
+          [disabled]="!editMovementForm.valid">Aggiorna</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Person Modal -->
+<div class="modal fade" id="deletePersonModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="deletePersonModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="deletePersonModalLabel">Elimina movimento</h1>
+      </div>
+      <div class="modal-body">
+        <p>Stai per eliminare {{selectedMovement.type == 'Join' ? 'l\'entrata' : 'l\'uscita'}} del
+          <b>{{selectedMovement.time | date: 'dd/MM/yyyy'}}</b> alle <b>{{selectedMovement.time | date: 'HH:mm'}}</b>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annulla</button>
+        <button type="button" class="btn btn-danger" (click)="deleteMovement()" data-bs-dismiss="modal">Elimina</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

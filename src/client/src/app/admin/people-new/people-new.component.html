@@ -1,0 +1,32 @@
+<app-navbar></app-navbar>
+<div class="container">
+  <div class="row">
+    <h1 class="display-5 pt-3">Nuova relazione</h1>
+
+    <div class="col-md-6">
+      <app-people-parent-display (parentChange)="updateParentOne($event)" (isValid)="updateValidParentOne($event)"
+        title="Genitore 1"></app-people-parent-display>
+    </div>
+    <div class="col-md-6">
+      <app-people-parent-display (parentChange)="updateParentTwo($event)" (isValid)="updateValidParentTwo($event)"
+        title="Genitore 2"></app-people-parent-display>
+    </div>
+
+    <div class="col-12">
+      <app-people-child-display (childChange)="updateChild($event)" (isValid)="updateValidChild($event)"
+        title="Ragazzo"></app-people-child-display>
+    </div>
+
+    <div class="col-12">
+      <app-people-address-display (addressChange)="updateAddress($event)" (isValid)="updateValidAddress($event)"
+        title="Residenza del ragazzo"></app-people-address-display>
+    </div>
+
+    <!-- Add create button -->
+    <div class="col-12 d-flex justify-content-end">
+      <button class="btn btn-primary btn-lg" (click)="create()" [disabled]="isValid.includes(false)">Crea
+        relazione</button>
+    </div>
+  </div>
+</div>
+<app-footer></app-footer>

@@ -1,0 +1,143 @@
+<app-navbar></app-navbar>
+
+<div class="container">
+  <div class="row">
+    <h1 class="display-5 pt-3">Ciao {{user?.name}},</h1>
+
+
+    <!-- user-profile-edit.component.html -->
+    <div class="mt-3">
+      <div class="card">
+        <div class="card-header">
+          <h5>Modifica il profilo</h5>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="profileForm" (ngSubmit)="updateData()" class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <div class="form-group">
+                  <label for="name" class="form-label form-required">Nome</label>
+                  <input id="name" type="text" formControlName="name" class="form-control"
+                    [ngClass]="{'is-invalid': profileForm.get('name')?.invalid && profileForm.get('name')?.touched}">
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <div class="form-group">
+                  <label for="surname" class="form-label form-required">Cognome</label>
+                  <input id="surname" type="text" formControlName="surname" class="form-control"
+                    [ngClass]="{'is-invalid': profileForm.get('surname')?.invalid && profileForm.get('surname')?.touched}">
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input id="email" type="email" formControlName="email" class="form-control"
+                  [ngClass]="{'is-invalid': profileForm.get('email')?.invalid && profileForm.get('email')?.touched}">
+              </div>
+            </div>
+
+            <!-- Radio button for theme Light or Dark or System default -->
+            <div class="mb-3">
+              <div class="form-group">
+                <label for="theme" class="form-label form-required">Tema</label>
+                <div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" formControlName="theme" id="themeLight" value="Light">
+                    <label class="form-check-label" for="themeLight">Chiaro</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" formControlName="theme" id="themeDark" value="Dark">
+                    <label class="form-check-label" for="themeDark">Scuro</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" formControlName="theme" id="themeSystem"
+                      value="System">
+                    <label class="form-check-label" for="themeSystem">Predefinito di sistema</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end pt-3">
+        <button type="submit" class="btn btn-primary btn-lg" [disabled]="profileForm.invalid" data-bs-toggle="modal"
+          data-bs-target="#updatePasswordModal" (click)="setUpdatePasswordNeeded(false)">Salva</button>
+      </div>
+    </div>
+
+    <div>
+      <hr class="mt-4">
+
+      <div class="d-flex justify-content-start">
+        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal"
+          data-bs-target="#updatePasswordModal" (click)="setUpdatePasswordNeeded(true)">Modifica password</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Popup modal aggiorna passwored conferma -->
+<div class="modal fade" id="updatePasswordModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="updatePasswordModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="updatePasswordModalLabel">Modifica password</h1>
+      </div>
+      <div class="modal-body">
+        <p class="mb-3">{{!updatePasswordNeeded ? "Conferma la tua password per proseguire": "Aggiora la tua password"}}
+        </p>
+
+        <form [formGroup]="passwordForm" class="row">
+          <div class="col-md-12">
+            <div class="mb-3">
+              <label for="password" class="form-label form-required">Password</label>
+              <input id="password" type="password" formControlName="oldPassword" class="form-control"
+                [ngClass]="{'is-invalid': passwordForm.get('oldPassword')?.invalid && passwordForm.get('oldPassword')?.touched}"
+                autocomplete="on">
+            </div>
+          </div>
+          <div class="col-md-6" *ngIf="updatePasswordNeeded">
+            <div class="mb-3">
+              <label for="newPassword" class="form-label form-required">Nuova password</label>
+              <input id="newPassword" type="password" formControlName="newPassword" class="form-control"
+                [ngClass]="{'is-invalid': passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched}"
+                autocomplete="on">
+              <div class="invalid-feedback">
+                La password deve essere lunga almeno 8 caratteri
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6" *ngIf="updatePasswordNeeded">
+            <div class="mb-3">
+              <label for="confirmPassword" class="form-label form-required">Conferma password</label>
+              <input id="confirmPassword" type="password" formControlName="confirmPassword" class="form-control"
+                [ngClass]="{'is-invalid': passwordForm.get('confirmPassword')?.invalid && passwordForm.get('confirmPassword')?.touched}"
+                autocomplete="on">
+              <div class="invalid-feedback">
+                Le password devono coincidere
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+          (click)="passwordForm.reset()">Annulla</button>
+        <button type="button" class="btn btn-success" (click)="update()" data-bs-dismiss="modal"
+          [disabled]="!isPasswordFormValid()">Conferma</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

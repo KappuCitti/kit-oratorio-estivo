@@ -1,0 +1,41 @@
+/*
+ *   Copyright (c) 2024 KappuCitti.
+ *   All rights reserved.
+ *
+ *   Licensed under the MIT License.
+ *   See LICENSE file in the project root for full license information.
+ */
+/* You can add global styles to this file, and also import other style files */
+
+/* Importing Bootstrap SCSS file. */
+@import "bootstrap/scss/bootstrap";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+// Color bar styles used in the TeamsComponent
+.color-bar {
+  width: 5px;
+  height: 100%; /* Set the height to 100% */
+  min-height: 20px; /* Add minimum height for the bar */
+  border-radius: 3px;
+}
+
+// Add required indicator near the form labels (e.g., "Name *"), used near form-label classes
+.form-required::after {
+  content: " *";
+  color: var(--bs-danger);
+}
+
+
+/** TODO - Dident work, HOW???
+ * I tryed adding a color change after .collapsed class was added and it works,
+ * but if i add transform rotation it dient work well, it didnt rotate
+ */
+// Add transition effect to collapse arrow
+// .card-header a i.bi.bi-chevron-down {
+//   transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
+//   transform: rotate(0deg); /* Initial state */
+// }
+
+// .card-header a.collapsed i.bi.bi-chevron-down {
+//   transform: rotate(90deg); /* Rotates smoothly */
+// }

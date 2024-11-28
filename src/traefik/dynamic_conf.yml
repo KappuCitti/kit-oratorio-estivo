@@ -1,0 +1,12 @@
+http:
+  routers:
+    websecure:
+      entryPoints:
+        - websecure
+      rule: "Host(`localhost`) || Host(`example.com`)"  # Usa `localhost` per ambiente locale
+      # tls:
+      #     certResolver: myresolver
+    web:
+      entryPoints:
+        - web
+      rule: "Host(`localhost`)"  # Per traffico HTTP su localhost

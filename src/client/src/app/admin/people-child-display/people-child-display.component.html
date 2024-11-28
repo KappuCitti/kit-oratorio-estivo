@@ -1,0 +1,60 @@
+<div class="card mb-4 mt-3">
+  <div class="card-header d-flex">
+    <h4 class="fw-bold mb-1">{{title}}</h4>
+  </div>
+  <div class="card-body">
+    <form [formGroup]="childForm" class="row">
+      <!-- Nome -->
+      <div class="col-md-6 col-12 mb-3">
+        <div class="form-group">
+          <label for="name" class="form-label form-required">Nome</label>
+          <input type="text" id="name" class="form-control" formControlName="name" placeholder="Inserisci il nome"
+            required [ngClass]="{'is-invalid': childForm.get('name')?.invalid && childForm.get('name')?.touched}" />
+        </div>
+      </div>
+
+      <!-- Cognome -->
+      <div class="col-md-6 col-12 mb-3">
+        <div class="form-group">
+          <label for="surname" class="form-label form-required">Cognome</label>
+          <input type="text" id="surname" class="form-control" formControlName="surname"
+            placeholder="Inserisci il cognome" required
+            [ngClass]="{'is-invalid': childForm.get('surname')?.invalid && childForm.get('surname')?.touched}" />
+        </div>
+      </div>
+
+      <!-- Sesso -->
+      <div class="col-md-4 col-12 mb-3">
+        <div class="form-group">
+          <label for="gender" class="form-label form-required">Sesso</label>
+          <select id="gender" class="form-select" formControlName="gender" required
+            [ngClass]="{'is-invalid': childForm.get('gender')?.invalid && childForm.get('gender')?.touched}" [ngModel]>
+            <option value="M">Maschio</option>
+            <option value="F">Femmina</option>
+            <option value="Other">Altro</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Data di Nascita -->
+      <div class="col-md-4 col-12 mb-3">
+        <div class="form-group">
+          <label for="birthdate" class="form-label form-required">Data di Nascita</label>
+          <input type="date" id="birthdate" class="form-control" formControlName="birthdate"
+            placeholder="Seleziona la data di nascita" required
+            [ngClass]="{'is-invalid': childForm.get('birthdate')?.invalid && childForm.get('birthdate')?.touched}" />
+        </div>
+      </div>
+
+      <!-- Luogo di Nascita -->
+      <div class="col-md-4 col-12 mb-3">
+        <div class="form-group">
+          <label for="birthplace" class="form-label form-required">Luogo di Nascita</label>
+          <input type="text" id="birthplace" class="form-control" formControlName="birthplace"
+            placeholder="Inserisci il luogo di nascita" required
+            [ngClass]="{'is-invalid': childForm.get('birthplace')?.invalid && childForm.get('birthplace')?.touched}" />
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

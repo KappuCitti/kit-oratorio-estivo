@@ -1,0 +1,22 @@
+# Copyright (c) 2024 KappuCitti.
+# All rights reserved.
+# 
+# Licensed under the MIT License.
+# See LICENSE file in the project root for full license information.
+
+server {
+  listen 80;
+  server_name localhost;
+
+  location / {
+    root /usr/share/nginx/html;
+    try_files $uri $uri/ /index.html;
+  }
+
+  # Impostazione del caching per file statici
+  location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+    root /usr/share/nginx/html;
+    expires 1y;
+    add_header Cache-Control "public, max-age=31536000";
+  }
+}

@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  traefik:
+    image: traefik:latest
+    command:
+      - "--api.insecure=true"          # Traefik Dashboard per debugging
+      - "--providers.docker=true"      # Usa Docker come provider
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      # - "--certificatesresolvers.myresolver.acme.httpChallenge.entryPoint=web" # Certificato SSL opzionale
+      # - "--certificatesresolvers.myresolver.acme.email=you@example.com"       # Certificato SSL opzionale
+      # - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080" # Dashboard di Traefik
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      # - "./traefik/letsencrypt:/letsencrypt"  # Certificato SSL opzionale
+      - "./src/traefik/traefik.yml:/etc/traefik/traefik.yml"
+      - "./src/traefik/dynamic_conf.yml:/etc/traefik/dynamic_conf.yml"
+    networks:
+      - internal
+
+  # Delete if you want to use your own MySQL database, remember to change the .env file in server/config folder
+  db:
+    build: ./src/database
+    env_file: ./src/database/.env
+    volumes:
+      - ./src/database/tables.sql:/docker-entrypoint-initdb.d/tables.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - internal
+
+  server:
+    build: ./src/server
+    env_file: ./src/server/config/.env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.server.rule=PathPrefix(`/api`)"
+      - "traefik.http.services.server.loadbalancer.server.port=3000"
+      - "traefik.http.routers.server.entrypoints=web"
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_PORT: ${MYSQL_PORT}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+
+      MUSIC_FOLDER: ${MUSIC_FOLDER}
+    volumes:
+      - "${MUSIC_FOLDER}:/server/static/music"
+    depends_on:
+      - db
+      - traefik
+    networks:
+      - internal
+
+  client:
+    build: ./src/client
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.client.rule=PathPrefix(`/`)"
+      - "traefik.http.services.client.loadbalancer.server.port=80"
+      - "traefik.http.routers.client.entrypoints=web"
+    depends_on:
+      - server
+      - traefik
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local

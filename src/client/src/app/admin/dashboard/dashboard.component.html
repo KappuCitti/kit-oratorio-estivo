@@ -1,0 +1,88 @@
+<app-navbar></app-navbar>
+
+<div class="container">
+  <div class="row">
+    <h1 class="display-5 pt-3">Dashboard</h1>
+
+    <!-- Enrollment Section -->
+    <div class="pt-3">
+      <h3>Iscrizioni</h3>
+    </div>
+    <div class="row">
+      <!-- This Year Enrollments -->
+      <div class="col-12 col-sm-6 col-md-4 mb-3">
+        <div class="card">
+          <div class="card-body text-center">
+            <h5 class="card-title">Iscritti Totali</h5>
+            <p class="display-6">{{enrollments.length || 0}}</p>
+            <p class="text-muted mb-0">Questo anno</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-0 col-sm-4 col-md-8 mb-3">
+      </div>
+
+      <!-- This Year Color Subdivision -->
+      <!-- Divisione Colori - Elementari -->
+      <div class="col-12 col-sm-6 col-md-6 mb-3">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Divisione Colori - Elementari</h5>
+            <ul class="list-group">
+              <li *ngFor="let team of teams" class="list-group-item d-flex justify-content-between align-items-center">
+                {{ team.name }}
+                <span class="badge rounded-pill" [ngStyle]="{ 'background-color': team.color }">
+                  {{ childrensTeams.primary[team.name] || 0 }}
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Divisione Colori - Medie -->
+      <div class="col-12 col-sm-6 col-md-6 mb-3">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Divisione Colori - Medie</h5>
+            <ul class="list-group">
+              <li *ngFor="let team of teams" class="list-group-item d-flex justify-content-between align-items-center">
+                {{ team.name }}
+                <span class="badge rounded-pill" [ngStyle]="{ 'background-color': team.color }">
+                  {{ childrensTeams.secondary[team.name] || 0 }}
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Attendance Section -->
+    <div class="pt-3">
+      <h3>Presenze</h3>
+    </div>
+    <div class="row">
+      <!-- Today's Attendance -->
+      <div class="col-12 col-sm-6 col-md-4 mb-3">
+        <div class="card">
+          <div class="card-body text-center">
+            <h5 class="card-title">Presenti Oggi</h5>
+            <p class="display-6">{{getTodayPresenceAttendances() || 0}} su {{attendances.length || 0}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leaderboard Section -->
+    <div class="pt-3">
+      <h3>Classifica</h3>
+    </div>
+    <app-leaderboard-ranks></app-leaderboard-ranks>
+  </div>
+</div>
+
+
+<app-footer></app-footer>

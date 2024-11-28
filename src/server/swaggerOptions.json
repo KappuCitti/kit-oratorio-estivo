@@ -1,0 +1,27 @@
+{
+  "definition": {
+    "openapi": "3.1.0",
+    "info": {
+      "title": "Kit's Oratorio Estivo API",
+      "version": "0.1.0",
+      "description": "This is a simple CRUD API application made with Express and documented with Swagger",
+      "license": {
+        "name": "MIT",
+        "url": "https://spdx.org/licenses/MIT.html"
+      },
+      "contact": {
+        "name": "KappuCitti",
+        "url": "https://kappu.it",
+        "email": "info@kappu.it"
+      }
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000"
+      }
+    ]
+  },
+  "apis": [
+    "./router/*.js"
+  ]
+}

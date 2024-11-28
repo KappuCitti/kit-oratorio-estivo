@@ -1,0 +1,33 @@
+{
+  "name": "kitoratorioestivo-server",
+  "version": "0.0.1",
+  "description": "Server API per la comunicazione tra l'interfaccia web ed il database: raccolta iscrizioni, gestione presenze, giochi interattivi e punteggi squadre.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ."
+  },
+  "keywords": [
+    "oratorio",
+    "estivo",
+    "oratorio",
+    "utils-kit"
+  ],
+  "author": "KappuCitti",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "colors": "^1.4.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "helmet": "^8.0.0",
+    "ini": "^5.0.0",
+    "kitoratorioestivo-server": "file:",
+    "mysql2": "^3.11.3",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^10.0.0"
+  }
+}

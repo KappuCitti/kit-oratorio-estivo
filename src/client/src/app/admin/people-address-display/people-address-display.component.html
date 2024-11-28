@@ -1,0 +1,47 @@
+<div class="card mb-4 mt-3">
+  <div class="card-header d-flex">
+    <h4 class="fw-bold mb-1">{{title}}</h4>
+  </div>
+  <div class="card-body">
+    <form [formGroup]="addressForm" class="row">
+      <!-- Nazione -->
+      <div class="col-md-3 col-12 mb-3">
+        <div class="form-group">
+          <label for="country" class="form-label form-required">Nazione</label>
+          <input type="text" id="country" class="form-control" formControlName="country" value="Italia"
+            placeholder="Inserisci il paese" required
+            [ngClass]="{'is-invalid': addressForm.get('country')?.invalid && addressForm.get('country')?.touched}" />
+        </div>
+      </div>
+
+      <!-- Città -->
+      <div class="col-md-3 col-12 mb-3">
+        <div class="form-group">
+          <label for="city" class="form-label form-required">Città</label>
+          <input type="text" id="city" class="form-control" formControlName="city" placeholder="Inserisci la città"
+            required [ngClass]="{'is-invalid': addressForm.get('city')?.invalid && addressForm.get('city')?.touched}" />
+        </div>
+      </div>
+
+      <!-- Via -->
+      <div class="col-md-3 col-12 mb-3">
+        <div class="form-group">
+          <label for="street" class="form-label form-required">Via</label>
+          <input type="text" id="street" class="form-control" formControlName="street" placeholder="Inserisci la via"
+            required
+            [ngClass]="{'is-invalid': addressForm.get('street')?.invalid && addressForm.get('street')?.touched}" />
+        </div>
+      </div>
+
+      <!-- Codice Postale -->
+      <div class="col-md-3 col-12 mb-3">
+        <div class="form-group">
+          <label for="zip" class="form-label form-required">Codice Postale</label>
+          <input type="text" id="zip" class="form-control" formControlName="zip"
+            placeholder="Inserisci il codice postale" required
+            [ngClass]="{'is-invalid': addressForm.get('zip')?.invalid && addressForm.get('zip')?.touched}" />
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false  # Serve solo i servizi che hanno `traefik.enable=true`
+
+api:
+  dashboard: true  # Abilita la dashboard di Traefik (accessibile su localhost:8080 se configurata)
+  insecure: true

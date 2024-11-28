@@ -1,0 +1,58 @@
+<nav>
+  <ul class="pagination justify-content-center">
+    <!-- Pulsante 'Previous' -->
+    <li class="page-item" [class.disabled]="page === 1">
+      <span class="page-link" (click)="setPage(page - 1)" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </span>
+    </li>
+
+    <!-- Prima pagina sempre visibile se ci sono più di 5 pagine -->
+    <li class="page-item" *ngIf="pages > 5 && page > 2">
+      <span class="page-link" (click)="setPage(1)">1</span>
+    </li>
+
+    <!-- Puntini se la pagina attuale è oltre la terza pagina -->
+    <li class="page-item" *ngIf="pages > 5 && page > 2">
+      <span class="page-link disabled">...</span>
+    </li>
+
+    <!-- Pagine centrali (2 prima e 2 dopo la pagina attuale) -->
+    <li class="page-item" *ngFor="let p of getVisiblePages()" [ngClass]="{'active': p === page}">
+      <span class="page-link" (click)="setPage(p)">{{ p }}</span>
+    </li>
+
+    <!-- Puntini se ci sono altre pagine oltre le ultime 3 -->
+    <li class="page-item" *ngIf="pages > 5 && page < pages - 2">
+      <span class="page-link disabled">...</span>
+    </li>
+
+    <!-- Ultima pagina sempre visibile se ci sono più di 5 pagine -->
+    <li class="page-item" *ngIf="pages > 5 && page < pages - 2">
+      <span class="page-link" (click)="setPage(pages)">{{ pages }}</span>
+    </li>
+
+    <!-- Pulsante 'Next' -->
+    <li class="page-item" [class.disabled]="page === pages">
+      <span class="page-link" (click)="setPage(page + 1)" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </span>
+    </li>
+  </ul>
+
+  <div class="d-flex justify-content-between align-items-center">
+    <!-- Dropdown per selezionare gli elementi per pagina -->
+    <div class="dropdown ms-auto">
+      <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="itemsSizeDropdown"
+        data-bs-toggle="dropdown" aria-expanded="false">
+        {{ size }} per pagina
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="itemsSizeDropdown">
+        <li><a class="dropdown-item" (click)="setSize(10)">10</a></li>
+        <li><a class="dropdown-item" (click)="setSize(25)">25</a></li>
+        <li><a class="dropdown-item" (click)="setSize(50)">50</a></li>
+        <li><a class="dropdown-item" (click)="setSize(100)">100</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>

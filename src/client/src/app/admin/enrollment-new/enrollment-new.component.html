@@ -1,0 +1,85 @@
+<app-navbar></app-navbar>
+
+<div class="container">
+  <div class="row">
+    <h1 class="display-5 pt-3">Nuova iscrizione</h1>
+
+    <div class="pt-3 d-flex">
+      <h3>Cerca</h3>
+      <h3 class="ms-auto"><a title="Cerca"><i class="bi bi-search" (click)="search()"></i></a></h3>
+    </div>
+
+    <div>
+      <form [formGroup]="searchForm" class="row">
+        <div class="col-12">
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text">Generalita</span>
+              <input type="text" class="form-control" placeholder="Cognome" aria-label="Cognome"
+                formControlName="surname">
+              <input type="text" class="form-control" placeholder="Nome" aria-label="Nome" formControlName="name">
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="pt-3 d-flex">
+      <h3>{{children.length}} risultati</h3>
+    </div>
+    
+    <div>
+      <table class="table table-striped table-hover align-middle mb-0 bg-white">
+        <thead class="bg-light">
+          <tr>
+            <th></th>
+            <th scope="col">Nome</th>
+            <th scope="col">Cognome</th>
+            <th scope="col">Genere</th>
+            <th scope="col">Data di nascita</th>
+            <th scope="col">Luogo di nascita</th>
+        </thead>
+        <tbody *ngIf="children.length > 0" [formGroup]="selectChildForm">
+          <tr *ngFor="let child of children; let i = index">
+            <td><input type="radio" [value]="child.id" formControlName="child"></td>
+            <td>{{child.name}}</td>
+            <td>{{child.surname}}</td>
+            <td>{{child.gender}}</td>
+            <td>{{child.birthDate | date: 'dd/MM/yyyy'}}</td>
+            <td>{{child.birthPlace}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination [elements]="total" (pageChange)="onPageChange($event)" (sizeChange)="onSizeChange($event)"
+      class="pt-3"></app-pagination>
+
+    <div *ngIf="child">
+      <hr>
+    </div>
+
+    <div class="pt-3" *ngIf="child">
+      <h3>Iscrizione</h3>
+      <div class="col-4">
+        <div [formGroup]="selectYearForm" class="input-group">
+          <span class="input-group-text" id="year">Anno</span>
+          <input class="form-control" type="number" id="year" formControlName="year">
+        </div>
+      </div>
+
+      <!-- Search for child by name and surname -->
+      <app-people-child-display [inputChild]="child" [isReadOnly]="true"></app-people-child-display>
+
+      <app-enrollment-display [inputYear]="selectYearForm.get('year')?.value"
+        (enrollmentChange)="saveEmittedEnrollment($event)"
+        (weeksChange)="saveEmittedWeeks($event)"></app-enrollment-display>
+
+      <div class="d-flex justify-content-end pt-3">
+        <button class="btn btn-primary btn-lg" (click)="create()">Crea</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

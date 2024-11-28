@@ -1,0 +1,69 @@
+<app-navbar></app-navbar>
+
+<div class="container">
+  <div class="row">
+    <h1 class="display-5 pt-3">Modifica iscrizione</h1>
+
+    <!-- Data iscrizione e anno di iscrizione -->
+    <div class="pt-3" *ngIf="enrollment">
+      <p>Data iscrizione: <span class="fw-bold">{{enrollment.timestamp | date: 'dd/MM/yyyy'}} alle
+          {{enrollment.timestamp | date: 'HH:mm'}}</span></p>
+      <p>Validita' iscrizione: <span class="fw-bold">{{enrollment.year}}</span></p>
+    </div>
+
+    <!-- Display child basic info (surname, name, resicense) -->
+    <div class="mb-4 mt-3">
+      <div class="card">
+        <div class="card-header d-flex">
+          <h4 class="fw-bold mb-1">Anagrafica</h4>
+          <h4 class="ms-auto"><a [routerLink]="['/admin/child', enrollment?.tree?.child?.id]" class="ms-1"
+              title="Modifica"><i class="bi bi-pencil-square text-secondary"></i></a></h4>
+        </div>
+        <div class="card-body">
+          <div class="row" *ngIf="enrollment">
+            <h5 class="fw-bold">Ragazz{{enrollment.tree.child.gender == 'F' ? 'a' : 'o'}}</h5>
+            <div class="col-6">
+              <p>Cognome: <span class="fw-bold">{{ enrollment.tree.child.surname }}</span></p>
+            </div>
+            <div class="col-6">
+              <p>Nome: <span class="fw-bold">{{ enrollment.tree.child.name }}</span></p>
+            </div>
+            <div class="col-12">
+              <p>Nato il <span class="fw-bold">{{ enrollment.tree.child.birthDate | date: 'dd/MM/yyyy' }}</span>
+                ({{calculateYO(enrollment.tree.child.birthDate)}} anni) a
+                <span class="fw-bold">{{ enrollment.tree.child.birthPlace }}</span>
+              </p>
+            </div>
+            <div class="col-12" *ngIf="enrollment.tree.child.address">
+              <p>Residente a <span class="fw-bold">{{ enrollment.tree.child.address.city }}</span> (<span
+                  class="fw-bold">{{ enrollment.tree.child.address.country }}</span>) in via <span class="fw-bold">{{
+                  enrollment.tree.child.address.street }}</span>, CAP <span class="fw-bold">{{
+                  enrollment.tree.child.address.zip }}</span></p>
+            </div>
+            <hr>
+            <!-- Add parents -->
+            <div class="col-12">
+              <div class="row">
+                <h5 class="fw-bold">Genitori / Tutori</h5>
+                <div class="col-6" *ngFor="let parent of enrollment.tree.parents; let i = index">
+                  <p>{{i + 1}}. {{ parent.surname }} {{ parent.name }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <app-loading *ngIf="enrollment == null"></app-loading>
+        </div>
+      </div>
+    </div>
+
+    <app-enrollment-display *ngIf="enrollment" [inputEnrollment]="enrollment"></app-enrollment-display>
+
+    <!-- Button for save enrollment -->
+    <div class="d-flex justify-content-end pt-3">
+      <button class="btn btn-primary btn-lg" (click)="saveEnrollment()">Salva</button>
+    </div>
+
+  </div>
+</div>
+
+<app-footer></app-footer>

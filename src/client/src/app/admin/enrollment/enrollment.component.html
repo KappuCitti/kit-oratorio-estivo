@@ -1,0 +1,183 @@
+<app-navbar></app-navbar>
+
+<div class="container">
+  <div class="row">
+    <h1 class="display-5 pt-3">Iscrizioni</h1>
+
+    <!-- Add a text inpit for select the year, and filters for name, class, payment and week  -->
+
+    <!-- Add filter header name -->
+    <div class="pt-3 d-flex">
+      <h3>Filtro <i class="bi bi-funnel"></i></h3>
+      <h3 class="ms-auto"><a title="Cerca"><i class="bi bi-search" (click)="search()"></i></a></h3>
+    </div>
+
+
+    <!-- Add a text inpit for select the year -->
+    <div>
+      <form [formGroup]="searchForm" class="row">
+        <div class="col-6">
+          <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon1">Anno</span>
+            <input type="text" class="form-control" id="year" placeholder="Anno oratorio" aria-label="Anno oratorio"
+              formControlName="year">
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="input-group">
+            <span class="input-group-text" id="week">Settimana</span>
+            <select class="form-select" id="week" formControlName="week" required>
+              <option value=""><span class="text-muted">Seleziona</span></option>
+              <option *ngFor="let week of weeks" [value]="week.id">{{getDate(week.start)}} - {{getDate(week.end)}}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="input-group mb-3 ">
+            <span class="input-group-text">Generalita</span>
+            <input type="text" class="form-control" placeholder="Cognome" aria-label="Cognome"
+              formControlName="surname">
+            <input type="text" class="form-control" placeholder="Nome" aria-label="Nome" formControlName="name">
+          </div>
+        </div>
+
+        <!-- Add filters for name, class, payment and week -->
+
+        <div class="col-sm-6">
+          <div class="input-group">
+            <span class="input-group-text" id="type">Tipo scuola</span>
+            <select class="form-select" id="type" formControlName="schoolType">
+              <option value=""><span class="text-muted">Seleziona</span></option>
+              <option value="Primary">Elementari</option>
+              <option value="Secondary">Medie</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <div class="input-group">
+            <span class="input-group-text" id="class">Classe</span>
+            <select class="form-select" id="class" formControlName="class" required="">
+              <option value=""><span class="text-muted">Seleziona</span></option>
+              <option value="I">I</option>
+              <option value="II">II</option>
+              <option value="III">III</option>
+              <option value="IV">IV</option>
+              <option value="V">V</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <div class="input-group">
+            <span class="input-group-text" id="section">Sezione</span>
+            <input type="text" class="form-control" name="section" id="section" formControlName="section"
+              placeholder="Sezione">
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="pt-3 d-flex">
+      <h3>{{enrollments.length}} risultati</h3>
+      <h3 class="ms-auto"><a title="Aggiungi"><i class="bi bi-plus-lg" [routerLink]="['/admin/enrollment/new']"></i></a>
+      </h3>
+    </div>
+
+    <div class="mb-0">
+      <table class="table table-striped table-hover align-middle bg-white">
+        <thead class="bg-light">
+          <tr>
+            <th>Name</th>
+            <th>Classe</th>
+            <th>Squara</th>
+            <th class="text-center">Pagamenti</th>
+            <th class="text-center">Autorizzazioni</th>
+            <th class="text-center">Settimana</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody *ngIf="enrollments.length > 0">
+          <tr *ngFor="let enrollment of enrollments">
+            <td>
+              <div class="d-flex align-items-center">
+                <p class="mb-1">{{enrollment.tree.child.surname}} {{enrollment.tree.child.name}}</p>
+              </div>
+            </td>
+            <td>
+              <p class="fw-normal mb-1">Scuola {{enrollment.schoolType.toLowerCase() == 'primary' ? 'primaria' :
+                'secondaria'}}</p>
+              <p class="text-muted mb-0">Classe {{enrollment.classNumber}}° {{enrollment.section}}</p>
+            </td>
+            <td>
+              <p *ngIf="enrollment.team.name != null">{{enrollment.team.name}} <i class="bi bi-droplet-fill"
+                  [style.color]="enrollment.team.color"></i></p>
+              <p class="text-muted mb-1" *ngIf="enrollment.team.name == null">-</p>
+            </td>
+            <td class="text-center">
+              <span class="badge" [ngClass]="{
+                'bg-success': getEnrolledAndPaidWeeksCount(enrollment) === getEnrolledWeeksCount(enrollment),
+                'bg-warning': getEnrolledAndPaidWeeksCount(enrollment) < getEnrolledWeeksCount(enrollment) && getEnrolledAndPaidWeeksCount(enrollment) > 0,
+                'bg-danger': getEnrolledAndPaidWeeksCount(enrollment) === 0
+              }">
+                {{ getEnrolledAndPaidWeeksCount(enrollment) }}/{{ getEnrolledWeeksCount(enrollment) }}
+              </span>
+            </td>
+            <td class="text-center">
+              <h4 class="fw-bold mb-1">
+                <i class="bi bi-database" [style.color]="enrollment.dataProcessingConsent ? 'green' : 'red'"
+                  title="Consenso a raccolta dati e immagine"></i>
+                <i class="bi bi-door-open" [style.color]="enrollment.exitAuthorization ? 'green' : 'red'"
+                  title="Consenso alle uscite"></i>
+              </h4>
+            </td>
+            <td class="text-center">
+              <h5>
+                <i *ngFor="let week of enrollment.weeks; let i = index" class="bi ms-1 text-secondary"
+                  [ngClass]="getCircleClass(week.enrolled ?? false, i)"
+                  title="{{getDate(week.start)}} - {{getDate(week.end)}}"></i>
+              </h5>
+            </td>
+            <td class="text-end">
+              <h4>
+                <a [routerLink]="['/admin/enrollment', enrollment.id, 'edit']" title="Modifica"><i
+                    class="bi bi-pencil-square text-secondary"></i></a>
+                <a class="ms-1 text-danger" title="Elimina" data-bs-toggle="modal"
+                  data-bs-target="#deleteEnrollmentModal" (click)="setEnrollmentToDelete(enrollment)"><i
+                    class="bi bi-file-earmark-x"></i></a>
+              </h4>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <app-loading *ngIf="loading" class="p-5"></app-loading>
+    <p class="text-muted text-center" *ngIf="enrollments.length == 0 && !loading">Nessuna iscrizione trovata</p>
+
+    <app-pagination [elements]="total" (pageChange)="onPageChange($event)" (sizeChange)="onSizeChange($event)"
+      class="pt-3"></app-pagination>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="deleteEnrollmentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="deleteEnrollmentModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="deleteEnrollmentModalLabel">Elimina iscrizione</h1>
+      </div>
+      <div class="modal-body">
+        <p> Stai per eliminare l'iscrizione di <b>{{enrollmentToDelete?.tree?.child?.surname}}
+            {{enrollmentToDelete?.tree?.child?.name}}</b></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annulla</button>
+        <button type="button" class="btn btn-danger" (click)="deleteEnrollment()"
+          data-bs-dismiss="modal">Elimina</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

@@ -1,0 +1,14 @@
+<div class="row">
+  <div class="col-md-3" *ngFor="let entry of leaderboard; let i = index">
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header text-white" [style.backgroundColor]="entry.team.color">
+        <h5 class="card-title">{{ i + 1 }}. {{ entry.team.name }}</h5>
+      </div>
+      <div class="card-body">
+        <p class="card-text">
+          <strong>Punti:</strong> {{ entry.points }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

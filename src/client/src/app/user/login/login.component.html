@@ -1,0 +1,39 @@
+<section class="vh-100">
+  <div class="container py-5 h-100">
+    <div class="row d-flex align-items-center justify-content-center h-100">
+      <div class="col-md-8 col-lg-7 col-xl-6">
+        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg" class="img-fluid"
+          alt="Logo oratorio">
+      </div>
+      <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
+        <!-- Add error message here -->
+        <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+          {{errorMessage}}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="login()">
+          <!-- Email input -->
+          <div data-mdb-input-init class="form-outline mb-4">
+            <label class="form-label form-required" for="username">Username</label>
+            <input type="text" id="username" class="form-control form-control-lg" formControlName="username"
+              name="username" placeholder="Cognome.None" required
+              [ngClass]="{'is-invalid': loginForm.get('username')?.invalid && loginForm.get('username')?.touched}" />
+          </div>
+
+          <!-- Password input -->
+          <div data-mdb-input-init class="form-outline mb-4">
+            <label class="form-label form-required" for="password">Password</label>
+            <input type="password" id="password" class="form-control form-control-lg" formControlName="password"
+              name="password" placeholder="Password" autocomplete="on" required
+              [ngClass]="{'is-invalid': loginForm.get('password')?.invalid && loginForm.get('password')?.touched}" />
+          </div>
+
+          <!-- Submit button -->
+          <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg btn-block"
+            [disabled]="!loginForm.valid">Accedi</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

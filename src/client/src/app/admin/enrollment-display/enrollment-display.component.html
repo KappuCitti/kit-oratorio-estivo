@@ -1,0 +1,131 @@
+<div class="mt-4">
+  <!-- General Info -->
+  <div class="card mb-4">
+    <div class="card-header d-flex">
+      <h4 class="fw-bold mb-1">Iscrizione</h4>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="enrollmentForm" class="row">
+        <div class="col-sm-6 mb-3">
+          <div class="form-group">
+            <label for="schoolType" id="type" class="form-label form-required">Tipo scuola</label>
+            <select class="form-select" id="type" formControlName="schoolType">
+              <option value="Primary">Elementari</option>
+              <option value="Secondary">Medie</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-sm-3 mb-3">
+          <div class="form-group">
+            <label for="class" id="class" class="form-label form-required">Classe</label>
+            <select class="form-select" id="class" formControlName="class" required="">
+              <option value="I">I</option>
+              <option value="II">II</option>
+              <option value="III">III</option>
+              <option value="IV">IV</option>
+              <option value="V">V</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-sm-3 mb-3">
+          <div class="form-group">
+            <label for="section" id="section" class="form-label form-required">Sezione</label>
+            <input type="text" class="form-control" name="section" id="section" formControlName="section">
+          </div>
+        </div>
+
+        <!-- Input for data processing consent -->
+        <div class="col-sm-6 mb-3">
+          <div class="form-group">
+            <label for="dataProcessingConsent" id="dataProcessingConsent" class="form-label form-required">Consenso a raccolta dati e immagini</label>
+            <select class="form-select" id="dataProcessingConsent" formControlName="dataProcessingConsent">
+              <option value="true">Si</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Input for exit authorization -->
+        <div class="col-sm-6 mb-3">
+          <div class="form-group">
+            <label for="exitAuthorization" id="exitAuthorization" class="form-label form-required">Consenso alle uscite</label>
+            <select class="form-select" id="exitAuthorization" formControlName="exitAuthorization">
+              <option value="true">Si</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Input for team -->
+        <div class="col-sm-6 mb-3">
+          <div class="form-group">
+            <label for="team" id="team" class="form-label">Squadra</label>
+            <select class="form-select" id="team" formControlName="team">
+              <option *ngFor="let team of teams" [value]="team.id">{{ team.name }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-sm-6 mb-3">
+          <div class="form-group">
+            <label for="shirt" id="shirt" class="form-label">Taglia magilietta</label>
+            <select class="form-select" id="shirt" formControlName="shirt">
+              <option *ngFor="let shirt of shirts" [value]="shirt.id">{{ shirt.size }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-12 mb-3">
+          <div class="form-group">
+            <label for="parentNotes" class="form-label">Note dei genitori</label>
+            <textarea class="form-control" name="parentNotes" id="parentNotes" formControlName="parentNotes"></textarea>
+          </div>
+        </div>
+
+        <div class="col-12 mb-3">
+          <div class="form-group">
+            <label for="managerNotes" class="form-label">Note del gestore</label>
+            <textarea class="form-control" name="managerNotes" id="managerNotes"
+              formControlName="managerNotes"></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Weeks Info -->
+  <div class="card">
+    <div class="card-header d-flex">
+      <h4 class="fw-bold mb-1">Settimane</h4>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Data di inizio</th>
+            <th scope="col">Data di fine</th>
+            <th scope="col" class="text-center">Iscritto</th>
+            <th scope="col" class="text-center">Stato pagamento</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let week of weeks; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ getDate(week.start) }}</td>
+            <td>{{ getDate(week.end) }}</td>
+            <td class="text-center">
+              <input type="checkbox" [value]="week.enrolled" [(ngModel)]="week.enrolled" (change)="emitWeeks()">
+            </td>
+            <td class="text-center">
+              <input type="checkbox" [value]="week.payed" [(ngModel)]="week.payed" [disabled]="!week.enrolled"
+                [checked]="week.enrolled && week.payed" (change)="emitWeeks()">
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

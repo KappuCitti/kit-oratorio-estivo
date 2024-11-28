@@ -1,0 +1,1 @@
+docker-compose --env-file ./src/server/config/.env --env-file ./src/database/.env up -d --build

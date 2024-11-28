@@ -1,0 +1,127 @@
+<app-navbar></app-navbar>
+
+<div class="container">
+  <div class="row">
+    <h1 class="display-5 pt-3">Punteggi</h1>
+    <div class="pt-3 d-flex">
+      <h3>Classifica</h3>
+    </div>
+
+    <app-leaderboard-ranks></app-leaderboard-ranks>
+
+    <div class="pt-3 d-flex">
+      <h3>Utimi punteggi aggiunti</h3>
+      <h3 class="ms-auto"><a title="Aggiungi"><i class="bi bi-plus-lg" (click)="setScore(null); setType('add')"
+            data-bs-toggle="modal" data-bs-target="#scoreModal"></i></a>
+      </h3>
+    </div>
+
+    <div class="col-12">
+      <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Squadra</th>
+            <th scope="col">Punteggio</th>
+            <th scope="col">Data</th>
+            <th scope="col">Motivo</th>
+            <th scope="col">Utente</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody *ngIf="scores.length > 0">
+          <tr *ngFor="let score of scores">
+            <td>{{score.team.name}}</td>
+            <td>{{score.points}}</td>
+            <td>{{score.date | date: 'dd/MM/yyyy'}}</td>
+            <td>{{score.reason}}</td>
+            <td>{{score.user?.name || '-'}}</td>
+            <td class="text-end">
+              <h4>
+                <a class="ms-1" title="Modifica" (click)="setScore(score); setType('edit')" data-bs-toggle="modal"
+                  data-bs-target="#scoreModal"><i class="bi bi-pencil-square text-secondary"></i></a>
+                <a class="ms-1 text-danger" title="Elimina" (click)="setScore(score); setType('delete')"
+                  data-bs-toggle="modal" data-bs-target="#scoreModal"><i class="bi bi-file-earmark-x"></i></a>
+              </h4>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <app-loading *ngIf="loading" class="p-5"></app-loading>
+      <p class="text-muted text-center" *ngIf="scores.length == 0 && !loading">Nessun punteggio trovato</p>
+
+      <app-pagination [elements]="total" (pageChange)="onPageChange($event)" (sizeChange)="onSizeChange($event)"
+        class="pt-3" *ngIf="scores.length > 0"></app-pagination>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="scoreModal" tabindex="-1" aria-labelledby="scoreModalLabel" aria-hidden="true"
+  data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="scoreModalLabel">
+          {{ selectedType === 'edit' ? 'Modifica Punteggio' : 'Aggiungi Punteggio' }}
+        </h5>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="scoreForm" class="row" *ngIf="selectedType !== 'delete'">
+          <!-- Squadra -->
+          <div class="mb-3 col-md-4 col-12" *ngIf="teams.length > 0">
+            <div class="form-group">
+              <label for="team" class="form-label form-required">Squadra</label>
+              <select id="team" class="form-select" formControlName="teamId" required>
+                <option *ngFor="let team of teams" [value]="team.id" [selected]="selectedScore?.team?.id === team.id" [ngValue]="team.id">
+                  {{ team.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Punteggio -->
+          <div class="mb-3 col-md-4 col-12">
+            <div class="form-group">
+              <label for="points" class="form-label form-required">Punteggio</label>
+              <input type="number" id="points" class="form-control" formControlName="points"
+                placeholder="Inserisci il punteggio" required />
+            </div>
+          </div>
+
+          <!-- Data -->
+          <div class="mb-3 col-md-4 col-12">
+            <div class="form-group">
+              <label for="date" class="form-label form-required">Data</label>
+              <input type="date" id="date" class="form-control" formControlName="date" required />
+            </div>
+          </div>
+
+          <!-- Motivo -->
+          <div class="mb-3 col-12">
+            <div class="form-group">
+              <label for="reason" class="form-label">Motivo</label>
+              <textarea id="reason" class="form-control" formControlName="reason" rows="3"
+                placeholder="Inserisci il motivo"></textarea>
+            </div>
+          </div>
+        </form>
+        <p *ngIf="!selectedScore && selectedType === 'delete'">Sei sicuro di voler eliminare questo punteggio?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="onCancel()">
+          Annulla
+        </button>
+        <button type="button" class="btn" data-bs-dismiss="modal" (click)="onSubmit()"
+          [ngClass]="selectedType === 'delete' ? 'btn-danger' : 'btn-success'"
+          [disabled]="selectedType !== 'delete' && !scoreForm.valid">
+          {{ selectedType === 'delete' ? 'Elimina' : selectedType === 'edit' ? 'Aggiorna' : 'Aggiungi' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<app-footer></app-footer>

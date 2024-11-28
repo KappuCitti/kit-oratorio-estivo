@@ -1,0 +1,106 @@
+<app-navbar></app-navbar>
+
+<div class="container">
+  <div class="row">
+    <h1 class="display-5 pt-3">Squadre</h1>
+
+    <!-- Display each team next to the other with a colored bar on the left -->
+    <div class="pt-3">
+      <div class="row row-cols-1 row-cols-md-4">
+        <div class="col" *ngFor="let team of teams">
+          <div class="card mb-4 rounded-3 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+              <!-- Colored bar on the left side -->
+              <div class="color-bar me-2" [ngStyle]="{'background-color': team.color}"></div>
+
+              <!-- Team name -->
+              <h5 class="m-0">{{ team.name }}</h5>
+
+              <h4 class="ms-auto"><i class="bi bi-pencil-square text-secondary" data-bs-toggle="modal"
+                  data-bs-target="#saveTeamModal" (click)="selectTeam(team)"></i></h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pt-3 d-flex">
+      <button title="Crea team" data-bs-toggle="modal" data-bs-target="#saveTeamModal"
+        class="btn btn-outline-secondary ms-auto" (click)="selectTeam(null)">Crea squadra</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal eidt or create team-->
+<div class="modal fade" id="saveTeamModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="saveTeamModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="saveTeamModalLabel">{{selectedTeam ? 'Modifica squadra' : 'Crea squadra'}}</h1>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="viewTeamForm">
+          <div class="mb-3">
+            <div class="mb-3">
+              <div class="form-group">
+                <label for="name" class="form-label form-required">Nome</label>
+                <input type="text" class="form-control" name="name" id="name" formControlName="name"
+                  placeholder="Nome della squadra">
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="form-group">
+                <label for="color" class="form-label form-required">Colore</label>
+                <input type="color" id="color" class="form-control" name="color" formControlName="color" format="hex">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" *ngIf="selectedTeam"
+          data-bs-toggle="modal" data-bs-target="#deleteTeamModal">Elimina</button>
+        <button type="button" class="btn btn-outline-secondary ms-auto" data-bs-dismiss="modal"
+          (click)="viewTeamForm.reset()">Annulla</button>
+        <button type="button" class="btn btn-success" (click)="saveTeam()" data-bs-dismiss="modal"
+          [disabled]="!viewTeamForm.valid">Salva</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal confirm delete team -->
+<div class="modal fade" id="deleteTeamModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="deleteTeamModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="deleteTeamModalLabel">Elimina squadra</h1>
+      </div>
+      <div class="modal-body">
+        <p class="mb-3"> Stai per eliminare la squadra <b>{{selectedTeam?.name}}</b></p>
+
+        <form [formGroup]="confirmDeleteTeamFrom">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" name="confirm" id="confirm" formControlName="confirm"
+              [value]="deleteTeamCheck" (change)="updateDeleteTeamCheck()" required
+              [ngClass]="{'is-invalid': confirmDeleteTeamFrom.get('confirm')?.invalid && confirmDeleteTeamFrom.get('confirm')?.touched}">
+            <label class="form-check-label form-required" for="confirm">Conferma</label>
+            <div id="confirmHelp" class="form-text">Con questa opzione confermi di voler eliminare la squadra e
+              <b>rimuovere tutti i membri da essa</b>!
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+          (click)="confirmDeleteTeamFrom.reset()">Annulla</button>
+        <button type="button" class="btn btn-danger" (click)="deleteTeam()" data-bs-dismiss="modal"
+          [disabled]="!confirmDeleteTeamFrom.valid">Elimina</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>
