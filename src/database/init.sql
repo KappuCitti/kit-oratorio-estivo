@@ -15,12 +15,14 @@ DROP TABLE IF EXISTS EnrollmentWeeks;
 DROP TABLE IF EXISTS Membership;
 DROP TABLE IF EXISTS Ranking;
 DROP TABLE IF EXISTS Session;
-DROP TABLE IF EXISTS Attendance_Details;
+DROP TABLE IF EXISTS ExtraordinaryAttendance;
 DROP TABLE IF EXISTS Attendance;
+DROP TABLE IF EXISTS Trip;
+DROP TABLE IF EXISTS TripEnrollment;
 DROP TABLE IF EXISTS Enrollment;
 DROP TABLE IF EXISTS Week;
 DROP TABLE IF EXISTS Team;
-DROP TABLE IF EXISTS Child_Parent;
+DROP TABLE IF EXISTS ChildParent;
 DROP TABLE IF EXISTS Child;
 DROP TABLE IF EXISTS Parent;
 DROP TABLE IF EXISTS Address;
@@ -74,16 +76,16 @@ CREATE TABLE UserRole (
 CREATE TABLE Session (
     Token VARCHAR(36) PRIMARY KEY,  -- Cookie
     Expires DATETIME NOT NULL,
-    UserID INT,                       -- UserID
+    UserID INT NOT NULL,                       -- UserID
     FOREIGN KEY (UserID) REFERENCES User(ID) ON DELETE CASCADE
 );
 
 CREATE TABLE Address (
   ID INT AUTO_INCREMENT PRIMARY KEY,
-  Street VARCHAR(255),
-  City VARCHAR(255),
-  PostalCode VARCHAR(20),
-  Country VARCHAR(100)
+  Street VARCHAR(255) NOT NULL,
+  City VARCHAR(255) NOT NULL,
+  PostalCode VARCHAR(20) NOT NULL,
+  Country VARCHAR(100) NOT NULL
 );
 
 -- Creazione della tabella Parent (Genitori)
@@ -93,7 +95,7 @@ CREATE TABLE Parent (
 	Surname VARCHAR(255) NOT NULL,
     Gender ENUM('M', 'F', 'Other') NOT NULL,
 	Email VARCHAR(255),
-	PhoneNumber VARCHAR(20)
+	PhoneNumber VARCHAR(20) NOT NULL
 );
 
 -- Creazione della tabella Child (Ragazzi)
@@ -102,13 +104,13 @@ CREATE TABLE Child (
 	Name VARCHAR(255) NOT NULL,
 	Surname VARCHAR(255) NOT NULL,
     Gender ENUM('M', 'F', 'Other') NOT NULL,
-	BirthDate DATE,
-	BirthPlace VARCHAR(255),
-	AddressID INT NOT NULL, -- Optional address specific to the child
+	BirthDate DATE NOT NULL,
+	BirthPlace VARCHAR(255) NOT NULL,
+	AddressID INT NOT NULL, -- NOT Optional address specific to the child
 	FOREIGN KEY (AddressID) REFERENCES Address(ID) -- Linking Address table
 );
 
-CREATE TABLE Child_Parent (
+CREATE TABLE ChildParent (
   ChildID INT,
   ParentID INT,
   PRIMARY KEY (ChildID, ParentID),
@@ -134,12 +136,12 @@ CREATE TABLE ShirtSize (
 -- Creazione della tabella Enrollment (Iscrizione)
 CREATE TABLE Enrollment (
     ID INT AUTO_INCREMENT PRIMARY KEY,
-    ChildID INT,    -- Ragazzo
+    ChildID INT NOT NULL,    -- Ragazzo
     
     TeamID INT,
     ShirtSizeID INT, -- Taglia della maglietta
     
-    DataProcessingConsent BOOLEAN NOT NULL, -- Autorizzazione al trattamento dei dati
+    DataProcessingConsent BOOLEAN NOT NULL DEFAULT TRUE, -- Autorizzazione al trattamento dei dati
     ExitAuthorization BOOLEAN NOT NULL,     -- Autorizzazione alle uscite
     
     SchoolType ENUM('Primary', 'Secondary') NOT NULL, -- Tipo scuola effettuata (Primario di primo, secondario di secondo)
@@ -147,14 +149,14 @@ CREATE TABLE Enrollment (
     Section CHAR(1) NOT NULL,   -- Sezione
     
 	Year INT NOT NULL,
-    Timestamp DATETIME NOT NULL,
+    DateOfEnrollment DATETIME NOT NULL,
     
-	ParentNotes TEXT,    -- Note inserite dal genitore
-    ManagerNotes TEXT,   -- Note inserite dal gestore
+	ParentNotes TEXT DEFAULT "",    -- Note inserite dal genitore
+    ManagerNotes TEXT DEFAULT "",   -- Note inserite dal gestore
     
     FOREIGN KEY (ChildID) REFERENCES Child(ID) ON DELETE CASCADE,
     FOREIGN KEY (TeamID) REFERENCES Team(ID) ON DELETE SET NULL,
-    FOREIGN KEY (ShirtSizeID) REFERENCES ShirtSize(ID)
+    FOREIGN KEY (ShirtSizeID) REFERENCES ShirtSize(ID) ON DELETE SET NULL
 );
 
 CREATE TABLE Week (
@@ -177,31 +179,59 @@ CREATE TABLE Attendance (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     EnrollmentID INT NOT NULL, -- Riferimento all'iscrizione
     Date DATE NOT NULL, -- Data della presenza
-    Present BOOLEAN DEFAULT FALSE, -- Se il ragazzo è 
-    EatsAtOratory BOOLEAN DEFAULT TRUE, -- Se mangia in oratorio (default True)
-    EatsInBianco BOOLEAN, -- Se mangia "in bianco"
+    Present BOOLEAN NOT NULL DEFAULT FALSE, -- Se il ragazzo è 
+    EatsAtOratory BOOLEAN NOT NULL DEFAULT FALSE, -- Se mangia in oratorio (default True)
+    EatsInBianco BOOLEAN NOT NULL DEFAULT FALSE, -- Se mangia "in bianco"
     FOREIGN KEY (EnrollmentID) REFERENCES Enrollment(ID)
 );
 
-CREATE TABLE Attendance_Details (
+CREATE TABLE ExtraordinaryAttendance (
     ID INT AUTO_INCREMENT PRIMARY KEY, -- ID univoco per i dettagli della presenza
     ChildID INT NOT NULL,
     Type ENUM('Join', 'Left') NOT NULL,
     Time DATETIME NOT NULL,
-    Notes VARCHAR(255) DEFAULT NULL, -- Eventuali note riguardanti la presenza
+    Notes VARCHAR(255) DEFAULT "", -- Eventuali note riguardanti la presenza
     FOREIGN KEY (ChildID) REFERENCES Child(ID)
 );
 
 -- Creazione della tabella Ranking (Classifica)
-CREATE TABLE Ranking (
+CREATE TABLE Point (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     TeamID INT NOT NULL,             -- ID della squadra
     Date DATE NOT NULL,              -- Data della classifica
-    Points INT NOT NULL,              -- Punteggio della squadra
+    Quantity INT NOT NULL,              -- Punteggio della squadra
     Reason TEXT,    -- Motivo del punteggio
     UserID INT DEFAULT NULL,         -- ID dello staff, permette NULL per ON DELETE SET NULL
     FOREIGN KEY (TeamID) REFERENCES Team(ID) ON DELETE CASCADE,
     FOREIGN KEY (UserID) REFERENCES User(ID) ON DELETE SET NULL
+);
+
+CREATE TABLE UserAction (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+	UserID INT NOT NULL,
+	Description TEXT NOT NULL,
+	Type ENUM('CREATE', 'UPDATE', 'DELETE') NOT NULL,
+	Date DATE NOT NULL, 
+	FOREIGN KEY (UserID) REFERENCES User(ID) ON DELETE SET NULL
+);
+
+CREATE TABLE Trip (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+	Title VARCHAR(255) NOT NULL,
+	Description TEXT DEFAULT "",
+	Place VARCHAR(255) NOT NULL,
+	Url TEXT DEFAULT NULL,
+	Date DATE NOT NULL,
+	Price DECIMAL(10, 2) DEFAULT 0
+);
+
+CREATE TABLE TripEnrollment (
+	ID INT AUTO_INCREMENT PRIMARY KEY,
+	EnrollmentID INT NOT NULL,
+	IsPaid BOOLEAN NOT NULL DEFAULT FALSE,
+    TripID INT DEFAULT NULL,
+    FOREIGN KEY (EnrollmentID) REFERENCES Enrollment(ID) ON DELETE CASCADE,
+    FOREIGN KEY (TripID) REFERENCES Trip(ID) ON DELETE CASCADE
 );
 
 
@@ -226,9 +256,9 @@ VALUES
     ('Blu', '#0d6efd'),     -- Blu
     ('Verde', '#198754');   -- Verde
 
--- Crea un utente admin con username "admin" e password "admin" (in chiaro per il momento)
+-- Crea un utente admin con username "admin" e password "admin1234" (in chiaro per il momento)
 INSERT INTO User (Name, Surname, Password)
-VALUES ('Admin', 'User', 'ac9689e2272427085e35b9d3e3e8bed88cb3434828b43b86fc0596cad4c6e270'); -- admin
+VALUES ('Admin', 'User', 'ac9689e2272427085e35b9d3e3e8bed88cb3434828b43b86fc0596cad4c6e270'); -- admin1234
 
 -- T-Shirt Sizes
 INSERT INTO ShirtSize (SizeName, Width, Height, IsAvailable)
