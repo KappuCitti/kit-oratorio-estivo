@@ -1,0 +1,14 @@
+[server]
+port = 3000
+host = '0.0.0.0'
+routes_prefix = '/api/v1'
+
+[logs]
+log_level = 'debug'
+log_folder = 'logs'
+
+[database]
+# For database credential use environment variables: MYSQL_HOST, MYSQL_PORT, MYSQL_DATABASE, MYSQL_USER, MYSQL_PASSWORD
+wait_for_connections = true
+connection_limit = 10
+queue_limit = 3

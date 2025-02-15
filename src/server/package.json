@@ -5,7 +5,9 @@
   "version": "0.0.1",
   "description": "Server API per la comunicazione tra l'interfaccia web ed il database: raccolta iscrizioni, gestione presenze, giochi interattivi e punteggi squadre.",
   "scripts": {
-    "start": "bun ."
+    "start": "bun .",
+    "dev": "bun run --hot .",
+    "update-permissions": "bun run scripts/createPermissionFile.ts"
   },
   "keywords": [
     "oratorio",
@@ -20,5 +22,17 @@
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@hono/zod-openapi": "^0.18.4",
+    "@scalar/hono-api-reference": "^0.5.173",
+    "dotenv": "^16.4.7",
+    "hono": "^4.7.1",
+    "hono-pino": "^0.7.2",
+    "mysql2": "^3.12.0",
+    "pino": "^9.6.0",
+    "pino-pretty": "^13.0.0",
+    "toml": "^3.0.0",
+    "zod": "^3.24.2"
   }
 }
