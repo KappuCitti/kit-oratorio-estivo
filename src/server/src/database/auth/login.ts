@@ -1,17 +1,39 @@
-import { execute, query } from '..';
-import { createSuccessResult } from '@/utils/createResult';
+import { db } from '@/database';
+import { createErrorResult, createSuccessResult } from '@/utils/createResult';
+import { sessionTable, usersTable } from '../schema';
+import { sql } from 'drizzle-orm';
+import strftime from 'strftime';
 
 export async function login(username: string, password: string) {
-  const userRes = await query<{
-    id: number;
-    password: string;
-  }>`SELECT ID as id, Password as password FROM User WHERE CONCAT(Surname, ".", Name) = ${username}`;
-  if (!userRes.success) return userRes;
-  const user = userRes.data[0];
-  const isSame = await Bun.password.verify(password, user.password);
-  if (!isSame) return createSuccessResult(null);
-  const uuid = crypto.randomUUID();
-  const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-  await execute`INSERT INTO Session (Token, Expires, UserID) VALUES (${uuid}, ${expires}, ${user.id})`;
-  return createSuccessResult(uuid);
+  try {
+    const [user] = await db
+      .select({
+        id: usersTable.id,
+        password: usersTable.password,
+      })
+      .from(usersTable)
+      .where(
+        sql`CONCAT(${usersTable.surname}, '.', ${
+          usersTable.name
+        }) = ${username.toLowerCase()}`
+      );
+    if (!user) return createSuccessResult(null);
+    const isSame = await Bun.password.verify(password, user.password);
+    if (!isSame) return createSuccessResult(null);
+    const expires = strftime(
+      '%Y-%m-%d %H:%M:%S',
+      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    );
+    const [session] = await db
+      .insert(sessionTable)
+      .values({
+        expires,
+        userId: user.id,
+      })
+      .$returningId();
+    return createSuccessResult(session.token);
+  } catch (e) {
+    console.error(e);
+    return createErrorResult('Internal server error');
+  }
 }
