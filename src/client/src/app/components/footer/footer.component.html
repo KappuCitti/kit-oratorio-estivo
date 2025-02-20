@@ -1,0 +1,56 @@
+<!-- Footer -->
+<footer class="bg-auto py-8 pt-10 w-full -z-10">
+  <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+    <!-- Quick Links -->
+    <div>
+      <h5 class="mb-3">Link Rapidi</h5>
+      <ul class="space-y-2">
+        <li><a routerLink="/">Home</a></li>
+        <li>
+          <a routerLink="/admin/dashboard">Dashboard</a>
+        </li>
+        <li>
+          <a routerLink="/admin/my">Il mio profilo</a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- About Section -->
+    <div>
+      <h5 class="mb-3">Chi Siamo</h5>
+      <p>
+        Il nostro progetto nasce per supportare le attività comunitarie,
+        fornendo strumenti per la gestione di iscrizioni, squadre, presenze, e
+        molto altro. Creiamo esperienze uniche per gli oratori estivi.
+      </p>
+    </div>
+
+    <!-- Social Media Links -->
+    <div>
+      <h5 class="mb-3">
+        <a
+          href="https://github.com/kappucitti/kit-oratorio-estivo"
+          target="_blank"
+          class="text-primary"
+          ><fa-icon [icon]="faGithub" class="pr-2 text-xl"></fa-icon>
+          <span>Contribuisci</span>
+        </a>
+      </h5>
+      <p>
+        Vuoi contribuire al progetto o hai domande? Contattaci e unisciti alla
+        nostra missione per rendere le comunità più connesse e organizzate.
+      </p>
+    </div>
+  </div>
+
+  <hr class="mt-6" />
+
+  <!-- Copyright and Credits -->
+  <div class="text-center mt-4 text-disabled text-sm">
+    <p>
+      Progetto realizzato con
+      <fa-icon [icon]="faHeart" class="text-red-500 px-1"></fa-icon> da
+      <a href="https://github.com/kappucitti" target="_blank">Kappu</a>
+    </p>
+  </div>
+</footer>

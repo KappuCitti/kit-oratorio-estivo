@@ -1,0 +1,90 @@
+<app-navbar></app-navbar>
+<div class="container min-h-4/5 flex flex-col justify-center items-center px-6">
+  <div class="max-w-3xl w-full bg-auto p-6 rounded-lg shadow-lg">
+    <h1 class="text-4xl font-bold mb-6 text-center">Ciao {{ user.name }}!</h1>
+
+    <p class="text-lg font-semibold mb-2">Visualizza dati personali</p>
+
+    <form [formGroup]="dataForm">
+      <div class="flex flex-wrap -mx-2">
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block">Cognome</label>
+          <input type="text" class="w-full" formControlName="surname" />
+        </div>
+
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block">Nome</label>
+          <input type="text" class="w-full" formControlName="name" />
+        </div>
+
+        <div class="mb-4 sm:w-3/5 md:w-4/5 w-full px-2">
+          <label class="block">Email</label>
+          <input type="email" class="w-full" formControlName="email" />
+        </div>
+
+        <div class="mb-4 sm:w-2/5 md:w-1/5 w-full px-2">
+          <label class="block">Tema</label>
+          <select
+            class="w-full"
+            formControlName="theme"
+            (change)="onChangeTheme()"
+          >
+            <option value="Dark">Scuro</option>
+            <option value="Light">Chiaro</option>
+            <option value="System">Sistema</option>
+          </select>
+        </div>
+      </div>
+    </form>
+
+    <details class="w-full mt-4" [open]="isPasswordFieldOpened()">
+      <summary class="cursor-pointer text-lg font-semibold rounded">
+        Modifica password
+      </summary>
+
+      <form [formGroup]="passwordForm" (ngSubmit)="onSubmit()">
+        <div class="flex flex-wrap -mx-2">
+          <div class="mb-4 sm:w-1/2 w-full px-2">
+            <label class="block">Nuova password</label>
+            <input
+              type="password"
+              class="w-full"
+              formControlName="confirmPasswordOne"
+            />
+          </div>
+          <div class="mb-4 sm:w-1/2 w-full px-2">
+            <label class="block">Conferma nuova password</label>
+            <input
+              type="password"
+              class="w-full"
+              formControlName="confirmPasswordTwo"
+            />
+          </div>
+          <div class="mb-4 lg:w-1/2 w-full px-2">
+            <label class="block">Vecchia password</label>
+            <input type="password" class="w-full" formControlName="password" />
+          </div>
+          <div class="flex justify-center items-end mb-4 lg:w-1/2 w-full px-2">
+            <div class="flex w-full space-x-4">
+              <button
+                type="submit"
+                class="button-primary flex-1"
+                [disabled]="!isPasswordFormValid()"
+              >
+                Salva Modifiche
+              </button>
+              <button
+                class="button-secondary flex-1"
+                (click)="onResetPasswordForm()"
+                [disabled]="isPasswordFormEmpty()"
+              >
+                Annulla
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </details>
+  </div>
+</div>
+<app-footer></app-footer>

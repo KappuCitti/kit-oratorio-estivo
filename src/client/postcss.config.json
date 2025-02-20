@@ -1,0 +1,7 @@
+{
+  "darkMode": "class",
+  "plugins": {
+    "@tailwindcss/postcss": {},
+    "autoprefixer": {}
+  }
+}

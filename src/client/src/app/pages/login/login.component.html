@@ -1,0 +1,40 @@
+<div class="min-h-screen flex flex-col justify-center items-center px-6">
+  <div class="bg-auto p-8 rounded-lg shadow-lg w-full max-w-md">
+    <h1 class="mb-6 text-center">Accedi</h1>
+    <form [formGroup]="form" (ngSubmit)="login()">
+      <div class="mb-4">
+        <label for="username">Username o Email</label>
+        <input
+          type="text"
+          id="username"
+          class="w-full"
+          placeholder="Inserisci il tuo username o email"
+          formControlName="username"
+        />
+      </div>
+      <div class="mb-4">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          class="w-full"
+          placeholder="Inserisci la tua password"
+          formControlName="password"
+        />
+      </div>
+      <button
+        type="submit"
+        class="w-full button-primary transition"
+        [disabled]="!form.valid"
+      >
+        Accedi
+      </button>
+    </form>
+  </div>
+  <a
+    routerLink="/"
+    class="fixed top-4 left-4 button-secondary rounded-full shadow-lg transition"
+  >
+    <fa-icon [icon]="faArrowLeft"></fa-icon> Torna alla home
+  </a>
+</div>

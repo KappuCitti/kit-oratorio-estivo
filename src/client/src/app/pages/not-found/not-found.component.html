@@ -1,0 +1,22 @@
+<div
+  class="min-h-screen flex flex-col justify-center items-center px-6"
+  data-theme="dark"
+>
+  <div class="max-w-3xl text-center">
+    <h1 class="text-4xl font-bold mb-4">Pagina non trovata</h1>
+
+    <p class="text-lg mb-6">
+      Sembra che la pagina che stai cercando non esista o sia stata spostata.
+    </p>
+
+    <!-- Messaggio personalizzabile -->
+    <p class="text-lg text-secondary mb-6">
+      {{ message }}
+    </p>
+
+    <div class="flex justify-center space-x-4">
+      <a routerLink="/" class="button-primary"> Torna alla Home </a>
+      <a routerLink="/login" class="button-secondary"> Accedi come admin </a>
+    </div>
+  </div>
+</div>
