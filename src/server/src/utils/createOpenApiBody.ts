@@ -1,6 +1,9 @@
 import { z } from '@hono/zod-openapi';
 
-export function createJsonBody(schema: z.ZodTypeAny, description: string) {
+export function createJsonBody<T extends z.ZodTypeAny>(
+  schema: T,
+  description: string
+) {
   return {
     content: {
       'application/json': {
@@ -11,9 +14,24 @@ export function createJsonBody(schema: z.ZodTypeAny, description: string) {
   };
 }
 
-export function createJsonResBody(
+export function createRequiredJsonBody<T extends z.ZodTypeAny>(
+  schema: T,
+  description: string
+) {
+  return {
+    content: {
+      'application/json': {
+        schema,
+      },
+    },
+    description,
+    required: true,
+  };
+}
+
+export function createJsonResBody<T extends z.ZodTypeAny>(
   success: boolean,
-  data: z.ZodTypeAny,
+  data: T,
   description: string
 ) {
   const schema = success

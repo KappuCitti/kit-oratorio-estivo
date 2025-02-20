@@ -3,8 +3,9 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import serveEmojiFavicon from './emojiFavicon';
 import type { Bindings } from '@/models/app.model';
 import { configureOpenApi } from './openApi';
-import { routes } from '@/index.routes';
 import config from '@/config';
+import router from '@/router';
+import { cors } from 'hono/cors';
 
 export function createRouter() {
   return new OpenAPIHono<Bindings>({
@@ -39,9 +40,15 @@ export default function createApp() {
   });
 
   configureOpenApi(app);
-  routes.forEach((route) =>
-    app.route(config.routesPrefix + route.path, route.handler)
+  app.use(
+    config.routesPrefix + config.routesPrefix.endsWith('/') ? '*' : '/*',
+    cors({
+      origin: '*',
+      credentials: true,
+      allowHeaders: ['Content-Type', 'Authorization', 'Content-Length'],
+    })
   );
+  app.route(config.routesPrefix, router());
 
   return app;
 }

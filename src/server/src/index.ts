@@ -1,5 +1,6 @@
-import config from './config';
-import createApp from './utils/createApp';
+import config from '@/config';
+import createApp from '@/utils/createApp';
+import '@/globals';
 
 const app = createApp();
 
