@@ -10,254 +10,238 @@ DROP DATABASE IF EXISTS oratorio;
 CREATE DATABASE IF NOT EXISTS oratorio;
 USE oratorio;
 
--- Drop the tables in the correct order, starting from the most dependent tables
-
 SET FOREIGN_KEY_CHECKS = 0;
 
-DROP TABLE IF EXISTS EnrollmentWeeks;
-
-DROP TABLE IF EXISTS Membership;
-
-DROP TABLE IF EXISTS Ranking;
-
-DROP TABLE IF EXISTS Session;
-
-DROP TABLE IF EXISTS ExtraordinaryAttendance;
-
-DROP TABLE IF EXISTS Attendance;
-
-DROP TABLE IF EXISTS Trip;
-
-DROP TABLE IF EXISTS TripEnrollment;
-
-DROP TABLE IF EXISTS Enrollment;
-
-DROP TABLE IF EXISTS Week;
-
-DROP TABLE IF EXISTS Team;
-
-DROP TABLE IF EXISTS ChildParent;
-
-DROP TABLE IF EXISTS Child;
-
-DROP TABLE IF EXISTS ShirtSize;
-
-DROP TABLE IF EXISTS Parent;
-
-DROP TABLE IF EXISTS Address;
-
-DROP TABLE IF EXISTS UserRole;
-
-DROP TABLE IF EXISTS RolePermission;
-
-DROP TABLE IF EXISTS User;
-
-DROP TABLE IF EXISTS Role;
-
-DROP TABLE IF EXISTS Permission;
-
-DROP TABLE IF EXISTS Point;
-
-DROP TABLE IF EXISTS UserAction;
+DROP TABLE IF EXISTS 
+    `Address`,
+    `Attendance`,
+    `Child`,
+    `ChildParent`,
+    `Enrollment`,
+    `EnrollmentWeeks`,
+    `ExtraordinaryAttendance`,
+    `Parent`,
+    `Permission`,
+    `Point`,
+    `Role`,
+    `RolePermission`,
+    `Session`,
+    `ShirtSize`,
+    `Team`,
+    `Trip`,
+    `TripEnrollment`,
+    `User`,
+    `UserAction`,
+    `UserRole`,
+    `Week`;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
--- Creazione della tabella User (Utenti)
-CREATE TABLE User (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(100) NOT NULL, -- Nome
-    Surname VARCHAR(100) NOT NULL, -- Cognome
-    Email VARCHAR(255),
-    Theme ENUM('Dark', 'Light', 'System') DEFAULT 'System',
-    Password VARCHAR(255) NOT NULL
+CREATE TABLE `Address` (
+    `ID` int AUTO_INCREMENT NOT NULL,
+    `Street` varchar(255) NOT NULL,
+    `City` varchar(255) NOT NULL,
+    `PostalCode` varchar(20) NOT NULL,
+    `Country` varchar(100) NOT NULL,
+    CONSTRAINT `Address_ID` PRIMARY KEY(`ID`)
 );
 
--- Creazione della tabella Permission (Permessi)
-CREATE TABLE Role (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(50) NOT NULL UNIQUE,
-    Description TEXT
+CREATE TABLE `Attendance` (
+    `ID` int AUTO_INCREMENT NOT NULL,
+    `EnrollmentID` int NOT NULL,
+    `Date` date NOT NULL,
+    `Present` boolean NOT NULL DEFAULT false,
+    `EatsInOratory` boolean NOT NULL DEFAULT false,
+    `EatsPlain` boolean NOT NULL DEFAULT false,
+    CONSTRAINT `Attendance_ID` PRIMARY KEY(`ID`)
 );
 
-CREATE TABLE Permission (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(100) NOT NULL UNIQUE,
-    Description TEXT
+CREATE TABLE `ChildParent` (
+    `ChildID` int NOT NULL,
+    `ParentID` int NOT NULL,
+    CONSTRAINT `ChildParent_ChildID_ParentID_pk` PRIMARY KEY(`ChildID`,`ParentID`)
 );
 
-CREATE TABLE RolePermission (
-    RoleID INT NOT NULL,
-    PermissionID INT NOT NULL,
-    PRIMARY KEY (RoleID, PermissionID),
-    FOREIGN KEY (RoleID) REFERENCES Role (ID) ON DELETE CASCADE,
-    FOREIGN KEY (PermissionID) REFERENCES Permission (ID) ON DELETE CASCADE
+CREATE TABLE `Child` (
+    `ID` int AUTO_INCREMENT NOT NULL,
+    `Name` varchar(255) NOT NULL,
+    `Surname` varchar(255) NOT NULL,
+    `Gender` enum('M','F','Other') NOT NULL,
+    `BirthDate` varchar(255) NOT NULL,
+    `BirthPlace` varchar(255) NOT NULL,
+    `AddressID` int NOT NULL,
+    CONSTRAINT `Child_ID` PRIMARY KEY(`ID`)
 );
 
-CREATE TABLE UserRole (
-    UserID INT NOT NULL,
-    RoleID INT NOT NULL,
-    PRIMARY KEY (UserID, RoleID),
-    FOREIGN KEY (UserID) REFERENCES User (ID) ON DELETE CASCADE,
-    FOREIGN KEY (RoleID) REFERENCES Role (ID) ON DELETE CASCADE
+CREATE TABLE `Enrollment` (
+    `ID` int AUTO_INCREMENT NOT NULL,
+    `ChildID` int NOT NULL,
+    `TeamID` int,
+    `ShirtSizeID` int,
+    `DataProcessingConsent` boolean NOT NULL DEFAULT true,
+    `ExitAuthorization` boolean NOT NULL,
+    `SchoolType` enum('Primary','Secondary') NOT NULL,
+    `Class` enum('I','II','III','IV','V') NOT NULL,
+    `Section` char NOT NULL,
+    `Year` int NOT NULL,
+    `DateOfEnrollment` datetime NOT NULL,
+    `ParentNotes` text,
+    `ManagerNotes` text,
+    CONSTRAINT `Enrollment_ID` PRIMARY KEY(`ID`)
 );
 
--- Creazione della tabella Session (Sessioni)
-CREATE TABLE Session (
-    Token VARCHAR(36) PRIMARY KEY, -- Cookie
-    Expires DATETIME NOT NULL,
-    UserID INT NOT NULL, -- UserID
-    FOREIGN KEY (UserID) REFERENCES User (ID) ON DELETE CASCADE
+CREATE TABLE `EnrollmentWeeks` (
+    `EnrollmentID` int NOT NULL,
+    `WeekID` int NOT NULL,
+    `IsPaid` boolean NOT NULL DEFAULT false,
+    CONSTRAINT `EnrollmentWeeks_EnrollmentID_WeekID_pk` PRIMARY KEY(`EnrollmentID`,`WeekID`)
 );
 
-CREATE TABLE Address (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    Street VARCHAR(255) NOT NULL,
-    City VARCHAR(255) NOT NULL,
-    PostalCode VARCHAR(20) NOT NULL,
-    Country VARCHAR(100) NOT NULL
+CREATE TABLE `ExtraordinaryAttendance` (
+    `ID` int AUTO_INCREMENT NOT NULL,
+    `ChildID` int NOT NULL,
+    `Type` enum('Join','Left') NOT NULL,
+    `Time` datetime NOT NULL,
+    `Notes` varchar(255) NOT NULL DEFAULT '',
+    CONSTRAINT `ExtraordinaryAttendance_ID` PRIMARY KEY(`ID`)
 );
 
--- Creazione della tabella Parent (Genitori)
-CREATE TABLE Parent (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(255) NOT NULL,
-    Surname VARCHAR(255) NOT NULL,
-    Gender ENUM('M', 'F', 'Other') NOT NULL,
-    Email VARCHAR(255),
-    PhoneNumber VARCHAR(20) NOT NULL
+CREATE TABLE `Parent` (
+    `ID` int AUTO_INCREMENT NOT NULL,
+    `Name` varchar(255) NOT NULL,
+    `Surname` varchar(255) NOT NULL,
+    `Gender` enum('M','F','Other') NOT NULL,
+    `Email` varchar(255),
+    `PhoneNumber` varchar(20) NOT NULL,
+    CONSTRAINT `Parent_ID` PRIMARY KEY(`ID`)
 );
 
--- Creazione della tabella Child (Ragazzi)
-CREATE TABLE Child (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(255) NOT NULL,
-    Surname VARCHAR(255) NOT NULL,
-    Gender ENUM('M', 'F', 'Other') NOT NULL,
-    BirthDate DATE NOT NULL,
-    BirthPlace VARCHAR(255) NOT NULL,
-    AddressID INT NOT NULL, -- NOT Optional address specific to the child
-    FOREIGN KEY (AddressID) REFERENCES Address (ID) -- Linking Address table
+CREATE TABLE `Permission` (
+    `ID` int AUTO_INCREMENT NOT NULL,
+    `Name` varchar(100) NOT NULL,
+    `Description` text,
+    CONSTRAINT `Permission_ID` PRIMARY KEY(`ID`),
+    CONSTRAINT `Permission_Name_unique` UNIQUE(`Name`)
 );
 
-CREATE TABLE ChildParent (
-    ChildID INT,
-    ParentID INT,
-    PRIMARY KEY (ChildID, ParentID),
-    FOREIGN KEY (ChildID) REFERENCES Child (ID) ON DELETE CASCADE,
-    FOREIGN KEY (ParentID) REFERENCES Parent (ID) ON DELETE CASCADE
+CREATE TABLE `Point` (
+    `ID` int AUTO_INCREMENT NOT NULL,
+    `TeamID` int NOT NULL,
+    `Date` date NOT NULL,
+    `Quantity` int NOT NULL,
+    `Reason` varchar(255),
+    `UserID` int,
+    CONSTRAINT `Point_ID` PRIMARY KEY(`ID`)
 );
 
--- Creazione della tabella Team (Squadre)
-CREATE TABLE Team (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(40) NOT NULL, -- Nome squadra
-    Color VARCHAR(7) NOT NULL -- Colore in formato HEX (ad es. #FF0000 per Rosso)
+CREATE TABLE `RolePermission` (
+    `RoleID` int NOT NULL,
+    `PermissionID` int NOT NULL,
+    CONSTRAINT `RolePermission_RoleID_PermissionID_pk` PRIMARY KEY(`RoleID`,`PermissionID`)
 );
 
-CREATE TABLE ShirtSize (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    SizeName VARCHAR(50) NOT NULL, -- Nome della taglia (es: Small, Medium, Large)
-    Width DECIMAL(5, 2) NOT NULL, -- Larghezza della maglietta in cm
-    Height DECIMAL(5, 2) NOT NULL, -- Altezza della maglietta in cm
-    IsAvailable BOOLEAN NOT NULL DEFAULT TRUE -- Disponibilità della taglia
+CREATE TABLE `Role` (
+    `ID` int AUTO_INCREMENT NOT NULL,
+    `Name` varchar(50) NOT NULL,
+    `Description` text,
+    CONSTRAINT `Role_ID` PRIMARY KEY(`ID`),
+    CONSTRAINT `Role_Name_unique` UNIQUE(`Name`)
 );
 
--- Creazione della tabella Enrollment (Iscrizione)
-CREATE TABLE Enrollment (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    ChildID INT NOT NULL, -- Ragazzo
-    TeamID INT,
-    ShirtSizeID INT, -- Taglia della maglietta
-    DataProcessingConsent BOOLEAN NOT NULL DEFAULT TRUE, -- Autorizzazione al trattamento dei dati
-    ExitAuthorization BOOLEAN NOT NULL, -- Autorizzazione alle uscite
-    SchoolType ENUM('Primary', 'Secondary') NOT NULL, -- Tipo scuola effettuata (Primario di primo, secondario di secondo)
-    Class ENUM('I', 'II', 'III', 'IV', 'V') NOT NULL, -- Classe (I, II, III, IV, V)
-    Section CHAR(1) NOT NULL, -- Sezione
-    Year INT NOT NULL,
-    DateOfEnrollment DATETIME NOT NULL,
-    ParentNotes TEXT, -- Note inserite dal genitore
-    ManagerNotes TEXT, -- Note inserite dal gestore
-    FOREIGN KEY (ChildID) REFERENCES Child (ID) ON DELETE CASCADE,
-    FOREIGN KEY (TeamID) REFERENCES Team (ID) ON DELETE SET NULL,
-    FOREIGN KEY (ShirtSizeID) REFERENCES ShirtSize (ID) ON DELETE SET NULL
+CREATE TABLE `Session` (
+    `Token` varchar(36) NOT NULL,
+    `Expires` varchar(255) NOT NULL,
+    `UserID` int NOT NULL,
+    CONSTRAINT `Session_Token` PRIMARY KEY(`Token`)
 );
 
-CREATE TABLE Week(
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    StartDate DATE NOT NULL,
-    EndDate DATE NOT NULL,
-    Price DECIMAL(10, 2) NOT NULL
+CREATE TABLE `ShirtSize` (
+    `ID` int AUTO_INCREMENT NOT NULL,
+    `SizeName` varchar(50) NOT NULL,
+    `Width` decimal(5,2) NOT NULL,
+    `Height` decimal(5,2) NOT NULL,
+    `IsAvailable` boolean NOT NULL DEFAULT true,
+    CONSTRAINT `ShirtSize_ID` PRIMARY KEY(`ID`)
 );
 
-CREATE TABLE EnrollmentWeeks (
-    EnrollmentID INT NOT NULL,
-    WeekID INT NOT NULL,
-    IsPaid BOOLEAN DEFAULT FALSE,
-    PRIMARY KEY (EnrollmentID, WeekID),
-    FOREIGN KEY (EnrollmentID) REFERENCES Enrollment (ID) ON DELETE CASCADE,
-    FOREIGN KEY (WeekID) REFERENCES Week(ID) ON DELETE CASCADE
+CREATE TABLE `Team` (
+    `ID` int AUTO_INCREMENT NOT NULL,
+    `Name` varchar(40) NOT NULL,
+    `Color` varchar(7) NOT NULL,
+    CONSTRAINT `Team_ID` PRIMARY KEY(`ID`)
 );
 
-CREATE TABLE Attendance (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    EnrollmentID INT NOT NULL, -- Riferimento all'iscrizione
-    Date DATE NOT NULL, -- Data della presenza
-    Present BOOLEAN NOT NULL DEFAULT FALSE, -- Se il ragazzo è 
-    EatsAtOratory BOOLEAN NOT NULL DEFAULT FALSE, -- Se mangia in oratorio (default True)
-    EatsInBianco BOOLEAN NOT NULL DEFAULT FALSE, -- Se mangia "in bianco"
-    FOREIGN KEY (EnrollmentID) REFERENCES Enrollment (ID)
+CREATE TABLE `TripEnrollment` (
+    `EnrollmentID` int NOT NULL,
+    `TripID` int NOT NULL,
+    `IsPaid` boolean NOT NULL DEFAULT false,
+    CONSTRAINT `TripEnrollment_EnrollmentID_TripID_pk` PRIMARY KEY(`EnrollmentID`,`TripID`)
 );
 
-CREATE TABLE ExtraordinaryAttendance (
-    ID INT AUTO_INCREMENT PRIMARY KEY, -- ID univoco per i dettagli della presenza
-    ChildID INT NOT NULL,
-    Type ENUM('Join', 'Left') NOT NULL,
-    Time DATETIME NOT NULL,
-    Notes VARCHAR(255) DEFAULT "", -- Eventuali note riguardanti la presenza
-    FOREIGN KEY (ChildID) REFERENCES Child (ID)
+CREATE TABLE `Trip` (
+    `ID` int AUTO_INCREMENT NOT NULL,
+    `Title` varchar(255) NOT NULL,
+    `Description` text,
+    `Place` varchar(255) NOT NULL,
+    `Url` text,
+    `Date` date NOT NULL,
+    `Price` decimal(10,2) NOT NULL DEFAULT '0',
+    CONSTRAINT `Trip_ID` PRIMARY KEY(`ID`)
 );
 
--- Creazione della tabella Ranking (Classifica)
-CREATE TABLE Point(
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    TeamID INT NOT NULL, -- ID della squadra
-    Date DATE NOT NULL, -- Data della classifica
-    Quantity INT NOT NULL, -- Punteggio della squadra
-    Reason TEXT, -- Motivo del punteggio
-    UserID INT DEFAULT NULL, -- ID dello staff, permette NULL per ON DELETE SET NULL
-    FOREIGN KEY (TeamID) REFERENCES Team (ID) ON DELETE CASCADE,
-    FOREIGN KEY (UserID) REFERENCES User (ID) ON DELETE SET NULL
+CREATE TABLE `UserAction` (
+    `ID` int AUTO_INCREMENT NOT NULL,
+    `UserID` int,
+    `Description` varchar(255) NOT NULL,
+    `Type` enum('CREATE','UPDATE','DELETE') NOT NULL,
+    `Date` date NOT NULL,
+    CONSTRAINT `UserAction_ID` PRIMARY KEY(`ID`)
 );
 
-CREATE TABLE UserAction (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    UserID INT,
-    Description TEXT NOT NULL,
-    Type ENUM('CREATE', 'UPDATE', 'DELETE') NOT NULL,
-    Date DATE NOT NULL,
-    FOREIGN KEY (UserID) REFERENCES User (ID) ON DELETE SET NULL
+CREATE TABLE `UserRole` (
+    `UserID` int NOT NULL,
+    `RoleID` int NOT NULL,
+    CONSTRAINT `UserRole_UserID_RoleID_pk` PRIMARY KEY(`UserID`,`RoleID`)
 );
 
-CREATE TABLE Trip (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    Title VARCHAR(255) NOT NULL,
-    Description TEXT,
-    Place VARCHAR(255) NOT NULL,
-    Url TEXT DEFAULT NULL,
-    Date DATE NOT NULL,
-    Price DECIMAL(10, 2) DEFAULT 0
+CREATE TABLE `User` (
+    `ID` int AUTO_INCREMENT NOT NULL,
+    `Name` varchar(100) NOT NULL,
+    `Surname` varchar(100) NOT NULL,
+    `Email` varchar(255),
+    `Theme` enum('Dark','Light','System') NOT NULL DEFAULT 'System',
+    `Password` varchar(255) NOT NULL,
+    CONSTRAINT `User_ID` PRIMARY KEY(`ID`)
 );
 
-CREATE TABLE TripEnrollment (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    EnrollmentID INT NOT NULL,
-    IsPaid BOOLEAN NOT NULL DEFAULT FALSE,
-    TripID INT DEFAULT NULL,
-    FOREIGN KEY (EnrollmentID) REFERENCES Enrollment (ID) ON DELETE CASCADE,
-    FOREIGN KEY (TripID) REFERENCES Trip (ID) ON DELETE CASCADE
+CREATE TABLE `Week` (
+    `ID` int AUTO_INCREMENT NOT NULL,
+    `StartDate` date NOT NULL,
+    `EndDate` date NOT NULL,
+    `Price` decimal(10,2) NOT NULL,
+    CONSTRAINT `Week_ID` PRIMARY KEY(`ID`)
 );
 
--- Crea un evento per cancellare le sessioni scadute
+ALTER TABLE `Attendance` ADD CONSTRAINT `Attendance_EnrollmentID_Enrollment_ID_fk` FOREIGN KEY (`EnrollmentID`) REFERENCES `Enrollment`(`ID`) ON DELETE no action ON UPDATE no action;
+ALTER TABLE `ChildParent` ADD CONSTRAINT `ChildParent_ChildID_Child_ID_fk` FOREIGN KEY (`ChildID`) REFERENCES `Child`(`ID`) ON DELETE cascade ON UPDATE no action;
+ALTER TABLE `ChildParent` ADD CONSTRAINT `ChildParent_ParentID_Parent_ID_fk` FOREIGN KEY (`ParentID`) REFERENCES `Parent`(`ID`) ON DELETE cascade ON UPDATE no action;
+ALTER TABLE `Child` ADD CONSTRAINT `Child_AddressID_Address_ID_fk` FOREIGN KEY (`AddressID`) REFERENCES `Address`(`ID`) ON DELETE no action ON UPDATE no action;
+ALTER TABLE `Enrollment` ADD CONSTRAINT `Enrollment_ChildID_Child_ID_fk` FOREIGN KEY (`ChildID`) REFERENCES `Child`(`ID`) ON DELETE cascade ON UPDATE no action;
+ALTER TABLE `Enrollment` ADD CONSTRAINT `Enrollment_TeamID_Team_ID_fk` FOREIGN KEY (`TeamID`) REFERENCES `Team`(`ID`) ON DELETE cascade ON UPDATE no action;
+ALTER TABLE `Enrollment` ADD CONSTRAINT `Enrollment_ShirtSizeID_ShirtSize_ID_fk` FOREIGN KEY (`ShirtSizeID`) REFERENCES `ShirtSize`(`ID`) ON DELETE set null ON UPDATE no action;
+ALTER TABLE `EnrollmentWeeks` ADD CONSTRAINT `EnrollmentWeeks_EnrollmentID_Enrollment_ID_fk` FOREIGN KEY (`EnrollmentID`) REFERENCES `Enrollment`(`ID`) ON DELETE cascade ON UPDATE no action;
+ALTER TABLE `EnrollmentWeeks` ADD CONSTRAINT `EnrollmentWeeks_WeekID_Week_ID_fk` FOREIGN KEY (`WeekID`) REFERENCES `Week`(`ID`) ON DELETE cascade ON UPDATE no action;
+ALTER TABLE `ExtraordinaryAttendance` ADD CONSTRAINT `ExtraordinaryAttendance_ChildID_Child_ID_fk` FOREIGN KEY (`ChildID`) REFERENCES `Child`(`ID`) ON DELETE no action ON UPDATE no action;
+ALTER TABLE `Point` ADD CONSTRAINT `Point_TeamID_Team_ID_fk` FOREIGN KEY (`TeamID`) REFERENCES `Team`(`ID`) ON DELETE cascade ON UPDATE no action;
+ALTER TABLE `Point` ADD CONSTRAINT `Point_UserID_User_ID_fk` FOREIGN KEY (`UserID`) REFERENCES `User`(`ID`) ON DELETE set null ON UPDATE no action;
+ALTER TABLE `RolePermission` ADD CONSTRAINT `RolePermission_RoleID_Role_ID_fk` FOREIGN KEY (`RoleID`) REFERENCES `Role`(`ID`) ON DELETE cascade ON UPDATE no action;
+ALTER TABLE `RolePermission` ADD CONSTRAINT `RolePermission_PermissionID_Permission_ID_fk` FOREIGN KEY (`PermissionID`) REFERENCES `Permission`(`ID`) ON DELETE cascade ON UPDATE no action;
+ALTER TABLE `Session` ADD CONSTRAINT `Session_UserID_User_ID_fk` FOREIGN KEY (`UserID`) REFERENCES `User`(`ID`) ON DELETE cascade ON UPDATE no action;
+ALTER TABLE `TripEnrollment` ADD CONSTRAINT `TripEnrollment_EnrollmentID_Enrollment_ID_fk` FOREIGN KEY (`EnrollmentID`) REFERENCES `Enrollment`(`ID`) ON DELETE cascade ON UPDATE no action;
+ALTER TABLE `TripEnrollment` ADD CONSTRAINT `TripEnrollment_TripID_Trip_ID_fk` FOREIGN KEY (`TripID`) REFERENCES `Trip`(`ID`) ON DELETE cascade ON UPDATE no action;
+ALTER TABLE `UserAction` ADD CONSTRAINT `UserAction_UserID_User_ID_fk` FOREIGN KEY (`UserID`) REFERENCES `User`(`ID`) ON DELETE set null ON UPDATE no action;
+ALTER TABLE `UserRole` ADD CONSTRAINT `UserRole_UserID_User_ID_fk` FOREIGN KEY (`UserID`) REFERENCES `User`(`ID`) ON DELETE cascade ON UPDATE no action;
+ALTER TABLE `UserRole` ADD CONSTRAINT `UserRole_RoleID_Role_ID_fk` FOREIGN KEY (`RoleID`) REFERENCES `Role`(`ID`) ON DELETE cascade ON UPDATE no action;-- Crea un evento per cancellare le sessioni scadute
 CREATE EVENT IF NOT EXISTS delete_expired_tokens
 ON SCHEDULE EVERY 1 MONTH
 STARTS (CURRENT_DATE + INTERVAL 1 DAY - INTERVAL DAYOFMONTH(CURRENT_DATE) - 1 DAY + INTERVAL '02:00' HOUR_MINUTE)
@@ -280,9 +264,9 @@ VALUES ('Rosso', '#dc3545'), -- Rosso
 INSERT INTO
     User (Name, Surname, Password)
 VALUES (
-        'Admin',
-        'User',
-        'ac9689e2272427085e35b9d3e3e8bed88cb3434828b43b86fc0596cad4c6e270'
+        'admin',
+        'user',
+        '$argon2id$v=19$m=1024,t=4,p=1$NHE+0PfYcMNtJa7gMKXIyS1vtU0i+g9Zv2ICoFyWYyw$GC8ONNZNnzSAHf76CxwQlj9zrYocoEQ0ww0HmiYoDaI'
     );
 -- admin1234
 
