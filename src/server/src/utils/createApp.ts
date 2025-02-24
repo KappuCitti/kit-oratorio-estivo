@@ -6,6 +6,7 @@ import { configureOpenApi } from './openApi';
 import config from '@/config';
 import router from '@/router';
 import { cors } from 'hono/cors';
+import { parseZodError } from './parseZodError';
 
 export function createRouter() {
   return new OpenAPIHono<Bindings>({
@@ -15,7 +16,7 @@ export function createRouter() {
         return c.json(
           {
             success: false,
-            error: result.error,
+            error: parseZodError(result.error),
           },
           422
         );
