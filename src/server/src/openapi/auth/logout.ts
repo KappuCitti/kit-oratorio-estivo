@@ -7,7 +7,16 @@ export const logoutRouteDef = createRoute({
   method: 'post',
   path: '/user/logout',
   responses: {
-    [HttpStatusCodes.OK]: createJsonResBody(true, z.null(), 'Login successful'),
+    [HttpStatusCodes.OK]: createJsonResBody(
+      true,
+      z.null(),
+      'Logout successful'
+    ),
+    [HttpStatusCodes.INTERNAL_SERVER_ERROR]: createJsonResBody(
+      false,
+      z.string(),
+      'Error while talking to database'
+    ),
   },
 });
 

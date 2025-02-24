@@ -1,9 +1,15 @@
+import { HttpStatusCodes } from '@/codes';
+import { logout } from '@/database/auth/logout';
 import type { RouteController } from '@/models/app.model';
 import type { LogoutRoute } from '@/openapi/auth/logout';
-import { httpSuccessResponse } from '@/utils/responses';
+import { httpErrorResponse, httpSuccessResponse } from '@/utils/responses';
 import { deleteCookie } from 'hono/cookie';
 const logoutController: RouteController<LogoutRoute> = async (c) => {
-  deleteCookie(c, 'user_token');
+  const cookie = deleteCookie(c, 'user_token');
+  if (!cookie) return httpSuccessResponse(c, null);
+  const res = await logout(cookie);
+  if (!res.success)
+    return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
   return httpSuccessResponse(c, null);
 };
 
