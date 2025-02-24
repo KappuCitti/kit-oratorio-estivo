@@ -18,12 +18,11 @@ export const fullEnrollmentSchema = createSelectSchema(enrollmentTable)
     shirtSizeId: true,
   })
   .extend({
-    shirt: createSelectSchema(shirtSizeTable),
-    team: createSelectSchema(teamTable),
+    shirt: z.union([createSelectSchema(shirtSizeTable), z.null()]),
+    team: z.union([createSelectSchema(teamTable), z.null()]),
     weeks: z.array(
       createSelectSchema(weekTable).extend({
-        paid: z.boolean(),
-        enrolled: z.boolean(),
+        isPaid: z.boolean(),
       })
     ),
     family: z.object({

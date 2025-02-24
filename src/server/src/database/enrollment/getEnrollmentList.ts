@@ -3,6 +3,7 @@ import { db } from '@/database';
 import type { BareEnrollment } from '@/models/enrollment.model';
 import { eq } from 'drizzle-orm';
 import { childTable, enrollmentWeeksTable, teamTable } from '../schema';
+import { HttpStatusCodes } from '@/codes';
 
 export async function getEnrollmentList(page: number, size: number) {
   try {
@@ -35,14 +36,18 @@ export async function getEnrollmentList(page: number, size: number) {
             enrollmentId: false,
           },
         }),
-        team: enroll.teamId ? (await db.query.teamTable.findMany({
-          where: eq(teamTable.id, enroll.teamId),
-        }))[0] : null,
+        team: enroll.teamId
+          ? (
+              await db.query.teamTable.findMany({
+                where: eq(teamTable.id, enroll.teamId),
+              })
+            )[0]
+          : null,
       });
     }
     return createSuccessResult(enrollments);
   } catch (e) {
     console.error(e);
-    return createErrorResult(500);
+    return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
 }
