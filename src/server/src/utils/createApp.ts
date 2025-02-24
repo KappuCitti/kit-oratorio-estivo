@@ -44,7 +44,12 @@ export default function createApp() {
   app.use(
     config.routesPrefix + config.routesPrefix.endsWith('/') ? '*' : '/*',
     cors({
-      origin: '*',
+      origin: [
+        'http://localhost',
+        'https://localhost',
+        'http://localhost:4200',
+        'https://localhost:4200',
+      ],
       credentials: true,
       allowHeaders: ['Content-Type', 'Authorization', 'Content-Length'],
     })
