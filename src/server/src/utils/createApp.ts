@@ -37,7 +37,7 @@ export default function createApp() {
     return httpErrorResponse(
       c,
       HttpStatusCodes.NOT_FOUND,
-      'Not found - ' + c.req.path
+      'Not found - ' + c.req.method.toUpperCase() + ' ' + c.req.path
     );
   });
 
@@ -60,7 +60,12 @@ export default function createApp() {
       allowHeaders: ['Content-Type', 'Authorization', 'Content-Length'],
     })
   );
+
   app.route(config.routesPrefix, router());
+
+  app.get('*', (c) => {
+    return c.redirect('/api/v1');
+  });
 
   return app;
 }
