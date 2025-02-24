@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, Signal, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
   FontAwesomeModule,
   IconDefinition,
@@ -20,6 +20,7 @@ import {
   faUserGear,
   faUsers,
 } from '@fortawesome/free-solid-svg-icons';
+import { ApiService } from '../../../services/api.service';
 
 interface Page {
   url: string;
@@ -113,15 +114,20 @@ export class NavbarComponent {
     },
   ];
 
+  constructor(private api: ApiService, private router: Router) {}
+
   toggleMenu(): void {
-    this.isMenuOpenSignal.set(!this.isMenuOpenSignal()); // Usa set() per aggiornare il signal
+    this.isMenuOpenSignal.set(!this.isMenuOpenSignal());
   }
 
   toggleDropdown(): void {
-    this.isDropdownOpenSignal.set(!this.isDropdownOpenSignal()); // Usa set() per aggiornare il signal
+    this.isDropdownOpenSignal.set(!this.isDropdownOpenSignal());
   }
 
   logout(): void {
-    console.log('Logout effettuato');
+    console.log(true)
+    this.api.logout().subscribe(() => {
+      this.router.navigate(['/login']);
+    });
   }
 }

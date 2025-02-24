@@ -73,10 +73,10 @@ export class ThemeService {
   }
 
   updateCookieAndSetTheme(theme: Theme): void {
-    // this.api.settingSetTheme(theme).subscribe(() => { // TODO
-    this.cookiesService.setCookie('user_theme', theme);
-    this.setTheme(theme);
-    // });
+    this.api.setUserTheme(theme).subscribe(() => {
+      this.cookiesService.setCookie('user_theme', theme);
+      this.setTheme(theme);
+    });
   }
 
   /** Ritorna il tema iniziale leggendo dal cookie o dalle impostazioni di sistema */

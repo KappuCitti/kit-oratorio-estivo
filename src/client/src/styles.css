@@ -66,6 +66,10 @@
 }
 
 @layer components {
+  .loader {
+    @apply w-12 h-12 border-6 border-gray-300 dark:border-gray-600 border-t-gray-700 dark:border-t-white rounded-full animate-spin;
+  }
+
   .container {
     @apply container mx-auto px-4 py-4 -z-10;
   }
@@ -84,6 +88,12 @@
 
   .text-disabled {
     @apply text-gray-400 dark:text-gray-500;
+  }
+
+  .text-monospace {
+    @apply font-mono px-2 py-1 rounded-lg text-sm;
+    @apply bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100;
+    @apply border border-gray-400 dark:border-gray-700;
   }
 
   .button-primary {

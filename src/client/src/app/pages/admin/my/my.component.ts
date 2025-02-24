@@ -1,11 +1,7 @@
 import {
-  AfterViewInit,
   Component,
-  effect,
-  ElementRef,
   OnInit,
   signal,
-  ViewChild,
 } from '@angular/core';
 import {
   AbstractControl,
@@ -18,20 +14,18 @@ import {
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { ThemeService } from '../../../../services/theme.service';
+import { ApiService } from '../../../../services/api.service';
+import User from '../../../../models/User.model';
+import { LoadingComponent } from "../../../components/loading/loading.component";
 
 @Component({
   selector: 'app-my',
-  imports: [ReactiveFormsModule, FooterComponent, NavbarComponent],
+  imports: [ReactiveFormsModule, FooterComponent, NavbarComponent, LoadingComponent],
   templateUrl: './my.component.html',
   styleUrl: './my.component.css',
 })
 export class MyComponent implements OnInit {
-  user = {
-    name: 'John',
-    surname: 'Doe',
-    email: 'john.doe@example.com',
-    theme: 'System',
-  };
+  user!: User;
 
   dataForm: FormGroup;
   passwordForm: FormGroup;
@@ -40,7 +34,7 @@ export class MyComponent implements OnInit {
   isPasswordFormValid = signal(false); // Signal per lo stato della validità del form
   isPasswordFormEmpty = signal(true); // Signal per lo stato di vuotezza dei campi del form
 
-  constructor(private fb: FormBuilder, private theme: ThemeService) {
+  constructor(private fb: FormBuilder, private theme: ThemeService, private api: ApiService) {
     this.dataForm = this.fb.group({
       surname: [{ value: '', disabled: true }, Validators.required],
       name: [{ value: '', disabled: true }, Validators.required],
@@ -68,8 +62,13 @@ export class MyComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.user.theme = this.theme.getTheme();
-    this.dataForm.patchValue(this.user);
+    this.api.getUser().subscribe((response) => {
+      if (response.status === 200 && response.body?.data) {
+        this.user = response.body?.data;
+
+        this.dataForm.patchValue(this.user);
+      }
+    })
 
     this.passwordForm.valueChanges.subscribe(() => {
       this.isPasswordFormValid.set(this.passwordForm.valid);
@@ -88,7 +87,11 @@ export class MyComponent implements OnInit {
 
   onSubmit(): void {
     if (this.passwordForm.valid) {
-      console.log('Password modificata con successo'); // TODO
+      this.api.setUserPassword(this.passwordForm.get('password')?.value, this.passwordForm.get('confirmPasswordOne')?.value).subscribe((response) => {
+        if (response.status === 200) {
+          this.onResetPasswordForm();
+        }
+      })
     }
   }
 

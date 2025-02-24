@@ -4,7 +4,6 @@ import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import {
   FormBuilder,
   FormGroup,
-  FormArray,
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
@@ -30,22 +29,25 @@ export class LoginComponent {
       password: ['', [Validators.required, Validators.minLength(8)]],
     });
 
-    this.form.valueChanges.subscribe((value) => {
-      console.log(value);
-    });
+    this.form.valueChanges.subscribe((value) => { });
   }
 
   login(): void {
-    this.error = null;
+    console.log(this.form.value.username, this.form.value.password)
     this.api
       .login(this.form.value.username, this.form.value.password)
-      .subscribe((response) => {
-        console.log(response);
-        // this.handleResponse(response);
+      .subscribe({
+        next: (response) => {
+          this.handleResponse(response);
+        },
+        error: (error) => {
+          this.handleResponse(error);
+        }
       });
   }
 
   handleResponse(response: HttpResponse<any>): void {
+    if (this.error) this.error = null;
     switch (response.status) {
       case 200:
         window.location.href = '/admin';
