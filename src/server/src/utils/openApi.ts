@@ -2,9 +2,10 @@ import type { HonoApp } from '@/models/app.model';
 
 import packageJSON from '../../package.json';
 import { apiReference } from '@scalar/hono-api-reference';
+import { prefixJoin } from './joinPrefix';
 
 export function configureOpenApi(app: HonoApp) {
-  app.doc('/openapi', {
+  app.doc(prefixJoin('/openapi'), {
     openapi: '3.0.0',
     info: {
       version: packageJSON.version,
@@ -13,11 +14,11 @@ export function configureOpenApi(app: HonoApp) {
   });
 
   app.get(
-    '/docs',
+    prefixJoin('/docs'),
     apiReference({
       theme: 'kepler',
       spec: {
-        url: '/openapi',
+        url: prefixJoin('/openapi'),
       },
     })
   );

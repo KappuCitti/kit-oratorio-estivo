@@ -9,6 +9,7 @@ import { cors } from 'hono/cors';
 import { parseZodError } from './parseZodError';
 import { httpErrorResponse } from './responses';
 import { HttpStatusCodes } from '@/codes';
+import { prefixJoin } from './joinPrefix';
 
 export function createRouter() {
   return new OpenAPIHono<Bindings>({
@@ -48,7 +49,7 @@ export default function createApp() {
 
   configureOpenApi(app);
   app.use(
-    config.routesPrefix + config.routesPrefix.endsWith('/') ? '*' : '/*',
+    prefixJoin('*'),
     cors({
       origin: [
         'http://localhost',
