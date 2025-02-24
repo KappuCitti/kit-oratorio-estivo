@@ -22,9 +22,9 @@ export const registerRouteDef = createRoute({
           .max(255, 'Surname must be at most 255 characters long'),
         password: z
           .string()
-          .min(8, 'Password must be at least 8 characters long')
+          .min(5, 'Password must be at least 5 characters long')
           .max(255, 'Password must be at most 255 characters long'),
-        roleId: z.number(),
+        roleIds: z.array(z.number()).min(1, 'At least one role is required'),
         email: z.string().optional(),
       }),
       'User info and password'

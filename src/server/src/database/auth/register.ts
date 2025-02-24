@@ -9,7 +9,7 @@ export async function register(
   name: string,
   surname: string,
   password: string,
-  roleId: number,
+  roleId: number[],
   email: string | null = null
 ) {
   try {
@@ -34,10 +34,8 @@ export async function register(
         email,
       })
       .$returningId();
-    await db.insert(userRoleTable).values({
-      userId: inserted.id,
-      roleId,
-    });
+    const toInsert = roleId.map((id) => ({ userId: inserted.id, roleId: id }));
+    await db.insert(userRoleTable).values(toInsert);
     return createSuccessResult(HttpStatusCodes.OK);
   } catch (e) {
     console.error(e);
