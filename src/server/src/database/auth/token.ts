@@ -2,6 +2,7 @@ import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { db } from '..';
 import { sessionTable } from '../schema';
 import { count, sql } from 'drizzle-orm';
+import { HttpStatusCodes } from '@/codes';
 
 export async function isValidToken(token: string) {
   try {
@@ -14,6 +15,6 @@ export async function isValidToken(token: string) {
     return createSuccessResult(res.count > 0);
   } catch (e) {
     console.error(e);
-    return createErrorResult(500);
+    return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
 }
