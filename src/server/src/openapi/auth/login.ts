@@ -8,7 +8,7 @@ import { createRoute, z } from '@hono/zod-openapi';
 export const loginRouteDef = createRoute({
   tags: ['auth'],
   method: 'post',
-  path: '/login',
+  path: '/user/login',
   request: {
     body: createRequiredJsonBody(
       z.object({ username: z.string(), password: z.string() }),
@@ -17,8 +17,16 @@ export const loginRouteDef = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: createJsonResBody(true, z.null(), 'Login successful'),
-    [HttpStatusCodes.BAD_REQUEST]: createJsonResBody(false, z.string(), 'Missing username or password'),
-    [HttpStatusCodes.UNAUTHORIZED]: createJsonResBody(false, z.string(), 'Invalid username or password'),
+    [HttpStatusCodes.BAD_REQUEST]: createJsonResBody(
+      false,
+      z.string(),
+      'Missing username or password'
+    ),
+    [HttpStatusCodes.UNAUTHORIZED]: createJsonResBody(
+      false,
+      z.string(),
+      'Invalid username or password'
+    ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: createJsonResBody(
       false,
       z.string(),

@@ -5,7 +5,7 @@ import { createRoute, z } from '@hono/zod-openapi';
 export const logoutRouteDef = createRoute({
   tags: ['auth'],
   method: 'post',
-  path: '/logout',
+  path: '/user/logout',
   responses: {
     [HttpStatusCodes.OK]: createJsonResBody(true, z.null(), 'Login successful'),
   },

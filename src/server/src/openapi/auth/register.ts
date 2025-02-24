@@ -8,7 +8,7 @@ import { createRoute, z } from '@hono/zod-openapi';
 export const registerRouteDef = createRoute({
   tags: ['auth'],
   method: 'post',
-  path: '/register',
+  path: '/user/register',
   request: {
     body: createRequiredJsonBody(
       z.object({
