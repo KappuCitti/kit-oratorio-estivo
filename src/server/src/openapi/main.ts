@@ -1,3 +1,4 @@
+import { HttpStatusCodes } from '@/codes';
 import { createJsonBody } from '@/utils/createOpenApiBody';
 import { createRoute, z } from '@hono/zod-openapi';
 
@@ -6,7 +7,7 @@ export const mainRouteDef = createRoute({
   method: 'get',
   path: '/',
   responses: {
-    200: createJsonBody(
+    [HttpStatusCodes.OK]: createJsonBody(
       z.object({
         name: z.string(),
         version: z.string(),

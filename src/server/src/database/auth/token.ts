@@ -14,6 +14,6 @@ export async function isValidToken(token: string) {
     return createSuccessResult(res.count > 0);
   } catch (e) {
     console.error(e);
-    return createErrorResult('Internal server error');
+    return createErrorResult(500);
   }
 }

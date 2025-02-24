@@ -1,3 +1,4 @@
+import { HttpStatusCodes } from '@/codes';
 import {
   createJsonResBody,
   createRequiredJsonBody,
@@ -15,10 +16,10 @@ export const loginRouteDef = createRoute({
     ),
   },
   responses: {
-    200: createJsonResBody(true, z.null(), 'Login successful'),
-    400: createJsonResBody(false, z.string(), 'Missing username or password'),
-    401: createJsonResBody(false, z.string(), 'Invalid username or password'),
-    500: createJsonResBody(
+    [HttpStatusCodes.OK]: createJsonResBody(true, z.null(), 'Login successful'),
+    [HttpStatusCodes.BAD_REQUEST]: createJsonResBody(false, z.string(), 'Missing username or password'),
+    [HttpStatusCodes.UNAUTHORIZED]: createJsonResBody(false, z.string(), 'Invalid username or password'),
+    [HttpStatusCodes.INTERNAL_SERVER_ERROR]: createJsonResBody(
       false,
       z.string(),
       'Error while talking to database'

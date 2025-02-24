@@ -7,6 +7,8 @@ import config from '@/config';
 import router from '@/router';
 import { cors } from 'hono/cors';
 import { parseZodError } from './parseZodError';
+import { httpErrorResponse } from './responses';
+import { HttpStatusCodes } from '@/codes';
 
 export function createRouter() {
   return new OpenAPIHono<Bindings>({
@@ -31,13 +33,17 @@ export default function createApp() {
 
   app.use(logger());
 
-  app.notFound((h) => {
-    return h.json({ message: 'Not found - ' + h.req.path }, 404);
+  app.notFound((c) => {
+    return httpErrorResponse(
+      c,
+      HttpStatusCodes.NOT_FOUND,
+      'Not found - ' + c.req.path
+    );
   });
 
-  app.onError((err, h) => {
-    h.var.logger.error(err);
-    return h.json({ message: 'Internal server error' }, 500);
+  app.onError((err, c) => {
+    c.var.logger.error(err);
+    return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
   });
 
   configureOpenApi(app);

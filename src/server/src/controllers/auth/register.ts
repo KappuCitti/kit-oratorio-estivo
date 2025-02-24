@@ -1,19 +1,35 @@
+import { HttpStatusCodes } from '@/codes';
 import { register } from '@/database/auth/register';
+import { isValidRole } from '@/database/role/isValid';
 import type { RouteController } from '@/models/app.model';
 import type { RegisterRoute } from '@/openapi/auth/register';
-import { createErrorResult, createSuccessResult } from '@/utils/createResult';
+import { httpErrorResponse, httpSuccessResponse } from '@/utils/responses';
 
 const registerController: RouteController<RegisterRoute> = async (c) => {
-  const { name, surname, password } = await c.req.valid('json');
-  const registerRes = await register(name, surname, password);
-  if (!registerRes.success) {
-    const text =
-      registerRes.error === 500
-        ? 'Internal server error'
-        : 'User already exists';
-    return c.json(createErrorResult(text), registerRes.error as 500 | 409);
+  const { name, surname, password, roleId, email } = await c.req.valid('json');
+  const isValidRoleId = await isValidRole(roleId);
+  if (!isValidRoleId.success) {
+    return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
-  return c.json(createSuccessResult(null), 200);
+  if (!isValidRoleId.data) {
+    return httpErrorResponse(
+      c,
+      HttpStatusCodes.BAD_REQUEST,
+      'Role does not exist'
+    );
+  }
+  const registerRes = await register(name, surname, password, roleId, email);
+  if (!registerRes.success) {
+    if (registerRes.error === HttpStatusCodes.CONFLICT) {
+      return httpErrorResponse(
+        c,
+        HttpStatusCodes.CONFLICT,
+        'User already exists'
+      );
+    }
+    return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
+  }
+  return httpSuccessResponse(c, null);
 };
 
 export default registerController;

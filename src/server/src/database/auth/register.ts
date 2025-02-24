@@ -1,13 +1,15 @@
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { db } from '..';
 import { count, sql } from 'drizzle-orm';
-import { usersTable } from '../schema';
+import { userRoleTable, usersTable } from '../schema';
 import { hashPassword } from '@/utils/password';
+import { HttpStatusCodes } from '@/codes';
 
 export async function register(
   name: string,
   surname: string,
   password: string,
+  roleId: number,
   email: string | null = null
 ) {
   try {
@@ -21,17 +23,24 @@ export async function register(
           usersTable.email
         } = ${email})`
       );
-    if (rows.count > 0) return createErrorResult(409);
+    if (rows.count > 0) return createErrorResult(HttpStatusCodes.CONFLICT);
     const passwordHash = await hashPassword(password);
-    await db.insert(usersTable).values({
-      name,
-      surname,
-      password: passwordHash,
-      email,
+    const [inserted] = await db
+      .insert(usersTable)
+      .values({
+        name,
+        surname,
+        password: passwordHash,
+        email,
+      })
+      .$returningId();
+    await db.insert(userRoleTable).values({
+      userId: inserted.id,
+      roleId,
     });
-    return createSuccessResult(200);
+    return createSuccessResult(HttpStatusCodes.OK);
   } catch (e) {
     console.error(e);
-    return createErrorResult(500);
+    return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
 }

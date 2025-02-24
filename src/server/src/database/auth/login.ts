@@ -34,6 +34,6 @@ export async function login(username: string, password: string) {
     return createSuccessResult(session.token);
   } catch (e) {
     console.error(e);
-    return createErrorResult('Internal server error');
+    return createErrorResult(500);
   }
 }

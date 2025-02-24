@@ -1,3 +1,4 @@
+import { HttpStatusCodes } from '@/codes';
 import {
   createJsonResBody,
   createRequiredJsonBody,
@@ -10,15 +11,42 @@ export const registerRouteDef = createRoute({
   path: '/register',
   request: {
     body: createRequiredJsonBody(
-      z.object({ name: z.string(), surname: z.string(), password: z.string() }),
+      z.object({
+        name: z
+          .string()
+          .min(2, 'Name must be at least 2 characters long')
+          .max(255, 'Name must be at most 255 characters long'),
+        surname: z
+          .string()
+          .min(2, 'Surname must be at least 2 characters long')
+          .max(255, 'Surname must be at most 255 characters long'),
+        password: z
+          .string()
+          .min(8, 'Password must be at least 8 characters long')
+          .max(255, 'Password must be at most 255 characters long'),
+        roleId: z.number(),
+        email: z.string().optional(),
+      }),
       'User info and password'
     ),
   },
   responses: {
-    200: createJsonResBody(true, z.null(), 'User successfully registered'),
-    400: createJsonResBody(false, z.string(), 'Missing registration data'),
-    409: createJsonResBody(false, z.string(), 'User already exists'),
-    500: createJsonResBody(
+    [HttpStatusCodes.OK]: createJsonResBody(
+      true,
+      z.null(),
+      'User successfully registered'
+    ),
+    [HttpStatusCodes.BAD_REQUEST]: createJsonResBody(
+      false,
+      z.string(),
+      'Missing or invalid registration data'
+    ),
+    [HttpStatusCodes.CONFLICT]: createJsonResBody(
+      false,
+      z.string(),
+      'User already exists'
+    ),
+    [HttpStatusCodes.INTERNAL_SERVER_ERROR]: createJsonResBody(
       false,
       z.string(),
       'Error while talking to database'
