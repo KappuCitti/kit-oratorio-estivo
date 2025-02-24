@@ -1,15 +1,15 @@
 import { count, eq } from 'drizzle-orm';
 import { db } from '..';
-import { userRoleTable } from '../schema';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { HttpStatusCodes } from '@/codes';
+import { roleTable } from '../schema';
 
 export async function isValidRole(roleId: number) {
   try {
     const [rows] = await db
       .select({ count: count() })
-      .from(userRoleTable)
-      .where(eq(userRoleTable.roleId, roleId));
+      .from(roleTable)
+      .where(eq(roleTable.id, roleId));
     return createSuccessResult(rows.count > 0);
   } catch (e) {
     console.error(e);
