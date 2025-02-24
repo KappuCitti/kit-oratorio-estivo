@@ -47,16 +47,15 @@ export default function createApp() {
     return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
   });
 
+  const origin = `${config.useHttps ? 'https' : 'http'}://${config.domain}:${
+    config.frontendPort
+  }`;
+
   configureOpenApi(app);
   app.use(
     prefixJoin('*'),
     cors({
-      origin: [
-        'http://localhost',
-        'https://localhost',
-        'http://localhost:4200',
-        'https://localhost:4200',
-      ],
+      origin: [origin],
       credentials: true,
       allowHeaders: ['Content-Type', 'Authorization', 'Content-Length'],
     })

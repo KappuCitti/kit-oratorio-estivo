@@ -15,6 +15,13 @@ const tomlSchema = z.object({
     port: z.number().int().positive().default(3000),
     host: z.string().default('0.0.0.0'),
     routes_prefix: z.string().default('/api/v1'),
+    use_https: z.boolean().default(false),
+    domain: z.string().default('localhost'),
+    frontend_port: z.number().int().positive().default(443),
+  }),
+  https: z.object({
+    cert: z.string().default('ssl/cert.pem'),
+    key: z.string().default('ssl/key.pem'),
   }),
   logs: z.object({
     log_level: z
@@ -55,11 +62,27 @@ try {
   process.exit(1);
 }
 
+if (config.server.use_https) {
+  if (
+    !(await Bun.file(config.https.cert).exists()) ||
+    !(await Bun.file(config.https.key).exists())
+  ) {
+    console.error('ssl/cert.pem or ssl/key.pem not found');
+    process.exit(1);
+  }
+}
+
 const cfgObject = {
   // Server configs
   port: env.SERVER_PORT || config.server.port,
   host: env.SERVER_HOST || config.server.host,
   routesPrefix: config.server.routes_prefix,
+  useHttps: config.server.use_https,
+  domain: config.server.domain,
+  frontendPort: config.server.frontend_port,
+  ssl: config.server.use_https
+    ? { cert: config.https.cert, key: config.https.key }
+    : undefined,
 
   // Public folder configs
   musicFolder: env.MUSIC_FOLDER,

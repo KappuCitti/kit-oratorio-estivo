@@ -2,6 +2,15 @@
 port = 3000
 host = '0.0.0.0'
 routes_prefix = '/api/v1'
+use_https = false
+domain = 'localhost'
+frontend_port = 4200
+
+[https]
+# if use_https is disabled the following settings are ignored
+# the paths are relative to the project root
+cert = 'ssl/cert.pem'
+key = 'ssl/key.pem'
 
 [logs]
 log_level = 'debug'
