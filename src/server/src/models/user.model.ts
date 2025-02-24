@@ -12,3 +12,14 @@ export const fullUserSchema = createSelectSchema(usersTable)
   });
 
 export type FullUser = z.infer<typeof fullUserSchema>;
+
+export const bareUserSchema = createSelectSchema(usersTable)
+  .omit({
+    password: true,
+    theme: true,
+  })
+  .extend({
+    roles: z.array(createSelectSchema(roleTable).omit({ description: true })),
+  });
+
+export type BareUser = z.infer<typeof bareUserSchema>;
