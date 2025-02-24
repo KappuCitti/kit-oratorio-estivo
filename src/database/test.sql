@@ -34,7 +34,7 @@ INSERT INTO Child (Name, Surname, Gender, BirthDate, BirthPlace, AddressID) VALU
 ('Marco', 'Gialli', 'M', '2012-12-25', 'Torino', 3);
 
 -- Child_Parent relationships
-INSERT INTO Child_Parent (ChildID, ParentID) VALUES
+INSERT INTO ChildParent (ChildID, ParentID) VALUES
 (1, 1),  -- Luca Rossi (ChildID 1) has Mario Rossi as parent
 (1, 2),  -- Luca Rossi (ChildID 1) also has Lucia Verdi as parent
 (2, 3),  -- Francesca Bianchi (ChildID 2) has Giovanni Bianchi as parent
@@ -53,7 +53,7 @@ INSERT INTO Week (StartDate, EndDate, Price) VALUES
 ('2025-06-23', '2025-06-27', 60);  -- Quarta settimana di giugno
 
 -- Enrollments (with Year)
-INSERT INTO Enrollment (ChildID, DataProcessingConsent, ExitAuthorization, SchoolType, Class, Section, Year, ParentNotes, ManagerNotes, ShirtSizeID, TimeStamp, TeamID) VALUES
+INSERT INTO Enrollment (ChildID, DataProcessingConsent, ExitAuthorization, SchoolType, Class, Section, Year, ParentNotes, ManagerNotes, ShirtSizeID, DateOfEnrollment, TeamID) VALUES
 (1, TRUE, TRUE, 'Primary', 'V', 'A', 2024, 'Lorem Ipsum', 'Lorem Ipsum', 1, '2024-01-01 00:00:00', 1),  -- Luca Rossi
 (2, TRUE, TRUE, 'Primary', 'IV', 'B', 2024, NULL, NULL, NULL, '2024-01-01 00:00:00', 2),  -- Francesca Bianchi
 (3, TRUE, TRUE, 'Secondary', 'II', 'C', 2024, 'Lorem Ipsum', 'Lorem Ipsum', 2, '2024-01-01 00:00:00', NULL),  -- Marco Gialli
@@ -75,7 +75,7 @@ INSERT INTO EnrollmentWeeks (EnrollmentID, WeekID, IsPaid) VALUES
 (2, 4, 0),  -- Marco Bianchi per la settimana 4, pagamento non effettuato
 (3, 4, 1);  -- Giulia Verdi per la settimana 4, pagamento effettuato
 
-INSERT INTO Attendance (EnrollmentID, Date, Present, EatsAtOratory, EatsInBianco)
+INSERT INTO Attendance (EnrollmentID, Date, Present, EatsInOratory, EatsPlain)
 VALUES
 (1, '2025-06-09', 1, 1, 0),  -- Luca Rossi presente il 9 giugno
 (1, '2025-06-10', 1, 1, 1),  -- Luca Rossi presente il 10 giugno, mangia in bianco
@@ -85,7 +85,7 @@ VALUES
 (3, '2025-06-10', 1, 0, 0);  -- Giulia Verdi presente il 10 giugno, non mangia in oratorio
 
 
-INSERT INTO Attendance_Details (ChildID, Type, Time, Notes)
+INSERT INTO ExtraordinaryAttendance (ChildID, Type, Time, Notes)
 VALUES
 (1, 'Join', '2025-06-09 09:00:00', 'Ingresso puntuale'),
 (1, 'Left', '2025-06-09 15:00:00', 'Uscita anticipata per appuntamento medico'),
@@ -93,7 +93,7 @@ VALUES
 (3, 'Left', '2025-06-09 16:00:00', 'Uscita regolare');
 
 -- Inserimento dei dati nella tabella Ranking
-INSERT INTO Ranking (TeamID, Date, Points, Reason, UserID) 
+INSERT INTO Point (TeamID, Date, Quantity, Reason, UserID) 
 VALUES 
 (1, '2024-10-01', 10, NULL, 1),
 (2, '2024-10-01', 15, 'Vittoria nella competizione settimanale', 1),
