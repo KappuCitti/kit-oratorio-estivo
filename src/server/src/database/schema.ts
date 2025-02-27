@@ -1,3 +1,5 @@
+import { CLASSES } from '@/models/class.model';
+import { SCHOOL_TYPES } from '@/models/schoolTypes.model';
 import {
   boolean,
   char,
@@ -141,8 +143,8 @@ export const enrollmentTable = mysqlTable('Enrollment', {
     .notNull()
     .default(true),
   exitAuthorization: boolean('ExitAuthorization').notNull(),
-  schoolType: mysqlEnum('SchoolType', ['Primary', 'Secondary']).notNull(),
-  class: mysqlEnum('Class', ['I', 'II', 'III', 'IV', 'V']).notNull(),
+  schoolType: mysqlEnum('SchoolType', SCHOOL_TYPES).notNull(),
+  class: mysqlEnum('Class', CLASSES).notNull(),
   section: char('Section').notNull(),
   year: int('Year').notNull(),
   dateOfEnrollment: datetime('DateOfEnrollment').notNull(),
