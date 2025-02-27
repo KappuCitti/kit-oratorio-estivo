@@ -1,18 +1,74 @@
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { db } from '@/database';
 import type { BareEnrollment } from '@/models/enrollment.model';
-import { eq } from 'drizzle-orm';
-import { childTable, enrollmentWeeksTable, teamTable } from '../schema';
+import { and, count, eq, getTableColumns, like, or } from 'drizzle-orm';
+import {
+  childTable,
+  enrollmentTable,
+  enrollmentWeeksTable,
+  teamTable,
+} from '../schema';
 import { HttpStatusCodes } from '@/codes';
+import type { SchoolType } from '@/models/schoolTypes.model';
+import type { Class } from '@/models/class.model';
 
-export async function getEnrollmentList(page: number, size: number) {
+export async function getEnrollmentList(
+  page: number,
+  size: number,
+  year: number,
+  weekId?: number,
+  teamId?: number,
+  query?: string,
+  schoolType?: SchoolType,
+  className?: Class
+) {
   try {
-    const eIds = await db.query.enrollmentTable.findMany({
-      limit: size,
-      offset: (page - 1) * size,
-    });
+    const filters: any[] = [];
+    if (teamId) filters.push(eq(enrollmentTable.teamId, teamId));
+    if (query) {
+      query
+        .split(' ')
+        .filter((s) => s.trim().length > 0)
+        .forEach((s) => {
+          filters.push(
+            or(
+              like(childTable.name, `%${s}%`),
+              like(childTable.surname, `%${s}%`)
+            )
+          );
+        });
+    }
+    if (schoolType) filters.push(eq(enrollmentTable.schoolType, schoolType));
+    if (className) filters.push(eq(enrollmentTable.class, className));
+    const [rows] = await db
+      .select({
+        count: count(),
+      })
+      .from(enrollmentTable)
+      .innerJoin(childTable, eq(enrollmentTable.childId, childTable.id))
+      .where(and(eq(enrollmentTable.year, year), ...filters))
+      .limit(size)
+      .offset((page - 1) * size);
+
+    const eIds = await db
+      .select({
+        ...getTableColumns(enrollmentTable),
+      })
+      .from(enrollmentTable)
+      .innerJoin(childTable, eq(enrollmentTable.childId, childTable.id))
+      .where(and(eq(enrollmentTable.year, year), ...filters))
+      .limit(size)
+      .offset((page - 1) * size);
     const enrollments: BareEnrollment[] = [];
     for (const enroll of eIds) {
+      const weeks = await db.query.enrollmentWeeksTable.findMany({
+        where: eq(enrollmentWeeksTable.enrollmentId, enroll.id),
+        columns: {
+          enrollmentId: false,
+        },
+      });
+      if (weekId && !weeks.map((w) => w.weekId).includes(weekId)) continue;
+
       enrollments.push({
         id: enroll.id,
         class: enroll.class,
@@ -30,12 +86,7 @@ export async function getEnrollmentList(page: number, size: number) {
             },
           })
         )[0],
-        weeks: await db.query.enrollmentWeeksTable.findMany({
-          where: eq(enrollmentWeeksTable.enrollmentId, enroll.id),
-          columns: {
-            enrollmentId: false,
-          },
-        }),
+        weeks,
         team: enroll.teamId
           ? (
               await db.query.teamTable.findMany({
@@ -45,7 +96,7 @@ export async function getEnrollmentList(page: number, size: number) {
           : null,
       });
     }
-    return createSuccessResult(enrollments);
+    return createSuccessResult({ enrollments, count: rows.count });
   } catch (e) {
     console.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
