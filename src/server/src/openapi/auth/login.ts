@@ -11,7 +11,14 @@ export const loginRouteDef = createRoute({
   path: '/user/login',
   request: {
     body: createRequiredJsonBody(
-      z.object({ username: z.string(), password: z.string() }),
+      z.object({
+        username: z
+          .string()
+          .max(255, 'Username must be at most 255 characters long'),
+        password: z
+          .string()
+          .max(255, 'Password must be at most 255 characters long'),
+      }),
       'Login credentials'
     ),
   },
