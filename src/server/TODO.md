@@ -6,3 +6,4 @@
 - [x] Add an option to choose http/https
 - [x] Add an option to choose a domain for cors
 - [ ] Make logger write json logs to file
+- [ ] Put boundaries and limits to the body parameters
