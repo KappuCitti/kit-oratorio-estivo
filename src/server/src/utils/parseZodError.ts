@@ -9,10 +9,10 @@ export function parseIssue(issue: ZodIssue) {
   switch (issue.code) {
     case 'invalid_type':
       if (issue.received === 'undefined')
-        return `Missing required field ${issue.path.join('.')}`;
-      return `Invalid type for field ${issue.path.join('.')}, expected ${
+        return `Missing required field '${issue.path.join('.')}'`;
+      return `Invalid type for field '${issue.path.join('.')}', expected '${
         issue.expected
-      } but got ${issue.received}`;
+      }' but got '${issue.received}'`;
   }
   return issue.message;
 }
