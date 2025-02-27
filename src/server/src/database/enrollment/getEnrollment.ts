@@ -1,6 +1,6 @@
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { db } from '@/database';
-import { eq } from 'drizzle-orm';
+import { eq, getTableColumns } from 'drizzle-orm';
 import {
   addressTable,
   childParentTable,
@@ -73,10 +73,7 @@ export async function getEnrollment(id: number) {
     if (team === undefined) return createSuccessResult(null);
     const weeks = await db
       .select({
-        id: weekTable.id,
-        startDate: weekTable.startDate,
-        endDate: weekTable.endDate,
-        price: weekTable.price,
+        ...getTableColumns(weekTable),
         isPaid: enrollmentWeeksTable.isPaid,
       })
       .from(weekTable)
