@@ -1,5 +1,6 @@
 import { CLASSES } from '@/models/class.model';
 import { SCHOOL_TYPES } from '@/models/schoolTypes.model';
+import { THEMES } from '@/models/theme.model';
 import {
   boolean,
   char,
@@ -19,7 +20,7 @@ export const usersTable = mysqlTable('User', {
   name: varchar('Name', { length: 100 }).notNull(),
   surname: varchar('Surname', { length: 100 }).notNull(),
   email: varchar('Email', { length: 255 }),
-  theme: mysqlEnum('Theme', ['Dark', 'Light', 'System'])
+  theme: mysqlEnum('Theme', THEMES)
     .notNull()
     .default('System'),
   password: varchar('Password', { length: 255 }).notNull(),
