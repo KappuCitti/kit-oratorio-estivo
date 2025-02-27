@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { db } from '..';
 import { sessionTable, usersTable } from '../schema';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
@@ -9,14 +9,17 @@ import { HttpStatusCodes } from '@/codes';
 
 export async function getUserFromToken(token: string) {
   try {
-    const [{ userId }] = await db
-      .select({ userId: sessionTable.userId })
-      .from(sessionTable)
-      .where(eq(sessionTable.token, token));
-
+    const session = await db.query.sessionTable.findFirst({
+      columns: { userId: true },
+      where: and(
+        eq(sessionTable.token, token),
+        sql`${sessionTable.expires} > NOW()`
+      ),
+    });
+    if (!session) return createSuccessResult(null);
     const user = await db.query.usersTable.findFirst({
       columns: { password: false },
-      where: eq(usersTable.id, userId),
+      where: eq(usersTable.id, session.userId),
     });
     if (!user) return createSuccessResult(null);
     return createSuccessResult(user);
