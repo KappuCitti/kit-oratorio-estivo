@@ -5,7 +5,7 @@ import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
 
 export const getShirtListRouteDef = createRoute({
-  tags: ['shirt'],
+  tags: ['Shirt'],
   method: 'get',
   path: '/shirts',
   responses: {

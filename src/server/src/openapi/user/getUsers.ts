@@ -5,7 +5,7 @@ import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
 
 export const getUserListRouteDef = createRoute({
-  tags: ['user'],
+  tags: ['User'],
   method: 'get',
   path: '/users',
   request: {

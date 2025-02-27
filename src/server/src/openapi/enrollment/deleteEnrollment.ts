@@ -4,7 +4,7 @@ import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
 
 export const deleteEnrollmentRouteDef = createRoute({
-  tags: ['enrollment'],
+  tags: ['Enrollment'],
   method: 'delete',
   path: '/enrollments/{id}',
   request: {

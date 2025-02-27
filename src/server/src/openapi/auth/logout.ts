@@ -3,7 +3,7 @@ import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute, z } from '@hono/zod-openapi';
 
 export const logoutRouteDef = createRoute({
-  tags: ['auth'],
+  tags: ['Auth'],
   method: 'post',
   path: '/user/logout',
   responses: {

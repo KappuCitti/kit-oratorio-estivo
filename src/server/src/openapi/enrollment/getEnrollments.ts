@@ -7,7 +7,7 @@ import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
 
 export const getEnrollmentListRouteDef = createRoute({
-  tags: ['enrollment'],
+  tags: ['Enrollment'],
   method: 'get',
   path: '/enrollments',
   request: {

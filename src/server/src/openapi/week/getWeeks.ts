@@ -5,7 +5,7 @@ import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
 
 export const getWeekListRouteDef = createRoute({
-  tags: ['week'],
+  tags: ['Week'],
   method: 'get',
   path: '/weeks',
   request: {

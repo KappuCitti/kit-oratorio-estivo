@@ -3,7 +3,7 @@ import { createJsonBody } from '@/utils/createOpenApiBody';
 import { createRoute, z } from '@hono/zod-openapi';
 
 export const mainRouteDef = createRoute({
-  tags: ['main'],
+  tags: ['Main'],
   method: 'get',
   path: '/',
   responses: {

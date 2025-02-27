@@ -8,7 +8,7 @@ import {
 import { createRoute, z } from '@hono/zod-openapi';
 
 export const changeUserThemeRouteDef = createRoute({
-  tags: ['user'],
+  tags: ['User'],
   method: 'post',
   path: '/user/theme',
   request: {

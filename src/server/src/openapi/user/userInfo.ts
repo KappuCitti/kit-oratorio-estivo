@@ -4,7 +4,7 @@ import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute, z } from '@hono/zod-openapi';
 
 export const getUserInfoRouteDef = createRoute({
-  tags: ['user'],
+  tags: ['User'],
   method: 'get',
   path: '/user',
   responses: {

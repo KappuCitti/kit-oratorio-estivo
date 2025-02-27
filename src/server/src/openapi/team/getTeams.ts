@@ -5,7 +5,7 @@ import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
 
 export const getTeamListRouteDef = createRoute({
-  tags: ['team'],
+  tags: ['Team'],
   method: 'get',
   path: '/teams',
   responses: {

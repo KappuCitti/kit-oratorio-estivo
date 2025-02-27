@@ -6,7 +6,7 @@ import {
 import { createRoute, z } from '@hono/zod-openapi';
 
 export const changePasswordRouteDef = createRoute({
-  tags: ['user', 'auth'],
+  tags: ['User', 'Auth'],
   method: 'post',
   path: '/user/password',
   request: {

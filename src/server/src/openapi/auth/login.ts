@@ -6,7 +6,7 @@ import {
 import { createRoute, z } from '@hono/zod-openapi';
 
 export const loginRouteDef = createRoute({
-  tags: ['auth'],
+  tags: ['Auth'],
   method: 'post',
   path: '/user/login',
   request: {
