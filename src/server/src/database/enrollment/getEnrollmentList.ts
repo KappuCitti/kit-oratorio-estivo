@@ -96,7 +96,7 @@ export async function getEnrollmentList(
           : null,
       });
     }
-    return createSuccessResult({ enrollments, count: rows.count });
+    return createSuccessResult({ enrollments, count: rows?.count ?? 0 });
   } catch (e) {
     console.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
