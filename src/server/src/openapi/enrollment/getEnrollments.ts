@@ -16,7 +16,7 @@ export const getEnrollmentListRouteDef = createRoute({
       size: z.coerce.number().int().positive().optional().default(25),
       year: z.coerce.number().int().positive(),
       weekId: z.coerce.number().int().positive().optional(),
-      teemId: z.coerce.number().int().positive().optional(),
+      teamId: z.coerce.number().int().positive().optional(),
       query: z.string().max(100, 'Max query size reached').optional(),
       schoolType: z.enum(SCHOOL_TYPES).optional(),
       className: z.enum(CLASSES).optional(),
