@@ -61,7 +61,7 @@ export async function editEnrollment(
       .where(eq(enrollmentWeeksTable.enrollmentId, enrollmentId));
     await db.insert(enrollmentWeeksTable).values({
       enrollmentId,
-      weekId: weeks[0].weekId,
+      weekId: weeks[0].id,
       isPaid: weeks[0].isPaid,
     });
     return createSuccessResult(null);

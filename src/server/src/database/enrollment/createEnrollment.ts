@@ -70,7 +70,7 @@ export async function createEnrollment(
       .where(
         inArray(
           weekTable.id,
-          weeks.map((w) => w.weekId)
+          weeks.map((w) => w.id)
         )
       );
     if (!weeksCount || weeksCount.count !== weeks.length)
@@ -78,7 +78,7 @@ export async function createEnrollment(
     for (const week of weeks) {
       await db.insert(enrollmentWeeksTable).values({
         enrollmentId: enroll.id,
-        weekId: week.weekId,
+        weekId: week.id,
         isPaid: week.isPaid,
       });
     }

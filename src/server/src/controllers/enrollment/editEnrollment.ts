@@ -13,8 +13,8 @@ const editEnrollmentController: RouteController<EditEnrollmentRoute> = async (
     section,
     year,
     weeks,
-    teamId,
-    shirtSizeId,
+    team,
+    shirt,
     parentNotes,
     managerNotes,
     dataProcessingConsent,
@@ -30,8 +30,8 @@ const editEnrollmentController: RouteController<EditEnrollmentRoute> = async (
     className,
     section,
     year,
-    teamId,
-    shirtSizeId,
+    team,
+    shirt,
     parentNotes,
     managerNotes
   );
