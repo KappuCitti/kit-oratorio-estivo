@@ -27,12 +27,16 @@ export const createEnrollmentRouteDef = createRoute({
         section: z.string().max(1, 'Section must be 1 character long'),
         year: z.number().int().positive(),
         parentNotes: z
-          .string()
-          .max(255, 'Max parent notes size reached')
+          .union([
+            z.string().max(255, 'Max parent notes size reached'),
+            z.null(),
+          ])
           .optional(),
         managerNotes: z
-          .string()
-          .max(255, 'Max manager notes size reached')
+          .union([
+            z.string().max(255, 'Max manager notes size reached'),
+            z.null(),
+          ])
           .optional(),
       }),
       'Enrollment to add'

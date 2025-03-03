@@ -19,7 +19,6 @@ export const editEnrollmentRouteDef = createRoute({
     }),
     body: createRequiredJsonBody(
       z.object({
-        childId: z.number().int().positive(),
         teamId: z.number().int().positive().optional(),
         shirtSizeId: z.number().int().positive().optional(),
         weeks: z.array(weekEnrollmentSchema),
@@ -30,12 +29,16 @@ export const editEnrollmentRouteDef = createRoute({
         section: z.string().max(1, 'Section must be 1 character long'),
         year: z.number().int().positive(),
         parentNotes: z
-          .string()
-          .max(255, 'Max parent notes size reached')
+          .union([
+            z.string().max(255, 'Max parent notes size reached'),
+            z.null(),
+          ])
           .optional(),
         managerNotes: z
-          .string()
-          .max(255, 'Max manager notes size reached')
+          .union([
+            z.string().max(255, 'Max manager notes size reached'),
+            z.null(),
+          ])
           .optional(),
       }),
       'Fields of enrollment to modify'

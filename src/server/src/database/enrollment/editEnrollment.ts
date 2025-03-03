@@ -16,7 +16,6 @@ import type { WeekEnrollment } from '@/models/week.model';
 
 export async function editEnrollment(
   enrollmentId: number,
-  childId: number,
   weeks: WeekEnrollment[],
   dataProcessingConsent: boolean,
   exitAuthorization: boolean,
@@ -26,14 +25,10 @@ export async function editEnrollment(
   year: number,
   teamId?: number,
   shirtSizeId?: number,
-  parentNotes?: string,
-  managerNotes?: string
+  parentNotes?: string | null,
+  managerNotes?: string | null
 ) {
   try {
-    const child = await db.query.childTable.findFirst({
-      where: eq(childTable.id, childId),
-    });
-    if (!child) return createErrorResult(HttpStatusCodes.BAD_REQUEST);
     if (teamId) {
       const team = await db.query.teamTable.findFirst({
         where: eq(teamTable.id, teamId),

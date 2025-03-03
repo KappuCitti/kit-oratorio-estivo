@@ -9,7 +9,6 @@ const editEnrollmentController: RouteController<EditEnrollmentRoute> = async (
 ) => {
   const { id } = await c.req.valid('param');
   const {
-    childId,
     className,
     section,
     year,
@@ -24,7 +23,6 @@ const editEnrollmentController: RouteController<EditEnrollmentRoute> = async (
   } = await c.req.valid('json');
   const res = await editEnrollment(
     id,
-    childId,
     weeks,
     dataProcessingConsent,
     exitAuthorization,

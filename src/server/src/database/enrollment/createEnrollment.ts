@@ -25,8 +25,8 @@ export async function createEnrollment(
   year: number,
   teamId?: number,
   shirtSizeId?: number,
-  parentNotes?: string,
-  managerNotes?: string
+  parentNotes?: string | null,
+  managerNotes?: string | null
 ) {
   try {
     const child = await db.query.childTable.findFirst({
