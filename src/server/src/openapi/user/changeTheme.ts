@@ -9,7 +9,7 @@ import { createRoute, z } from '@hono/zod-openapi';
 
 export const changeUserThemeRouteDef = createRoute({
   tags: ['User'],
-  method: 'post',
+  method: 'put',
   path: '/user/theme',
   request: {
     body: createRequiredJsonBody(
