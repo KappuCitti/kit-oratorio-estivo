@@ -19,8 +19,8 @@ export const editEnrollmentRouteDef = createRoute({
     }),
     body: createRequiredJsonBody(
       z.object({
-        teamId: z.number().int().positive().optional(),
-        shirtSizeId: z.number().int().positive().optional(),
+        team: z.number().int().positive().optional(),
+        shirt: z.number().int().positive().optional(),
         weeks: z.array(weekEnrollmentSchema),
         dataProcessingConsent: z.boolean(),
         exitAuthorization: z.boolean(),

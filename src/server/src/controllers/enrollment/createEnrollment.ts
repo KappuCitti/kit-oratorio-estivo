@@ -8,13 +8,13 @@ const createEnrollmentController: RouteController<
   CreateEnrollmentRoute
 > = async (c) => {
   const {
-    childId,
+    child,
     className,
     section,
     year,
     weeks,
-    teamId,
-    shirtSizeId,
+    team,
+    shirt,
     parentNotes,
     managerNotes,
     dataProcessingConsent,
@@ -22,7 +22,7 @@ const createEnrollmentController: RouteController<
     schoolType,
   } = await c.req.valid('json');
   const res = await createEnrollment(
-    childId,
+    child,
     weeks,
     dataProcessingConsent,
     exitAuthorization,
@@ -30,8 +30,8 @@ const createEnrollmentController: RouteController<
     className,
     section,
     year,
-    teamId,
-    shirtSizeId,
+    team,
+    shirt,
     parentNotes,
     managerNotes
   );
