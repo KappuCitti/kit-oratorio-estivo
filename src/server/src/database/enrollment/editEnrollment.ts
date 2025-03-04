@@ -23,8 +23,8 @@ export async function editEnrollment(
   className: Class,
   section: string,
   year: number,
-  teamId?: number,
-  shirtSizeId?: number,
+  teamId?: number | null,
+  shirtSizeId?: number | null,
   parentNotes?: string | null,
   managerNotes?: string | null
 ) {
