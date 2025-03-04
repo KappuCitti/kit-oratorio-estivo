@@ -59,11 +59,13 @@ export async function editEnrollment(
     await db
       .delete(enrollmentWeeksTable)
       .where(eq(enrollmentWeeksTable.enrollmentId, enrollmentId));
-    await db.insert(enrollmentWeeksTable).values({
-      enrollmentId,
-      weekId: weeks[0].id,
-      isPaid: weeks[0].isPaid,
-    });
+    for (const week of weeks) {
+      await db.insert(enrollmentWeeksTable).values({
+        enrollmentId,
+        weekId: week.id,
+        isPaid: week.isPaid,
+      });
+    }
     return createSuccessResult(null);
   } catch (e) {
     console.error(e);
