@@ -10,7 +10,7 @@ export function logger() {
     },
     pretty({
       colorize: true,
-      messageFormat: "[{level}] {req.method} '{req.url}' -> {res.status}",
+      messageFormat: "{req.method} '{req.url}' -> {res.status}",
       hideObject: true,
     })
   );
