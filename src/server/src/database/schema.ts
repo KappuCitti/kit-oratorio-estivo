@@ -1,4 +1,5 @@
 import { CLASSES } from '@/models/class.model';
+import { GENDERS } from '@/models/gender.model';
 import { SCHOOL_TYPES } from '@/models/schoolTypes.model';
 import { THEMES } from '@/models/theme.model';
 import {
@@ -20,9 +21,7 @@ export const usersTable = mysqlTable('User', {
   name: varchar('Name', { length: 100 }).notNull(),
   surname: varchar('Surname', { length: 100 }).notNull(),
   email: varchar('Email', { length: 255 }),
-  theme: mysqlEnum('Theme', THEMES)
-    .notNull()
-    .default('System'),
+  theme: mysqlEnum('Theme', THEMES).notNull().default('System'),
   password: varchar('Password', { length: 255 }).notNull(),
 });
 
@@ -87,7 +86,7 @@ export const parentTable = mysqlTable('Parent', {
   id: int('ID').primaryKey().autoincrement(),
   name: varchar('Name', { length: 255 }).notNull(),
   surname: varchar('Surname', { length: 255 }).notNull(),
-  gender: mysqlEnum('Gender', ['M', 'F', 'Other']).notNull(),
+  gender: mysqlEnum('Gender', GENDERS).notNull(),
   email: varchar('Email', { length: 255 }),
   phoneNumber: varchar('PhoneNumber', { length: 20 }).notNull(),
 });
@@ -96,7 +95,7 @@ export const childTable = mysqlTable('Child', {
   id: int('ID').primaryKey().autoincrement(),
   name: varchar('Name', { length: 255 }).notNull(),
   surname: varchar('Surname', { length: 255 }).notNull(),
-  gender: mysqlEnum('Gender', ['M', 'F', 'Other']).notNull(),
+  gender: mysqlEnum('Gender', GENDERS).notNull(),
   birthDate: varchar('BirthDate', { length: 255 }).notNull(),
   birthPlace: varchar('BirthPlace', { length: 255 }).notNull(),
   addressId: int('AddressID')
