@@ -13,7 +13,7 @@ export const getEnrollmentListRouteDef = createRoute({
   request: {
     query: z.object({
       page: z.coerce.number().int().gte(1).optional().default(1),
-      size: z.coerce.number().int().positive().optional().default(25),
+      size: z.coerce.number().int().positive().max(200).optional().default(25),
       year: z.coerce.number().int().positive(),
       weekId: z.coerce.number().int().positive().optional(),
       teamId: z.coerce.number().int().positive().optional(),
