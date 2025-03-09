@@ -3,16 +3,15 @@ import type { Class } from '@/models/class.model';
 import type { SchoolType } from '@/models/schoolTypes.model';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { db } from '..';
-import { count, eq, inArray } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import {
-  childTable,
   enrollmentTable,
   enrollmentWeeksTable,
   shirtSizeTable,
   teamTable,
-  weekTable,
 } from '../schema';
 import type { WeekEnrollment } from '@/models/week.model';
+import { dbLogger } from '../logger';
 
 export async function editEnrollment(
   enrollmentId: number,
@@ -68,7 +67,7 @@ export async function editEnrollment(
     }
     return createSuccessResult(null);
   } catch (e) {
-    console.error(e);
+    dbLogger.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
 }

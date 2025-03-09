@@ -3,6 +3,7 @@ import { db } from '..';
 import { enrollmentTable } from '../schema';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { HttpStatusCodes } from '@/codes';
+import { dbLogger } from '../logger';
 
 export async function deleteEnrollment(id: number) {
   try {
@@ -13,7 +14,7 @@ export async function deleteEnrollment(id: number) {
     await db.delete(enrollmentTable).where(eq(enrollmentTable.id, id));
     return createSuccessResult(null);
   } catch (e) {
-    console.error(e);
+    dbLogger.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
 }

@@ -3,6 +3,7 @@ import type { BareUser } from '@/models/user.model';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { roleTable, userRoleTable } from '../schema';
 import { eq } from 'drizzle-orm';
+import { dbLogger } from '../logger';
 
 export async function getUserList(page: number, size: number) {
   try {
@@ -31,7 +32,7 @@ export async function getUserList(page: number, size: number) {
     }
     return createSuccessResult(finalUsers);
   } catch (e) {
-    console.error(e);
+    dbLogger.error(e);
     return createErrorResult(500);
   }
 }

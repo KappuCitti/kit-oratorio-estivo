@@ -14,6 +14,7 @@ import {
 } from '../schema';
 import type { FullEnrollment } from '@/models/enrollment.model';
 import { HttpStatusCodes } from '@/codes';
+import { dbLogger } from '../logger';
 
 export async function getEnrollment(id: number) {
   try {
@@ -77,7 +78,10 @@ export async function getEnrollment(id: number) {
         isPaid: enrollmentWeeksTable.isPaid,
       })
       .from(weekTable)
-      .innerJoin(enrollmentWeeksTable, eq(enrollmentWeeksTable.weekId, weekTable.id))
+      .innerJoin(
+        enrollmentWeeksTable,
+        eq(enrollmentWeeksTable.weekId, weekTable.id)
+      )
       .where(eq(enrollmentWeeksTable.enrollmentId, enrollment.id));
 
     finalEnrollment = {
@@ -101,7 +105,7 @@ export async function getEnrollment(id: number) {
     };
     return createSuccessResult(finalEnrollment);
   } catch (e) {
-    console.error(e);
+    dbLogger.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
 }

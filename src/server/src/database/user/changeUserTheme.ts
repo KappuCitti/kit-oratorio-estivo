@@ -4,6 +4,7 @@ import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { db } from '..';
 import { and, eq, sql } from 'drizzle-orm';
 import { sessionTable, usersTable } from '../schema';
+import { dbLogger } from '../logger';
 
 export async function changeUserTheme(token: string, theme: Theme) {
   try {
@@ -20,7 +21,7 @@ export async function changeUserTheme(token: string, theme: Theme) {
       .where(eq(usersTable.id, session.userId));
     return createSuccessResult(HttpStatusCodes.OK);
   } catch (e) {
-    console.error(e);
+    dbLogger.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
 }

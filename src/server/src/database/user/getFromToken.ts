@@ -6,6 +6,7 @@ import type { FullUser } from '@/models/user.model';
 import { getUserRoles } from '../role/getUserRoles';
 import { getUserPermissions } from '../permissions/getUserPermissions';
 import { HttpStatusCodes } from '@/codes';
+import { dbLogger } from '../logger';
 
 export async function getUserFromToken(token: string) {
   try {
@@ -24,7 +25,7 @@ export async function getUserFromToken(token: string) {
     if (!user) return createSuccessResult(null);
     return createSuccessResult(user);
   } catch (e) {
-    console.error(e);
+    dbLogger.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
 }
@@ -43,7 +44,7 @@ export async function getUserWithPermissionsFromToken(token: string) {
     user.permissions = permissions.data;
     return createSuccessResult(user);
   } catch (e) {
-    console.error(e);
+    dbLogger.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
 }

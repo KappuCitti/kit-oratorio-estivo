@@ -4,6 +4,7 @@ import { sessionTable, usersTable } from '../schema';
 import { sql } from 'drizzle-orm';
 import strftime from 'strftime';
 import { HttpStatusCodes } from '@/codes';
+import { dbLogger } from '../logger';
 
 export async function login(username: string, password: string) {
   try {
@@ -34,7 +35,7 @@ export async function login(username: string, password: string) {
       .$returningId();
     return createSuccessResult(session.token);
   } catch (e) {
-    console.error(e);
+    dbLogger.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
 }

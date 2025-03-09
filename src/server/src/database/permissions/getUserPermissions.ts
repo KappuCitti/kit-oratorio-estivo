@@ -3,6 +3,7 @@ import { db } from '..';
 import { permissionTable, rolePermissionTable, userRoleTable } from '../schema';
 import { createSuccessResult, createErrorResult } from '@/utils/createResult';
 import { HttpStatusCodes } from '@/codes';
+import { dbLogger } from '../logger';
 
 export async function getUserPermissions(userId: number) {
   try {
@@ -26,7 +27,7 @@ export async function getUserPermissions(userId: number) {
     });
     return createSuccessResult(permissions);
   } catch (error) {
-    console.log(error);
+    dbLogger.error(error);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
 }

@@ -13,6 +13,7 @@ import {
   weekTable,
 } from '../schema';
 import type { WeekEnrollment } from '@/models/week.model';
+import { dbLogger } from '../logger';
 
 export async function createEnrollment(
   childId: number,
@@ -84,7 +85,7 @@ export async function createEnrollment(
     }
     return createSuccessResult(enroll.id);
   } catch (e) {
-    console.error(e);
+    dbLogger.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
 }

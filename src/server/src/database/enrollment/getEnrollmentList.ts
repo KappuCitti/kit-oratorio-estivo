@@ -11,6 +11,7 @@ import {
 import { HttpStatusCodes } from '@/codes';
 import type { SchoolType } from '@/models/schoolTypes.model';
 import type { Class } from '@/models/class.model';
+import { dbLogger } from '../logger';
 
 export async function getEnrollmentList(
   page: number,
@@ -98,7 +99,7 @@ export async function getEnrollmentList(
     }
     return createSuccessResult({ enrollments, count: rows?.count ?? 0 });
   } catch (e) {
-    console.error(e);
+    dbLogger.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
 }

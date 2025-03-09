@@ -3,6 +3,7 @@ import { db } from '..';
 import { eq, inArray } from 'drizzle-orm';
 import { roleTable, userRoleTable } from '../schema';
 import { HttpStatusCodes } from '@/codes';
+import { dbLogger } from '../logger';
 
 export async function getUserRoles(userId: number) {
   try {
@@ -18,7 +19,7 @@ export async function getUserRoles(userId: number) {
     });
     return createSuccessResult(roles);
   } catch (error) {
-    console.log(error);
+    dbLogger.error(error);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
 }

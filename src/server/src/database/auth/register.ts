@@ -4,6 +4,7 @@ import { count, sql } from 'drizzle-orm';
 import { userRoleTable, usersTable } from '../schema';
 import { hashPassword } from '@/utils/password';
 import { HttpStatusCodes } from '@/codes';
+import { dbLogger } from '../logger';
 
 export async function register(
   name: string,
@@ -38,7 +39,7 @@ export async function register(
     await db.insert(userRoleTable).values(toInsert);
     return createSuccessResult(HttpStatusCodes.OK);
   } catch (e) {
-    console.error(e);
+    dbLogger.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
 }

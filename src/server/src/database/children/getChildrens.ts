@@ -4,6 +4,7 @@ import { childTable } from '../schema';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { HttpStatusCodes } from '@/codes';
 import type { Gender } from '@/models/gender.model';
+import { dbLogger } from '../logger';
 
 export async function getChildrens(
   page: number,
@@ -31,7 +32,7 @@ export async function getChildrens(
 
     return createSuccessResult(childs);
   } catch (e) {
-    console.error(e);
+    dbLogger.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
 }

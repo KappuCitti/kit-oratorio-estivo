@@ -3,6 +3,7 @@ import { db } from '..';
 import { weekTable } from '../schema';
 import { HttpStatusCodes } from '@/codes';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
+import { dbLogger } from '../logger';
 
 export async function getWeeks(year: number) {
   try {
@@ -11,7 +12,7 @@ export async function getWeeks(year: number) {
     });
     return createSuccessResult(weeks);
   } catch (e) {
-    console.error(e);
+    dbLogger.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
 }
