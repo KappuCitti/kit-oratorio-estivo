@@ -1,19 +1,8 @@
-import config from '@/config';
+import { createLogger } from '@/utils/logger';
 import { pinoLogger } from 'hono-pino';
-import pino from 'pino';
-import pretty from 'pino-pretty';
 
 export function logger() {
-  const p = pino(
-    {
-      level: config.logLevel,
-    },
-    pretty({
-      colorize: true,
-      messageFormat: "{req.method} '{req.url}' -> {res.status}",
-      hideObject: true,
-    })
-  );
+  const p = createLogger('SERVER', "{req.method} '{req.url}' -> {res.status}");
 
   return pinoLogger({
     pino: p,
