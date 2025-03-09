@@ -7,12 +7,14 @@ import week from './week';
 import team from './team';
 import shirt from './shirt';
 import children from './children';
+import parent from './parent';
 
 export default (router: HonoApp) => {
   auth(router);
   children(router);
   enrollment(router);
   main(router);
+  parent(router);
   shirt(router);
   team(router);
   user(router);
