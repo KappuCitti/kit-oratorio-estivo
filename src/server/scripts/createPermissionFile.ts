@@ -1,6 +1,6 @@
-import { query } from '@/database';
 import path from 'node:path';
 import fs from 'node:fs/promises';
+import { db } from '@/database';
 
 async function writeNewFile(permissions: string[]) {
   const tagFile = path.join(__dirname, '../src/models/permissions.model.ts');
@@ -18,19 +18,24 @@ async function writeNewFile(permissions: string[]) {
   await stream.write(
     'Object.freeze(PERMISSIONS);\n\nexport type Permission = (typeof PERMISSIONS)[number];'
   );
-  
+
   await stream.close();
 }
 
-(async () => {
-  const permissions = await query<{
-    Name: string;
-  }>`SELECT Name FROM Permission`;
-  if (!permissions.success) {
-    console.error(permissions.error);
-    process.exit(1);
-  }
-  await writeNewFile(permissions.data.map((p) => p.Name));
+async function main() {
+  const permissions = (
+    await db.query.permissionTable
+      .findMany({
+        columns: { name: true },
+      })
+      .execute()
+  ).map((p) => p.name);
+  await writeNewFile(permissions);
   console.log('File created successfully');
   process.exit(0);
-})();
+}
+
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
