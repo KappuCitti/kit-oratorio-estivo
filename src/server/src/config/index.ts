@@ -63,10 +63,7 @@ try {
 }
 
 if (config.server.use_https) {
-  if (
-    !(await Bun.file(config.https.cert).exists()) ||
-    !(await Bun.file(config.https.key).exists())
-  ) {
+  if (!existsSync(config.https.cert) || !existsSync(config.https.key)) {
     console.error('ssl/cert.pem or ssl/key.pem not found');
     process.exit(1);
   }
