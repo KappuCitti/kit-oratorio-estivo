@@ -6,10 +6,10 @@ import { httpErrorResponse, httpSuccessResponse } from '@/utils/responses';
 
 const getParentsController: RouteController<GetParentListRoute> = async (c) => {
   const { page, size, query, gender, child } = await c.req.valid('query');
-  const enrollments = await getParents(page, size, query, gender, child);
-  if (!enrollments.success)
+  const parents = await getParents(page, size, query, gender, child);
+  if (!parents.success)
     return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
-  return httpSuccessResponse(c, enrollments.data);
+  return httpSuccessResponse(c, parents.data);
 };
 
 export default getParentsController;
