@@ -15,6 +15,7 @@ export const getParentListRouteDef = createRoute({
       size: z.coerce.number().positive().max(200).default(25),
       query: z.string().max(100, 'Max query size reached').optional(),
       gender: z.enum(GENDERS).optional(),
+      child: z.coerce.number().positive().optional(),
     }),
   },
   responses: {

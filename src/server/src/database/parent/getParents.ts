@@ -3,14 +3,15 @@ import { db } from '..';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { HttpStatusCodes } from '@/codes';
 import type { Gender } from '@/models/gender.model';
-import { parentTable } from '../schema';
+import { childParentTable, parentTable } from '../schema';
 import { dbLogger } from '../logger';
 
 export async function getParents(
   page: number,
   pageSize: number,
   query: string = '',
-  gender?: Gender
+  gender?: Gender,
+  childId?: number
 ) {
   try {
     const filters = query
@@ -23,15 +24,23 @@ export async function getParents(
         )
       );
     if (gender) filters.push(eq(parentTable.gender, gender));
-    const childs = await db.query.parentTable.findMany({
-      columns: {
-        email: false,
-        phoneNumber: false,
-      },
-      where: filters.length > 0 ? and(...filters) : undefined,
-      limit: pageSize,
-      offset: (page - 1) * pageSize,
-    });
+    if (childId) filters.push(eq(childParentTable.childId, childId));
+    const childs = await db
+      .select({
+        id: parentTable.id,
+        name: parentTable.name,
+        surname: parentTable.surname,
+        gender: parentTable.gender,
+      })
+      .from(parentTable)
+      .innerJoin(
+        childParentTable,
+        eq(parentTable.id, childParentTable.parentId)
+      )
+      .where(filters.length > 0 ? and(...filters) : undefined)
+      .limit(pageSize)
+      .offset((page - 1) * pageSize)
+      .execute();
 
     return createSuccessResult(childs);
   } catch (e) {
