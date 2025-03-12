@@ -8,6 +8,7 @@ import team from './team';
 import shirt from './shirt';
 import children from './children';
 import parent from './parent';
+import people from './people';
 
 export default (router: HonoApp) => {
   auth(router);
@@ -15,6 +16,7 @@ export default (router: HonoApp) => {
   enrollment(router);
   main(router);
   parent(router);
+  people(router);
   shirt(router);
   team(router);
   user(router);
