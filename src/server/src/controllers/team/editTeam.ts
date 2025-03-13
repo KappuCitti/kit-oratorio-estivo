@@ -6,6 +6,7 @@ import { httpErrorResponse, httpSuccessResponse } from '@/utils/responses';
 
 const editTeamController: RouteController<EditTeamRoute> = async (c) => {
   const { name, color, child } = await c.req.valid('json');
+  if (!name && !color && !child) return httpErrorResponse(c, HttpStatusCodes.BAD_REQUEST, 'Nothing to modify');
   const { id } = await c.req.valid('param');
   const res = await editTeam(id, name, color, child);
   if (!res.success)

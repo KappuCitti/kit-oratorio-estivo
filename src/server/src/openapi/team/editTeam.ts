@@ -12,7 +12,7 @@ export const editTeamRouteDef = createRoute({
   path: '/teams/{id}',
   request: {
     params: z.object({
-      id: z.number().int().positive(),
+      id: z.coerce.number().int().positive(),
     }),
     body: createRequiredJsonBody(
       z.object({
@@ -24,7 +24,7 @@ export const editTeamRouteDef = createRoute({
         child: z.object({
           type: z.union([z.literal('SET'), z.literal('ADD')]),
           ids: z.array(z.number().int().positive()),
-        }),
+        }).optional(),
       }),
       'Data to modify'
     ),
