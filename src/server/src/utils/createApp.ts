@@ -51,7 +51,10 @@ export default function createApp() {
     config.frontendPort
   }`;
 
-  configureOpenApi(app);
+  if (process.env.NODE_ENV !== 'production') {
+    configureOpenApi(app);
+  }
+
   app.use(
     prefixJoin('*'),
     cors({
