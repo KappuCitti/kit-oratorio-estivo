@@ -1,5 +1,4 @@
 import { HttpStatusCodes } from '@/codes';
-import { fullEnrollmentSchema } from '@/models/enrollment.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
@@ -10,13 +9,12 @@ export const getEnrollmentInfoRouteDef = createRoute({
   path: '/enrollments/{id}',
   request: {
     params: z.object({
-      id: z.coerce.number().int().positive(),
+      id: z.coerce.number().int().nonnegative(),
     }),
   },
   responses: {
     [HttpStatusCodes.OK]: createJsonResBody(
       true,
-      fullEnrollmentSchema,
       'Enrollment informations'
     ),
     [HttpStatusCodes.NOT_FOUND]: createJsonResBody(

@@ -12,7 +12,7 @@ export const editTeamRouteDef = createRoute({
   path: '/teams/{id}',
   request: {
     params: z.object({
-      id: z.coerce.number().int().positive(),
+      id: z.coerce.number().int().nonnegative(),
     }),
     body: createRequiredJsonBody(
       z.object({
