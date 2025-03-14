@@ -8,10 +8,10 @@ const getChildrensController: RouteController<GetChildListRoute> = async (
   c
 ) => {
   const { page, size, query, gender } = await c.req.valid('query');
-  const enrollments = await getChildrens(page, size, query, gender);
-  if (!enrollments.success)
+  const childrens = await getChildrens(page, size, query, gender);
+  if (!childrens.success)
     return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
-  return httpSuccessResponse(c, enrollments.data);
+  return httpSuccessResponse(c, childrens.data);
 };
 
 export default getChildrensController;
