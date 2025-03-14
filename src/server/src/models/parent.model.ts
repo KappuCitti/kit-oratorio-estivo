@@ -2,7 +2,6 @@ import { childTable, parentTable } from '@/database/schema';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { addressSchema } from './address.model';
-import { fullEnrollmentSchema } from './enrollment.model';
 
 export const parentSchema = createSelectSchema(parentTable).omit({
   email: true,
@@ -22,7 +21,6 @@ export const fullParentWithChildrenSchema = fullParentSchema.extend({
       })
       .extend({
         address: addressSchema,
-        enrollment: fullEnrollmentSchema,
       })
   ),
 });
