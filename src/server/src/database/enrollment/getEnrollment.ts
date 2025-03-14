@@ -12,66 +12,39 @@ import {
   teamTable,
   weekTable,
 } from '../schema';
-import type { FullEnrollment } from '@/models/enrollment.model';
+import type {
+  FullEnrollment,
+  FullEnrollmentWithFamily,
+} from '@/models/enrollment.model';
 import { HttpStatusCodes } from '@/codes';
 import { dbLogger } from '../logger';
 
-export async function getEnrollment(id: number) {
+export async function getBaseEnrollment(id: number) {
   try {
     const enrollment = await db.query.enrollmentTable.findFirst({
       where: eq(enrollmentTable.id, id),
     });
-    if (!enrollment) return createSuccessResult(null);
+    if (!enrollment) return createErrorResult(HttpStatusCodes.NOT_FOUND);
     let finalEnrollment!: FullEnrollment;
-
-    const baseChild = await db.query.childTable.findFirst({
-      where: eq(childTable.id, enrollment.childId),
-    });
-    if (!baseChild) return createSuccessResult(null);
-
-    const child: FullEnrollment['family']['child'] = {
-      id: baseChild.id,
-      name: baseChild.name,
-      surname: baseChild.surname,
-      gender: baseChild.gender,
-      birthDate: baseChild.birthDate,
-      birthPlace: baseChild.birthPlace,
-      address: (
-        await db.query.addressTable.findMany({
-          where: eq(addressTable.id, baseChild.addressId),
-          columns: {
-            id: false,
-          },
-        })
-      )[0],
-    };
-
-    if (!child) return createSuccessResult(null);
-
-    const parents = (
-      await db
-        .select()
-        .from(parentTable)
-        .innerJoin(
-          childParentTable,
-          eq(parentTable.id, childParentTable.parentId)
-        )
-        .where(eq(childParentTable.childId, enrollment.childId))
-    ).map((p) => p.Parent);
-
     const shirt = enrollment.shirtSizeId
       ? await db.query.shirtSizeTable.findFirst({
           where: eq(shirtSizeTable.id, enrollment.shirtSizeId),
         })
       : null;
-    if (shirt === undefined) return createSuccessResult(null);
+    if (shirt === undefined) {
+      dbLogger.error(`Enrollment ${id} has an invalid shirt size id`);
+      return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
+    }
 
     const team = enrollment.teamId
       ? await db.query.teamTable.findFirst({
           where: eq(teamTable.id, enrollment.teamId),
         })
       : null;
-    if (team === undefined) return createSuccessResult(null);
+    if (team === undefined) {
+      dbLogger.error(`Enrollment ${id} has an invalid team id`);
+      return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
+    }
     const weeks = await db
       .select({
         ...getTableColumns(weekTable),
@@ -95,13 +68,77 @@ export async function getEnrollment(id: number) {
       parentNotes: enrollment.parentNotes,
       year: enrollment.year,
       dateOfEnrollment: enrollment.dateOfEnrollment,
+      shirt,
+      team,
+      weeks,
+    };
+    return createSuccessResult(finalEnrollment);
+  } catch (e) {
+    dbLogger.error(e);
+    return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
+  }
+}
+
+export async function getEnrollment(id: number) {
+  try {
+    const baseEnrollment = await getBaseEnrollment(id);
+    if (!baseEnrollment.success) return baseEnrollment;
+    const enrollment = baseEnrollment.data;
+    const childIdQuery = await db.query.enrollmentTable.findFirst({
+      where: eq(enrollmentTable.id, enrollment.id),
+      columns: {
+        childId: true,
+      },
+    });
+    if (!childIdQuery) {
+      dbLogger.error(`Enrollment ${id} has an invalid child id`);
+      return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
+    }
+
+    let finalEnrollment!: FullEnrollmentWithFamily;
+
+    const baseChild = await db.query.childTable.findFirst({
+      where: eq(childTable.id, childIdQuery.childId),
+    });
+    if (!baseChild) {
+      dbLogger.error(`Enrollment ${id} has an invalid child id`);
+      return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
+    }
+
+    const child: FullEnrollmentWithFamily['family']['child'] = {
+      id: baseChild.id,
+      name: baseChild.name,
+      surname: baseChild.surname,
+      gender: baseChild.gender,
+      birthDate: baseChild.birthDate,
+      birthPlace: baseChild.birthPlace,
+      address: (
+        await db.query.addressTable.findMany({
+          where: eq(addressTable.id, baseChild.addressId),
+          columns: {
+            id: false,
+          },
+        })
+      )[0],
+    };
+
+    const parents = (
+      await db
+        .select()
+        .from(parentTable)
+        .innerJoin(
+          childParentTable,
+          eq(parentTable.id, childParentTable.parentId)
+        )
+        .where(eq(childParentTable.childId, childIdQuery.childId))
+    ).map((p) => p.Parent);
+
+    finalEnrollment = {
+      ...enrollment,
       family: {
         child,
         parents,
       },
-      shirt,
-      team,
-      weeks,
     };
     return createSuccessResult(finalEnrollment);
   } catch (e) {

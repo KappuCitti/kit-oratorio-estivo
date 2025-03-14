@@ -25,17 +25,24 @@ export const fullEnrollmentSchema = createSelectSchema(enrollmentTable)
         isPaid: z.boolean(),
       })
     ),
-    family: z.object({
-      child: createSelectSchema(childTable)
-        .omit({ addressId: true })
-        .extend({
-          address: createSelectSchema(addressTable).omit({ id: true }),
-        }),
-      parents: z.array(createSelectSchema(parentTable)).max(2),
-    }),
   });
 
 export type FullEnrollment = z.infer<typeof fullEnrollmentSchema>;
+
+export const fullEnrollmentWithFamilySchema = fullEnrollmentSchema.extend({
+  family: z.object({
+    child: createSelectSchema(childTable)
+      .omit({ addressId: true })
+      .extend({
+        address: createSelectSchema(addressTable).omit({ id: true }),
+      }),
+    parents: z.array(createSelectSchema(parentTable)).max(2),
+  }),
+});
+
+export type FullEnrollmentWithFamily = z.infer<
+  typeof fullEnrollmentWithFamilySchema
+>;
 
 export const bareEnrollmentSchema = createSelectSchema(enrollmentTable)
   .omit({

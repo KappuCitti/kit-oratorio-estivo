@@ -9,14 +9,18 @@ const getEnrollmentController: RouteController<GetEnrollmentInfoRoute> = async (
 ) => {
   const { id } = await c.req.valid('param');
   const enrollment = await getEnrollment(id);
-  if (!enrollment.success)
-    return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
-  if (!enrollment.data)
-    return httpErrorResponse(
-      c,
-      HttpStatusCodes.NOT_FOUND,
-      'Enrollment not found'
-    );
+  if (!enrollment.success) {
+    switch (enrollment.error) {
+      case HttpStatusCodes.NOT_FOUND:
+        return httpErrorResponse(
+          c,
+          HttpStatusCodes.NOT_FOUND,
+          'Enrollment not found'
+        );
+      default:
+        return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
   return httpSuccessResponse(c, enrollment.data);
 };
 
