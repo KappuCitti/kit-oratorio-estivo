@@ -16,7 +16,7 @@ export const deleteChildRouteDef = createRoute({
     [HttpStatusCodes.OK]: createJsonResBody(
       true,
       z.null(),
-      'Child informations'
+      'Child deleted successfully'
     ),
     [HttpStatusCodes.NOT_FOUND]: createJsonResBody(
       false,
