@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { hasPermission } from '@/middlewares/hasPermission';
 import { fullEnrollmentWithFamilySchema } from '@/models/enrollment.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
@@ -8,6 +9,7 @@ export const getEnrollmentInfoRouteDef = createRoute({
   tags: ['Enrollment'],
   method: 'get',
   path: '/enrollments/{id}',
+  middleware: hasPermission('enrollment_get'),
   request: {
     params: z.object({
       id: z.coerce.number().int().nonnegative(),

@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { hasPermission } from '@/middlewares/hasPermission';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';

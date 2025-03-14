@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { hasPermission } from '@/middlewares/hasPermission';
 import {
   createJsonResBody,
   createRequiredJsonBody,
@@ -10,6 +11,7 @@ export const editTeamRouteDef = createRoute({
   tags: ['Team'],
   method: 'post',
   path: '/teams/{id}',
+  middleware: hasPermission('team_update'),
   request: {
     params: z.object({
       id: z.coerce.number().int().nonnegative(),
@@ -21,10 +23,12 @@ export const editTeamRouteDef = createRoute({
           .string()
           .regex(/(#[\da-f]{3})|(#[\da-f]{6})/i)
           .optional(),
-        child: z.object({
-          type: z.union([z.literal('SET'), z.literal('ADD')]),
-          ids: z.array(z.number().int().positive()),
-        }).optional(),
+        child: z
+          .object({
+            type: z.union([z.literal('SET'), z.literal('ADD')]),
+            ids: z.array(z.number().int().positive()),
+          })
+          .optional(),
       }),
       'Data to modify'
     ),

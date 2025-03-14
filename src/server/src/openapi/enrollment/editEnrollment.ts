@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { hasPermission } from '@/middlewares/hasPermission';
 import { CLASSES } from '@/models/class.model';
 import { SCHOOL_TYPES } from '@/models/schoolTypes.model';
 import { weekEnrollmentSchema } from '@/models/week.model';
@@ -13,6 +14,7 @@ export const editEnrollmentRouteDef = createRoute({
   tags: ['Enrollment'],
   method: 'put',
   path: '/enrollments/{id}',
+  middleware: hasPermission('enrollment_update'),
   request: {
     params: z.object({
       id: z.coerce.number().int().nonnegative(),

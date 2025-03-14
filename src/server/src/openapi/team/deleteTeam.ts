@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { hasPermission } from '@/middlewares/hasPermission';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
@@ -7,6 +8,7 @@ export const deleteTeamRouteDef = createRoute({
   tags: ['Team'],
   method: 'delete',
   path: '/teams/{id}',
+  middleware: hasPermission('team_delete'),
   request: {
     params: z.object({
       id: z.coerce.number().int().nonnegative(),

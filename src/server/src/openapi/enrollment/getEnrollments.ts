@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { hasPermission } from '@/middlewares/hasPermission';
 import { CLASSES } from '@/models/class.model';
 import { bareEnrollmentSchema } from '@/models/enrollment.model';
 import { SCHOOL_TYPES } from '@/models/schoolTypes.model';
@@ -9,6 +10,7 @@ import { z } from 'zod';
 export const getEnrollmentListRouteDef = createRoute({
   tags: ['Enrollment'],
   method: 'get',
+  middleware: hasPermission('enrollment_get'),
   path: '/enrollments',
   request: {
     query: z.object({

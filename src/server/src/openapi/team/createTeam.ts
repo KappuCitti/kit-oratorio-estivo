@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { hasPermission } from '@/middlewares/hasPermission';
 import {
   createJsonResBody,
   createRequiredJsonBody,
@@ -10,6 +11,7 @@ export const createTeamRouteDef = createRoute({
   tags: ['Team'],
   method: 'post',
   path: '/teams',
+  middleware: hasPermission('team_add'),
   request: {
     body: createRequiredJsonBody(
       z.object({

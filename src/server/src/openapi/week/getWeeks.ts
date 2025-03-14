@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { hasPermission } from '@/middlewares/hasPermission';
 import { weekSchema } from '@/models/week.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
@@ -8,6 +9,7 @@ export const getWeekListRouteDef = createRoute({
   tags: ['Week'],
   method: 'get',
   path: '/weeks',
+  middleware: hasPermission('week_get'),
   request: {
     query: z.object({
       year: z.coerce.number().int().positive(),
