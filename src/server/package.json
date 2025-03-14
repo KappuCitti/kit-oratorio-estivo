@@ -23,7 +23,7 @@
     "drizzle-kit": "^0.30.5"
   },
   "peerDependencies": {
-    "typescript": "^5.8.2"
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "@hono/zod-openapi": "^0.18.4",
