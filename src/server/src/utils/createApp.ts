@@ -43,7 +43,7 @@ export default function createApp() {
   });
 
   app.onError((err, c) => {
-    c.var.logger.error(err);
+    c.var.logger.error(err.message, err);
     return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
   });
 
