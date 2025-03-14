@@ -18,7 +18,7 @@ export const fullChildSchema = createSelectSchema(childTable)
   })
   .extend({
     address: addressSchema,
-    enrollment: fullEnrollmentSchema,
+    enrollments: z.array(fullEnrollmentSchema),
   });
 
 export type FullChild = z.infer<typeof fullChildSchema>;

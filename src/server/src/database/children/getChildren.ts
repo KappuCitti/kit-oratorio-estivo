@@ -12,6 +12,7 @@ import {
 } from '../schema';
 import type { FullChildWithParents } from '@/models/children.model';
 import { getBaseEnrollment } from '../enrollment/getEnrollment';
+import type { FullEnrollment } from '@/models/enrollment.model';
 
 export async function getChildren(id: number) {
   try {
@@ -27,18 +28,18 @@ export async function getChildren(id: number) {
       dbLogger.error(`Child ${id} has no address`);
       return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
-    const enrollId = await db.query.enrollmentTable.findFirst({
+    const enrollIds = await db.query.enrollmentTable.findMany({
       where: eq(enrollmentTable.childId, childResult.id),
       columns: {
         id: true,
       },
     });
-    if (!enrollId) {
-      dbLogger.error(`Child ${id} has no enrollment`);
-      return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
+    const enrollments: FullEnrollment[] = [];
+    for (const enrollId of enrollIds) {
+      const enrollmentsRes = await getBaseEnrollment(enrollId.id);
+      if (!enrollmentsRes.success) return enrollmentsRes;
+      enrollments.push(enrollmentsRes.data);
     }
-    const enrollment = await getBaseEnrollment(enrollId.id);
-    if (!enrollment.success) return enrollment;
 
     const parents = (
       await db
@@ -60,7 +61,7 @@ export async function getChildren(id: number) {
       birthDate: childResult.birthDate,
       birthPlace: childResult.birthPlace,
       address,
-      enrollment: enrollment.data,
+      enrollments,
       parents,
     };
 
