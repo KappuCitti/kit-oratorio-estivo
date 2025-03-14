@@ -1,6 +1,9 @@
 import { childTable } from '@/database/schema';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
+import { addressSchema } from './address.model';
+import { parentSchema } from './parent.model';
+import { fullEnrollmentSchema } from './enrollment.model';
 
 export const childSchema = createSelectSchema(childTable).omit({
   addressId: true,
@@ -8,3 +11,20 @@ export const childSchema = createSelectSchema(childTable).omit({
 });
 
 export type BareChild = z.infer<typeof childSchema>;
+
+export const fullChildSchema = createSelectSchema(childTable)
+  .omit({
+    addressId: true,
+  })
+  .extend({
+    address: addressSchema,
+    enrollment: fullEnrollmentSchema,
+  });
+
+export type FullChild = z.infer<typeof fullChildSchema>;
+
+export const fullChildWithParentsSchema = fullChildSchema.extend({
+  parents: z.array(parentSchema),
+});
+
+export type FullChildWithParents = z.infer<typeof fullChildWithParentsSchema>;
