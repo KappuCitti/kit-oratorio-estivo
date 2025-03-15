@@ -59,7 +59,7 @@ export async function getBaseEnrollment(id: number) {
 
     finalEnrollment = {
       id: enrollment.id,
-      class: enrollment.class,
+      className: enrollment.className,
       section: enrollment.section,
       dataProcessingConsent: enrollment.dataProcessingConsent,
       exitAuthorization: enrollment.exitAuthorization,

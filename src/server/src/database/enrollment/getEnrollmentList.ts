@@ -40,7 +40,7 @@ export async function getEnrollmentList(
         });
     }
     if (schoolType) filters.push(eq(enrollmentTable.schoolType, schoolType));
-    if (className) filters.push(eq(enrollmentTable.class, className));
+    if (className) filters.push(eq(enrollmentTable.className, className));
     const [rows] = await db
       .select({
         count: count(),
@@ -72,7 +72,7 @@ export async function getEnrollmentList(
 
       enrollments.push({
         id: enroll.id,
-        class: enroll.class,
+        className: enroll.className,
         section: enroll.section,
         dataProcessingConsent: enroll.dataProcessingConsent,
         exitAuthorization: enroll.exitAuthorization,

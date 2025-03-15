@@ -144,7 +144,7 @@ export const enrollmentTable = mysqlTable('Enrollment', {
     .default(true),
   exitAuthorization: boolean('ExitAuthorization').notNull(),
   schoolType: mysqlEnum('SchoolType', SCHOOL_TYPES).notNull(),
-  class: mysqlEnum('Class', CLASSES).notNull(),
+  className: mysqlEnum('Class', CLASSES).notNull(),
   section: char('Section').notNull(),
   year: int('Year').notNull(),
   dateOfEnrollment: datetime('DateOfEnrollment').notNull(),

@@ -55,7 +55,7 @@ export async function createEnrollment(
         dataProcessingConsent,
         exitAuthorization,
         schoolType,
-        class: className,
+        className,
         section,
         year,
         dateOfEnrollment: new Date(),

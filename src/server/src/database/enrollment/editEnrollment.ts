@@ -48,7 +48,7 @@ export async function editEnrollment(
         dataProcessingConsent,
         exitAuthorization,
         schoolType,
-        class: className,
+        className,
         section,
         year,
         parentNotes,
