@@ -12,6 +12,7 @@ import { getEnrollmentListRouteDef } from '@/openapi/enrollment/getEnrollments';
 
 export default (router: HonoApp) => {
   router.openapi(getEnrollmentListRouteDef, getEnrollmentsController);
+  //@ts-expect-error Type instantiation is excessively deep and possibly infinite.
   router.openapi(getEnrollmentInfoRouteDef, getEnrollmentController);
   router.openapi(deleteEnrollmentRouteDef, deleteEnrollmentController);
   router.openapi(createEnrollmentRouteDef, createEnrollmentController);

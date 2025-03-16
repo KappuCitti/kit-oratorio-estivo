@@ -8,7 +8,7 @@ import { getChildListRouteDef } from '@/openapi/children/getChildrens';
 
 export default (router: HonoApp) => {
   router.openapi(getChildListRouteDef, getChildrensController);
-  //? Used `as any` to avoid vscode giving `Type instantiation is excessively deep` error
-  router.openapi(getChildInfoRouteDef, getChildrenController as any);
+  //@ts-expect-error Type instantiation is excessively deep and possibly infinite.
+  router.openapi(getChildInfoRouteDef, getChildrenController);
   router.openapi(deleteChildRouteDef, deleteChildrenController);
 };
