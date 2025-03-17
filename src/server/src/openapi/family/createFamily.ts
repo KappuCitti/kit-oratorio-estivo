@@ -24,8 +24,8 @@ export const createFamilyRouteDef = createRoute({
     [HttpStatusCodes.OK]: createJsonResBody(
       true,
       z.object({
-        parents: z.array(idSchema),
-        childs: z.array(idSchema),
+        parents: z.array(idSchema).min(1),
+        childs: z.array(idSchema).min(1),
         enrollments: z.array(idSchema),
       }),
       'Family created successfully, returns ids of created children, parents and enrollments'

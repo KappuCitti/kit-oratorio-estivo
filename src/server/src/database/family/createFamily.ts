@@ -63,26 +63,29 @@ export async function createFamily(family: BodyFamily) {
     const childs = (
       await db.insert(childTable).values(childToInsert).$returningId()
     ).map(({ id }) => id);
-    const enrollmentIds = (
-      await db
-        .insert(enrollmentTable)
-        .values(
-          enrollments.map((e) => ({
-            ...e,
-            childId: childs[e.childId],
+    let enrollmentIds: number[] = [];
+    if (enrollments.length > 0) {
+      enrollmentIds = (
+        await db
+          .insert(enrollmentTable)
+          .values(
+            enrollments.map((e) => ({
+              ...e,
+              childId: childs[e.childId],
+            }))
+          )
+          .$returningId()
+      ).map(({ id }) => id);
+
+      if (enrollmentWeeks.length > 0) {
+        await db.insert(enrollmentWeeksTable).values(
+          enrollmentWeeks.map((w) => ({
+            ...w,
+            enrollmentId: enrollmentIds[w.enrollmentId],
           }))
-        )
-        .$returningId()
-    ).map(({ id }) => id);
-    const enrollmentWeekIds = await db
-      .insert(enrollmentWeeksTable)
-      .values(
-        enrollmentWeeks.map((w) => ({
-          ...w,
-          enrollmentId: enrollmentIds[w.enrollmentId],
-        }))
-      )
-      .$returningId();
+        );
+      }
+    }
     return createSuccessResult({
       parents,
       childs,
