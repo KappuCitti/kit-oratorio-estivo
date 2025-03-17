@@ -4,6 +4,7 @@ import { CLASSES } from './class.model';
 import { SCHOOL_TYPES } from './schoolTypes.model';
 import { fullChildSchema } from './children.model';
 import { fullParentSchema } from './parent.model';
+import { bodyAddressSchema } from './address.model';
 
 export const bodyFamilyEnrollmentSchema = z.object({
   team: z.union([z.number().int().positive(), z.null()]).optional(),
@@ -27,8 +28,10 @@ export type BodyFamilyEnrollment = z.infer<typeof bodyFamilyEnrollmentSchema>;
 export const bodyFamilyChildSchema = fullChildSchema
   .omit({
     id: true,
+    address: true,
   })
   .extend({
+    address: bodyAddressSchema,
     enrollments: z.array(bodyFamilyEnrollmentSchema),
   });
 export type BodyFamilyChild = z.infer<typeof bodyFamilyChildSchema>;
