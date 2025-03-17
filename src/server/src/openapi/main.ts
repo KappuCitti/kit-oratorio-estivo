@@ -11,6 +11,7 @@ export const mainRouteDef = createRoute({
       z.object({
         name: z.string(),
         version: z.string(),
+        docs: z.string().optional()
       }),
       'API entry point'
     ),
