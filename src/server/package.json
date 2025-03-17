@@ -17,6 +17,9 @@
     "utils-kit"
   ],
   "author": "KappuCitti",
+  "contributors": [
+    "Benjo332"
+  ],
   "license": "MIT",
   "devDependencies": {
     "@types/bun": "latest",
