@@ -5,11 +5,13 @@ import { addressSchema } from './address.model';
 import { parentSchema } from './parent.model';
 import { fullEnrollmentSchema } from './enrollment.model';
 
-export const childSchema = createSelectSchema(childTable).omit({
+export const childTableSchema = createSelectSchema(childTable);
+export type ChildTable = z.infer<typeof childTableSchema>;
+
+export const childSchema = childTableSchema.omit({
   addressId: true,
   birthPlace: true,
 });
-
 export type BareChild = z.infer<typeof childSchema>;
 
 export const fullChildSchema = createSelectSchema(childTable)
@@ -20,11 +22,9 @@ export const fullChildSchema = createSelectSchema(childTable)
     address: addressSchema,
     enrollments: z.array(fullEnrollmentSchema),
   });
-
 export type FullChild = z.infer<typeof fullChildSchema>;
 
 export const fullChildWithParentsSchema = fullChildSchema.extend({
   parents: z.array(parentSchema),
 });
-
 export type FullChildWithParents = z.infer<typeof fullChildWithParentsSchema>;

@@ -11,7 +11,10 @@ import {
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-export const fullEnrollmentSchema = createSelectSchema(enrollmentTable)
+export const enrollmentTableSchema = createSelectSchema(enrollmentTable);
+export type EnrollmentTable = z.infer<typeof enrollmentTableSchema>;
+
+export const fullEnrollmentSchema = enrollmentTableSchema
   .omit({
     childId: true,
     teamId: true,

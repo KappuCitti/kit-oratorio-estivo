@@ -14,3 +14,6 @@ export const weekEnrollmentSchema = createSelectSchema(enrollmentWeeksTable)
     id: z.number().int().positive(),
   });
 export type WeekEnrollment = z.infer<typeof weekEnrollmentSchema>;
+
+export const enrollmentWeekSchema = createSelectSchema(enrollmentWeeksTable);
+export type EnrollmentWeek = z.infer<typeof enrollmentWeekSchema>;
