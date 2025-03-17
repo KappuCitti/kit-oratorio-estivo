@@ -8,6 +8,7 @@
     "start": "NODE_ENV=production bun .",
     "dev": "bun run --hot .",
     "check": "tsc --noEmit --pretty",
+    "build": "tsc -b",
     "update-permissions": "bun run scripts/createPermissionFile.ts"
   },
   "keywords": [

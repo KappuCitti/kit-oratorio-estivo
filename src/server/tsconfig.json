@@ -11,17 +11,17 @@
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
     "allowJs": true,
-    "outDir": "dist",
+    "outDir": "./dist",
     "paths": {
       "@/*": [
         "./src/*"
       ]
     },
+    "declaration": true,
     // Bundler mode
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
-    "noEmit": true,
+    "noEmit": false,
     // Best practices
     "strict": true,
     "skipLibCheck": true,
