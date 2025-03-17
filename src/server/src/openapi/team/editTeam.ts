@@ -9,7 +9,7 @@ import { z } from 'zod';
 
 export const editTeamRouteDef = createRoute({
   tags: ['Team'],
-  method: 'post',
+  method: 'put',
   path: '/teams/{id}',
   middleware: hasPermission('team_update'),
   request: {
