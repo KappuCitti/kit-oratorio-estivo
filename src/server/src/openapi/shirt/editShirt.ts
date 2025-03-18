@@ -1,6 +1,6 @@
 import { HttpStatusCodes } from '@/codes';
 import { hasPermission } from '@/middlewares/hasPermission';
-import { idSchema } from '@/models/common.model';
+import { paramIdSchema } from '@/models/common.model';
 import { bodyShirtSchema } from '@/models/shirt.model';
 import {
   createJsonResBody,
@@ -9,24 +9,28 @@ import {
 import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
 
-export const createShirtRouteDef = createRoute({
+export const editShirtRouteDef = createRoute({
   tags: ['Shirt'],
-  method: 'post',
-  path: '/shirts',
-  middleware: hasPermission('shirt_add'),
+  method: 'put',
+  path: '/shirts/{id}',
+  middleware: hasPermission('shirt_update'),
   request: {
+    params: paramIdSchema,
     body: createRequiredJsonBody(
-      bodyShirtSchema.extend({
-        isAvailable: z.boolean().optional(),
-      }),
-      'Data of the shirt size'
+      bodyShirtSchema.partial(),
+      'Data of the shirt to modify'
     ),
   },
   responses: {
     [HttpStatusCodes.OK]: createJsonResBody(
       true,
-      idSchema,
-      'Shirt created successfully'
+      z.null(),
+      'Shirt updated successfully'
+    ),
+    [HttpStatusCodes.NOT_FOUND]: createJsonResBody(
+      false,
+      z.string(),
+      'Shirt not found'
     ),
     [HttpStatusCodes.CONFLICT]: createJsonResBody(
       false,
@@ -41,4 +45,4 @@ export const createShirtRouteDef = createRoute({
   },
 });
 
-export type CreateShirtRoute = typeof createShirtRouteDef;
+export type EditShirtRoute = typeof editShirtRouteDef;
