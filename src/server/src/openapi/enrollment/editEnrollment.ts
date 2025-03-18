@@ -1,6 +1,7 @@
 import { HttpStatusCodes } from '@/codes';
 import { hasPermission } from '@/middlewares/hasPermission';
 import { CLASSES } from '@/models/class.model';
+import { paramIdSchema } from '@/models/common.model';
 import { SCHOOL_TYPES } from '@/models/schoolTypes.model';
 import { weekEnrollmentSchema } from '@/models/week.model';
 import {
@@ -16,9 +17,7 @@ export const editEnrollmentRouteDef = createRoute({
   path: '/enrollments/{id}',
   middleware: hasPermission('enrollment_update'),
   request: {
-    params: z.object({
-      id: z.coerce.number().int().nonnegative(),
-    }),
+    params: paramIdSchema,
     body: createRequiredJsonBody(
       z.object({
         team: z.union([z.number().int().positive(), z.null()]).optional(),

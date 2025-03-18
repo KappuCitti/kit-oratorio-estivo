@@ -1,5 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
-import { hasPermission } from '@/middlewares/hasPermission';
+import { paramIdSchema } from '@/models/common.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
@@ -9,9 +9,7 @@ export const deleteChildRouteDef = createRoute({
   method: 'delete',
   path: '/childs/{id}',
   request: {
-    params: z.object({
-      id: z.coerce.number().int().nonnegative(),
-    }),
+    params: paramIdSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: createJsonResBody(

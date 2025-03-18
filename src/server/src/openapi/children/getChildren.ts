@@ -2,6 +2,7 @@ import { HttpStatusCodes } from '@/codes';
 import {
   fullChildWithParentsSchema,
 } from '@/models/children.model';
+import { paramIdSchema } from '@/models/common.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
@@ -11,9 +12,7 @@ export const getChildInfoRouteDef = createRoute({
   method: 'get',
   path: '/childs/{id}',
   request: {
-    params: z.object({
-      id: z.coerce.number().int().nonnegative(),
-    }),
+    params: paramIdSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: createJsonResBody(

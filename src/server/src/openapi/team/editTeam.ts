@@ -1,5 +1,6 @@
 import { HttpStatusCodes } from '@/codes';
 import { hasPermission } from '@/middlewares/hasPermission';
+import { paramIdSchema } from '@/models/common.model';
 import {
   createJsonResBody,
   createRequiredJsonBody,
@@ -13,9 +14,7 @@ export const editTeamRouteDef = createRoute({
   path: '/teams/{id}',
   middleware: hasPermission('team_update'),
   request: {
-    params: z.object({
-      id: z.coerce.number().int().nonnegative(),
-    }),
+    params: paramIdSchema,
     body: createRequiredJsonBody(
       z.object({
         name: z.string().min(1).optional(),
