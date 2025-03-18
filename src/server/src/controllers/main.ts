@@ -18,7 +18,7 @@ const mainController: RouteController<MainRoute> = (c) => {
   return c.json({
     name: 'API Server - Kit Oratorio Estivo',
     version: packageJSON.version,
-    authors: authors.join(', '),
+    authors,
     docs,
   });
 };
