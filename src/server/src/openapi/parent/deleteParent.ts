@@ -1,6 +1,9 @@
 import { HttpStatusCodes } from '@/codes';
 import { paramIdSchema } from '@/models/common.model';
-import { createJsonResBody } from '@/utils/createOpenApiBody';
+import {
+  createJsonResBody,
+  createRequiredJsonBody,
+} from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
 
@@ -10,6 +13,12 @@ export const deleteParentRouteDef = createRoute({
   path: '/parents/{id}',
   request: {
     params: paramIdSchema,
+    body: createRequiredJsonBody(
+      z.object({
+        deleteChildren: z.boolean().default(false),
+      }),
+      'Delete every child of the parent'
+    ),
   },
   responses: {
     [HttpStatusCodes.OK]: createJsonResBody(

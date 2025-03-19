@@ -8,7 +8,8 @@ const deleteParentController: RouteController<DeleteParentRoute> = async (
   c
 ) => {
   const { id } = await c.req.valid('param');
-  const deleted = await deleteParent(id);
+  const { deleteChildren } = await c.req.valid('json');
+  const deleted = await deleteParent(id, deleteChildren);
   if (!deleted.success) {
     switch (deleted.error) {
       case HttpStatusCodes.NOT_FOUND:
