@@ -27,3 +27,8 @@ export const fullParentWithChildrenSchema = fullParentSchema.extend({
 export type FullParentWithChildren = z.infer<
   typeof fullParentWithChildrenSchema
 >;
+
+export const bodyParentSchema = createSelectSchema(parentTable).omit({
+  id: true,
+});
+export type BodyParent = z.infer<typeof bodyParentSchema>;
