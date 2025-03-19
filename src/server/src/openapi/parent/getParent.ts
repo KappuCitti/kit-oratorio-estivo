@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { paramIdSchema } from '@/models/common.model';
 import { fullParentWithChildrenSchema } from '@/models/parent.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
@@ -9,9 +10,7 @@ export const getParentInfoRouteDef = createRoute({
   method: 'get',
   path: '/parents/{id}',
   request: {
-    params: z.object({
-      id: z.coerce.number().nonnegative(),
-    }),
+    params: paramIdSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: createJsonResBody(
