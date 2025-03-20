@@ -1,21 +1,18 @@
 {
+  "exclude": ["./scripts/*", "./drizzle.config.ts", "./src/globals.ts"],
   "compilerOptions": {
     // Enable latest features
-    "lib": [
-      "ESNext",
-      "DOM"
-    ],
+    "lib": ["ESNext", "DOM"],
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
     "allowJs": true,
+    "rootDir": "./src",
     "outDir": "./dist",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
     "declaration": true,
     // Bundler mode
