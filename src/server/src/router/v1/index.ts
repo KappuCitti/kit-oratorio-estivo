@@ -10,8 +10,10 @@ import children from './children';
 import parent from './parent';
 import people from './people';
 import family from './family';
+import attendance from './attendance';
 
 export default (router: HonoApp) => {
+  attendance(router);
   auth(router);
   children(router);
   enrollment(router);
