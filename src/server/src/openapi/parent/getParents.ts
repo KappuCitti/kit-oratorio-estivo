@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { queryPageSchema, querySizeSchema } from '@/models/common.model';
 import { GENDERS } from '@/models/gender.model';
 import { parentSchema } from '@/models/parent.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
@@ -11,8 +12,8 @@ export const getParentListRouteDef = createRoute({
   path: '/parents',
   request: {
     query: z.object({
-      page: z.coerce.number().min(1).default(1),
-      size: z.coerce.number().positive().max(200).default(25),
+      page: queryPageSchema,
+      size: querySizeSchema,
       query: z.string().max(100, 'Max query size reached').optional(),
       gender: z.enum(GENDERS).optional(),
       child: z.coerce.number().positive().optional(),

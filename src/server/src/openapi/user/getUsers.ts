@@ -1,5 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
-import { hasPermission } from '@/middlewares/hasPermission';
+import { queryPageSchema, querySizeSchema } from '@/models/common.model';
 import { bareUserSchema } from '@/models/user.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
@@ -11,8 +11,8 @@ export const getUserListRouteDef = createRoute({
   path: '/users',
   request: {
     query: z.object({
-      page: z.number().int().gte(1).optional().default(1),
-      size: z.number().int().positive().optional().default(25),
+      page: queryPageSchema,
+      size: querySizeSchema,
     }),
   },
   responses: {

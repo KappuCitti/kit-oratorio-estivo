@@ -1,7 +1,11 @@
 import { HttpStatusCodes } from '@/codes';
 import { hasPermission } from '@/middlewares/hasPermission';
 import { CLASSES } from '@/models/class.model';
-import { coercedIdSchema } from '@/models/common.model';
+import {
+  coercedIdSchema,
+  queryPageSchema,
+  querySizeSchema,
+} from '@/models/common.model';
 import { bareEnrollmentSchema } from '@/models/enrollment.model';
 import { SCHOOL_TYPES } from '@/models/schoolTypes.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
@@ -15,8 +19,8 @@ export const getEnrollmentListRouteDef = createRoute({
   path: '/enrollments',
   request: {
     query: z.object({
-      page: z.coerce.number().int().gte(1).optional().default(1),
-      size: z.coerce.number().int().positive().max(200).optional().default(25),
+      page: queryPageSchema,
+      size: querySizeSchema,
       year: z.coerce.number().int().positive(),
       weekId: coercedIdSchema.optional(),
       teamId: coercedIdSchema.optional(),
