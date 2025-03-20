@@ -47,9 +47,9 @@ export default function createApp() {
     return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
   });
 
-  const origin = `${config.useHttps ? 'https' : 'http'}://${config.domain}:${
-    config.frontendPort
-  }`;
+  const origin = `${config.useHttps ? 'https' : 'http'}://${
+    config.server.domain
+  }:${config.server.frontendPort}`;
 
   if (process.env.NODE_ENV !== 'production') {
     configureOpenApi(app);
@@ -64,7 +64,7 @@ export default function createApp() {
     })
   );
 
-  app.route(config.routesPrefix, router());
+  app.route(config.server.routesPrefix, router());
 
   app.get('*', (c) => {
     return c.redirect('/api/v1');

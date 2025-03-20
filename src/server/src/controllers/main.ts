@@ -7,8 +7,8 @@ import packageJSON from '../../package.json';
 const mainController: RouteController<MainRoute> = (c) => {
   const docs =
     process.env.NODE_ENV !== 'production'
-      ? `${config.useHttps ? 'https' : 'http'}://${config.domain}:${
-          config.port
+      ? `${config.useHttps ? 'https' : 'http'}://${config.server.domain}:${
+          config.server.port
         }/api/v1/docs`
       : undefined;
 

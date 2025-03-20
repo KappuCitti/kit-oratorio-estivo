@@ -5,6 +5,7 @@ routes_prefix = '/api/v1'
 use_https = false
 domain = 'localhost'
 frontend_port = 4200
+music_folder = '../public/music'
 
 [https]
 # if use_https is disabled the following settings are ignored
@@ -17,7 +18,11 @@ log_level = 'debug'
 log_folder = 'logs'
 
 [database]
-# For database credential use environment variables: MYSQL_HOST, MYSQL_PORT, MYSQL_DATABASE, MYSQL_USER, MYSQL_PASSWORD
+host = 'localhost'
+port = 3306
+user = 'root'
+password = ''
+database = 'oratorio'
 wait_for_connections = true
 connection_limit = 10
 queue_limit = 3

@@ -5,12 +5,12 @@ import '@/globals';
 const app = createApp();
 
 export default {
-  port: config.port,
+  port: config.server.port,
   fetch: app.fetch,
   tls: config.useHttps
     ? {
-        cert: Bun.file(config.ssl?.cert as string),
-        key: Bun.file(config.ssl?.key as string),
+        cert: Bun.file(config.ssl.cert),
+        key: Bun.file(config.ssl.key),
       }
     : undefined,
 };
