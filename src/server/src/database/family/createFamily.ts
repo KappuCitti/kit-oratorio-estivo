@@ -4,6 +4,7 @@ import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { HttpStatusCodes } from '@/codes';
 import { db } from '..';
 import {
+  childParentTable,
   childTable,
   enrollmentTable,
   enrollmentWeeksTable,
@@ -63,6 +64,15 @@ export async function createFamily(family: BodyFamily) {
     const childs = (
       await db.insert(childTable).values(childToInsert).$returningId()
     ).map(({ id }) => id);
+
+    const childParents: { childId: number; parentId: number }[] = [];
+    for (const childId of childs) {
+      for (const parentId of parents) {
+        childParents.push({ childId, parentId });
+      }
+    }
+    await db.insert(childParentTable).values(childParents);
+
     let enrollmentIds: number[] = [];
     if (enrollments.length > 0) {
       enrollmentIds = (
