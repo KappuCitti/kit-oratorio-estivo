@@ -15,18 +15,17 @@ export async function getPeople(
   gender?: Gender
 ) {
   try {
-    const mappedSearch = query
-      .split(' ')
-      .filter((s) => s.trim().length > 0)
-      .map((s) =>
-        or(
-          like(parentTable.name, `%${s}%`),
-          like(parentTable.surname, `%${s}%`)
-        )
-      );
-    if (gender) mappedSearch.push(eq(parentTable.gender, gender));
-    const filters = mappedSearch.length > 0 ? or(...mappedSearch) : undefined;
-    mappedSearch.length > 0 ? or(...mappedSearch) : undefined;
+    function createFilters(table: any) {
+      const mappedSearch = query
+        .split(' ')
+        .filter((s) => s.trim().length > 0)
+        .map((s) =>
+          or(like(table.name, `%${s}%`), like(table.surname, `%${s}%`))
+        );
+      if (gender) mappedSearch.push(eq(table.gender, gender));
+      return mappedSearch.length > 0 ? or(...mappedSearch) : undefined;
+    }
+
     const parentsQuery = db
       .select({
         id: parentTable.id,
@@ -36,7 +35,7 @@ export async function getPeople(
         type: sql<PeopleType>`'Parent'`,
       })
       .from(parentTable)
-      .where(filters);
+      .where(createFilters(parentTable));
     const childsQuery = db
       .select({
         id: childTable.id,
@@ -46,7 +45,7 @@ export async function getPeople(
         type: sql<PeopleType>`'Child'`,
       })
       .from(childTable)
-      .where(filters);
+      .where(createFilters(childTable));
     const [rows] = await db
       .select({
         count: count(),
