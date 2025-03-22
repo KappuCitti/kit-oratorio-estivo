@@ -22,7 +22,10 @@ export const getParentListRouteDef = createRoute({
   responses: {
     [HttpStatusCodes.OK]: createJsonResBody(
       true,
-      z.array(parentSchema),
+      z.object({
+        count: z.number().int().nonnegative(),
+        parents: z.array(parentSchema),
+      }),
       'List of parents'
     ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: createJsonResBody(

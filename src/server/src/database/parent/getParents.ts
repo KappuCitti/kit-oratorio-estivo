@@ -1,4 +1,4 @@
-import { and, eq, like, or } from 'drizzle-orm';
+import { and, count, eq, like, or } from 'drizzle-orm';
 import { db } from '..';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { HttpStatusCodes } from '@/codes';
@@ -25,7 +25,7 @@ export async function getParents(
       );
     if (gender) filters.push(eq(parentTable.gender, gender));
     if (childId) filters.push(eq(childParentTable.childId, childId));
-    const childs = await db
+    const parentsQuery = db
       .select({
         id: parentTable.id,
         name: parentTable.name,
@@ -37,12 +37,17 @@ export async function getParents(
         childParentTable,
         eq(parentTable.id, childParentTable.parentId)
       )
-      .where(filters.length > 0 ? and(...filters) : undefined)
+      .where(and(...filters));
+    const [rows] = await db
+      .select({ count: count() })
+      .from(parentsQuery.as('p'))
+      .execute();
+    const parents = await parentsQuery
       .limit(pageSize)
       .offset((page - 1) * pageSize)
       .execute();
 
-    return createSuccessResult(childs);
+    return createSuccessResult({ count: rows.count, parents });
   } catch (e) {
     dbLogger.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);

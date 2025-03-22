@@ -21,7 +21,10 @@ export const getChildListRouteDef = createRoute({
   responses: {
     [HttpStatusCodes.OK]: createJsonResBody(
       true,
-      z.array(childSchema),
+      z.object({
+        count: z.number().int().nonnegative(),
+        childs: z.array(childSchema),
+      }),
       'List of childrens'
     ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: createJsonResBody(

@@ -1,4 +1,4 @@
-import { and, eq, like, or } from 'drizzle-orm';
+import { and, count, eq, like, or } from 'drizzle-orm';
 import { db } from '..';
 import { childTable } from '../schema';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
@@ -20,17 +20,26 @@ export async function getChildrens(
         or(like(childTable.name, `%${s}%`), like(childTable.surname, `%${s}%`))
       );
     if (gender) filters.push(eq(childTable.gender, gender));
-    const childs = await db.query.childTable.findMany({
-      columns: {
-        addressId: false,
-        birthPlace: false,
-      },
-      where: filters.length > 0 ? and(...filters) : undefined,
-      limit: pageSize,
-      offset: (page - 1) * pageSize,
-    });
+    const childsQuery = db
+      .select({
+        id: childTable.id,
+        name: childTable.name,
+        surname: childTable.surname,
+        gender: childTable.gender,
+        birthDate: childTable.birthDate,
+      })
+      .from(childTable)
+      .where(and(...filters));
+    const [rows] = await db
+      .select({ count: count() })
+      .from(childsQuery.as('c'))
+      .execute();
+    const childs = await childsQuery
+      .limit(pageSize)
+      .offset((page - 1) * pageSize)
+      .execute();
 
-    return createSuccessResult(childs);
+    return createSuccessResult({ count: rows.count, childs });
   } catch (e) {
     dbLogger.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
