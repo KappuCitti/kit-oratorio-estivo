@@ -1,0 +1,76 @@
+<div id="child">
+  <div class="flex justify-between mb-2">
+    <h2>Ragazzo</h2>
+    @if (editable && save) {
+    <button
+      class="text-md button-secondary h-min"
+      [disabled]="!childForm.valid || !addressForm.valid"
+      (click)="saveChild()"
+    >
+      <fa-icon [icon]="faFloppyDisk"></fa-icon>
+    </button>
+    }
+  </div>
+
+  <details class="w-full">
+    <summary class="cursor-pointer text-lg font-semibold rounded">
+      Anagrafica
+    </summary>
+
+    <form [formGroup]="childForm">
+      <div class="flex flex-wrap -mx-2">
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block required">Nome</label>
+          <input type="text" class="w-full" formControlName="name" />
+        </div>
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block required">Cognome</label>
+          <input type="text" class="w-full" formControlName="surname" />
+        </div>
+
+        <div class="mb-4 sm:w-1/3 w-full px-2">
+          <label class="block required">Sesso</label>
+          <select class="w-full" formControlName="gender">
+            <option value="M">Maschio</option>
+            <option value="F">Femmina</option>
+          </select>
+        </div>
+        <div class="mb-4 sm:w-1/3 w-full px-2">
+          <label class="block required">Data di nascita</label>
+          <input type="date" class="w-full" formControlName="birthDate" />
+        </div>
+        <div class="mb-4 sm:w-1/3 w-full px-2">
+          <label class="block required">Luogo di nascita</label>
+          <input type="text" class="w-full" formControlName="birthPlace" />
+        </div>
+      </div>
+    </form>
+  </details>
+
+  <details class="w-full mt-4">
+    <summary class="cursor-pointer text-lg font-semibold rounded">
+      Indirizzo
+    </summary>
+
+    <form [formGroup]="addressForm">
+      <div class="flex flex-wrap -mx-2">
+        <div class="mb-4 sm:w-1/2 lg:w-1/4 w-full px-2">
+          <label class="block required">Nazione</label>
+          <input type="text" class="w-full" formControlName="country" />
+        </div>
+        <div class="mb-4 sm:w-1/2 lg:w-1/4 w-full px-2">
+          <label class="block required">Citta'</label>
+          <input type="text" class="w-full" formControlName="city" />
+        </div>
+        <div class="mb-4 sm:w-1/2 lg:w-1/4 w-full px-2">
+          <label class="block required">Via</label>
+          <input type="text" class="w-full" formControlName="street" />
+        </div>
+        <div class="mb-4 sm:w-1/2 lg:w-1/4 w-full px-2">
+          <label class="block required">Codice Postale</label>
+          <input type="text" class="w-full" formControlName="postalCode" />
+        </div>
+      </div>
+    </form>
+  </details>
+</div>

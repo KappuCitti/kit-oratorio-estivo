@@ -1,0 +1,62 @@
+<nav class="flex justify-center items-center space-x-1 mt-4">
+  <button
+    class="px-3 py-1 button-secondary"
+    [disabled]="currentPage === 1"
+    (click)="changePage(currentPage - 1)"
+  >
+    «
+  </button>
+
+  <!-- Prima pagina sempre visibile -->
+  <button
+    class="px-3 py-1"
+    [class.button-primary]="currentPage === 1"
+    [class.button-secondary]="currentPage !== 1"
+    (click)="changePage(1)"
+  >
+    1
+  </button>
+
+  @if(shouldShowLeftDots()) {
+  <button class="px-3 py-1 button-secondary text-primary" disabled>...</button>
+  }
+
+  <!-- Numeri di pagina -->
+  @if (getMiddlePages().length > 0) {
+  <div class="flex space-x-1">
+    @for (page of getMiddlePages(); track page) {
+    <button
+      class="px-3 py-1"
+      [class.button-primary]="currentPage === page"
+      [class.button-secondary]="currentPage !== page"
+      (click)="changePage(page)"
+    >
+      {{ page }}
+    </button>
+    }
+  </div>
+  } @if (shouldShowRightDots()) {
+  <button class="px-3 py-1 button-secondary" disabled>...</button>
+  }
+
+  <!-- Pulsante "Successivo" -->
+  @if (totalPages > 1) {
+  <button
+    class="px-3 py-1"
+    [class.button-primary]="currentPage === totalPages"
+    [class.button-secondary]="currentPage !== totalPages"
+    (click)="changePage(totalPages)"
+  >
+    {{ totalPages }}
+  </button>
+  }
+
+  <!-- Pulsante "Successivo" -->
+  <button
+    class="px-3 py-1 button-secondary"
+    [disabled]="currentPage == totalPages"
+    (click)="changePage(currentPage + 1)"
+  >
+    »
+  </button>
+</nav>

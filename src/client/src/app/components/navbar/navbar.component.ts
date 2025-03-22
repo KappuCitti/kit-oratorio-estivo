@@ -65,10 +65,10 @@ export class NavbarComponent {
       disabled: true,
     },
     {
-      url: '/admin/enrollment',
+      url: '/admin/enrollments',
       icon: this.faUsers,
       title: 'Iscrizioni',
-      disabled: true,
+      disabled: false,
     },
     {
       url: '/admin/attendances',
@@ -86,7 +86,7 @@ export class NavbarComponent {
       url: '/admin/teams',
       icon: this.faFlag,
       title: 'Squadre',
-      disabled: true,
+      disabled: false,
     },
     {
       url: '/admin/leaderboard',
@@ -125,7 +125,6 @@ export class NavbarComponent {
   }
 
   logout(): void {
-    console.log(true)
     this.api.logout().subscribe(() => {
       this.router.navigate(['/login']);
     });

@@ -10,6 +10,7 @@ import {
 import { ApiService } from '../../../services/api.service';
 import { HttpResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
+import { UtilsService } from '../../../services/utils.service';
 
 @Component({
   selector: 'app-login',
@@ -23,17 +24,20 @@ export class LoginComponent {
   form: FormGroup;
   error: string | null = null;
 
-  constructor(private fb: FormBuilder, private api: ApiService) {
+  constructor(
+    private fb: FormBuilder,
+    private api: ApiService,
+    private utils: UtilsService
+  ) {
     this.form = this.fb.group({
       username: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(8)]],
     });
 
-    this.form.valueChanges.subscribe((value) => { });
+    this.form.valueChanges.subscribe((value) => {});
   }
 
   login(): void {
-    console.log(this.form.value.username, this.form.value.password)
     this.api
       .login(this.form.value.username, this.form.value.password)
       .subscribe({
@@ -42,26 +46,12 @@ export class LoginComponent {
         },
         error: (error) => {
           this.handleResponse(error);
-        }
+        },
       });
   }
 
   handleResponse(response: HttpResponse<any>): void {
     if (this.error) this.error = null;
-    switch (response.status) {
-      case 200:
-        window.location.href = '/admin';
-        break;
-      case 401:
-        this.error = 'Username o password errati!';
-        break;
-      case 403:
-        this.error = "L'utente non ha i permessi necessari!";
-        break;
-      case 500:
-      default:
-        this.error = 'Si è verificato un errore, riprova più tardi!';
-        break;
-    }
+    this.error = this.utils.handleResponse(response, '/admin');
   }
 }

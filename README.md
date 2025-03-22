@@ -4,8 +4,8 @@ Un progetto open source progettato per aiutare gli animatori e lo staff dell'ora
 
 ## Funzionalità Principali
 
-- [x] **Gestione Iscrizioni e Presenze**: Raccoglie e tiene traccia delle iscrizioni e delle presenze giornaliere degli utenti alla struttura.
-- [x] **Gestione Classifica**: Monitora e aggiorna le classifiche delle squadre, con la possibilità di aggiungere o rimuovere squadre e gestire i punteggi divisi per giorno o per gioco.
+- [ ] **Gestione Iscrizioni e Presenze**: Raccoglie e tiene traccia delle iscrizioni e delle presenze giornaliere degli utenti alla struttura.
+- [ ] **Gestione Classifica**: Monitora e aggiorna le classifiche delle squadre, con la possibilità di aggiungere o rimuovere squadre e gestire i punteggi divisi per giorno o per gioco.
 - [ ] **Giochi Interattivi**: Include giochi proiettabili come "4 immagini 1 animatore" per coinvolgere i partecipanti.
 - [ ] **Spazio per Musica e Balli di Gruppo**: Include sezioni per canzoni, jingle e coreografie di gruppo, accessibili facilmente durante gli eventi.
 - [ ] **Timer e Cronometro**: Funzionalità di temporizzazione integrate per facilitare la gestione del tempo durante le attività.
@@ -14,11 +14,10 @@ Un progetto open source progettato per aiutare gli animatori e lo staff dell'ora
 
 ## Tecnologie Utilizzate
 
-- **Frontend**: [Angular](https://angular.io/)
-- **Backend**: [Express.js](https://expressjs.com/) 
-- **Database**: [MySQL](https://www.mysql.com/)
-- **UI**: [Bootstrap](https://getbootstrap.com/) per il design reattivo e personalizzabile
-- **Containerizzazione**: Progetto dockerizzabile per un facile deployment in ambienti diversi.
+- **Frontend**: [Angular](https://angular.io/) (versione 19.1) con supporto per animazioni e gestione delle rotte. Stile e interfaccia basati su [Tailwind CSS](https://tailwindcss.com/) e [FontAwesome](https://fontawesome.com/).
+- **Backend**: [Hono](https://hono.dev/) come framework ultraleggero per API, con validazione tramite [Zod](https://zod.dev/) e ORM [Drizzle](https://orm.drizzle.team/) per l'interazione con il database MySQL. Logging avanzato con [Pino](https://getpino.io/).  
+- **Database**: [MySQL](https://www.mysql.com/) con driver [mysql2](https://www.npmjs.com/package/mysql2) e gestione degli schemi tramite Drizzle ORM.  
+- **Containerizzazione**: Progetto dockerizzabile per un facile deployment in ambienti diversi.  
 
 ## Obiettivi
 

@@ -71,9 +71,9 @@ INSERT INTO EnrollmentWeeks (EnrollmentID, WeekID, IsPaid) VALUES
 (3, 2, FALSE),  -- Marco enrolled in Week 2 (not paid)
 (3, 3, TRUE),  -- Marco enrolled in Week 3 (paid)
 -- Anno dopo
-(1, 4, 1),  -- Luca Rossi per la settimana 4, pagamento effettuato
-(2, 4, 0),  -- Marco Bianchi per la settimana 4, pagamento non effettuato
-(3, 4, 1);  -- Giulia Verdi per la settimana 4, pagamento effettuato
+(4, 4, 1),  -- Luca Rossi per la settimana 4, pagamento effettuato
+(5, 4, 0),  -- Marco Bianchi per la settimana 4, pagamento non effettuato
+(6, 4, 1);  -- Giulia Verdi per la settimana 4, pagamento effettuato
 
 INSERT INTO Attendance (EnrollmentID, Date, Present, EatsInOratory, EatsPlain)
 VALUES

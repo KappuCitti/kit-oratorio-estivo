@@ -4,72 +4,296 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Response } from '../models/Response.model';
 import User from '../models/User.model';
 import { Theme } from '../models/Theme.model';
+import Enrollment, { EnrollmentSearch } from '../models/Enrollment.model';
+import {
+  ChildsGetRequest,
+  EnrollmentCreateRequest,
+  EnrollmentGetRequest,
+  EnrollmentUpdateRequest,
+  FamilyEnrollmentCreateRequest,
+  TeamCreateRequest,
+  TeamUpdateRequest,
+} from '../models/Request.model';
+import Week from '../models/Week.model';
+import Team from '../models/Team.model';
+import { Shirt } from '../models/Shirt.model';
+import { Child, ChildSearch, Family, Parent } from '../models/Family.model';
 @Injectable({
   providedIn: 'root',
 })
 export class ApiService {
   private baseUrl = environment.server + '/api/v1';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  // create login method
+  // User
   login(username: string, password: string) {
-    return this.http.post<Response<any>>(`${this.baseUrl}/user/login`, {
-      username,
-      password,
-    },
+    return this.http.post<Response<any>>(
+      `${this.baseUrl}/user/login`,
+      {
+        username,
+        password,
+      },
       {
         headers: new HttpHeaders({
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         }),
-        responseType: "json",
+        responseType: 'json',
         withCredentials: true,
-        observe: 'response'
-      });
+        observe: 'response',
+      }
+    );
   }
 
   logout() {
-    return this.http.post<Response<any>>(`${this.baseUrl}/user/logout`, {}, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json'
-      }),
-      responseType: "json",
-      withCredentials: true,
-      observe: 'response'
-
-    })
+    return this.http.post<Response<any>>(
+      `${this.baseUrl}/user/logout`,
+      {},
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
   }
 
   getUser() {
     return this.http.get<Response<User>>(`${this.baseUrl}/user`, {
       headers: new HttpHeaders({
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       }),
-      responseType: "json",
+      responseType: 'json',
       withCredentials: true,
-      observe: 'response'
-    })
+      observe: 'response',
+    });
   }
 
   setUserTheme(theme: Theme) {
-    return this.http.post<Response<any>>(`${this.baseUrl}/user/theme`, { theme }, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json'
-      }),
-      responseType: "json",
-      withCredentials: true,
-      observe: 'response'
-    })
+    return this.http.put<Response<any>>(
+      `${this.baseUrl}/user/theme`,
+      { theme },
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
   }
 
-  setUserPassword(oldest: string, newest: string) {
-    return this.http.post<Response<any>>(`${this.baseUrl}/user/password`, { old: oldest, new: newest }, {
+  setUserPassword(oldPassword: string, newPassword: string) {
+    return this.http.put<Response<any>>(
+      `${this.baseUrl}/user/password`,
+      { oldPassword, newPassword },
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
+  }
+
+  // Enrollments
+  getEnrollments(params: EnrollmentGetRequest) {
+    return this.http.get<
+      Response<{ enrollments: EnrollmentSearch[]; count: number }>
+    >(`${this.baseUrl}/enrollments`, {
+      params: { ...params },
       headers: new HttpHeaders({
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       }),
-      responseType: "json",
+      responseType: 'json',
       withCredentials: true,
-      observe: 'response'
-    })
+      observe: 'response',
+    });
+  }
+
+  getEnrollmentById(id: string | number) {
+    return this.http.get<Response<Enrollment>>(
+      `${this.baseUrl}/enrollments/${id.toString()}`,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
+  }
+
+  updateEnrollment(enrollment: EnrollmentUpdateRequest) {
+    return this.http.put<Response<Enrollment>>(
+      `${this.baseUrl}/enrollments/${enrollment.id}`,
+      enrollment,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
+  }
+
+  deleteEnrollment(id: string | number) {
+    return this.http.delete<Response<any>>(
+      `${this.baseUrl}/enrollments/${id.toString()}`,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
+  }
+
+  createEnrollment(enrollment: EnrollmentCreateRequest) {
+    return this.http.post<Response<number>>(
+      `${this.baseUrl}/enrollments`,
+      enrollment,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
+  }
+
+  // Weeks
+  getWeeks(year: number | string) {
+    return this.http.get<Response<Week[]>>(`${this.baseUrl}/weeks`, {
+      params: { year: year.toString() },
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      responseType: 'json',
+      withCredentials: true,
+      observe: 'response',
+    });
+  }
+
+  // Teams
+  getTeams() {
+    return this.http.get<Response<Team[]>>(`${this.baseUrl}/teams`, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      responseType: 'json',
+      withCredentials: true,
+      observe: 'response',
+    });
+  }
+
+  createTeam(params: TeamCreateRequest) {
+    return this.http.post<Response<number>>(`${this.baseUrl}/teams`, params, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      responseType: 'json',
+      withCredentials: true,
+      observe: 'response',
+    });
+  }
+
+  updateTeam(team: TeamUpdateRequest) {
+    return this.http.put<Response<null>>(
+      `${this.baseUrl}/teams/${team.id}`,
+      team,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
+  }
+
+  deleteTeam(id: string | number) {
+    return this.http.delete<Response<null>>(
+      `${this.baseUrl}/teams/${id.toString()}`,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
+  }
+
+  // Shirts
+  getShirts() {
+    return this.http.get<Response<Shirt[]>>(`${this.baseUrl}/shirts`, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      responseType: 'json',
+      withCredentials: true,
+      observe: 'response',
+    });
+  }
+
+  // Families
+  getChilds(params: ChildsGetRequest) {
+    return this.http.get<Response<ChildSearch[]>>(`${this.baseUrl}/childs`, {
+      params: { ...params },
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      responseType: 'json',
+      withCredentials: true,
+      observe: 'response',
+    });
+  }
+
+  createChild(child: Child) {
+    return this.http.post<Response<number>>(`${this.baseUrl}/childs`, child, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      responseType: 'json',
+      withCredentials: true,
+      observe: 'response',
+    });
+  }
+
+  createParent(parent: Parent) {
+    return this.http.post<Response<number>>(`${this.baseUrl}/parents`, parent, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      responseType: 'json',
+      withCredentials: true,
+      observe: 'response',
+    });
+  }
+
+  createFamilyWithEnrollment(family: FamilyEnrollmentCreateRequest) {
+    return this.http.post<Response<number>>(`${this.baseUrl}/family`, family, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      responseType: 'json',
+      withCredentials: true,
+      observe: 'response',
+    });
   }
 }

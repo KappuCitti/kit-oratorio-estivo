@@ -1,0 +1,343 @@
+<app-navbar></app-navbar>
+<div class="container min-h-4/5 flex flex-col justify-between">
+  <!-- Top -->
+  <header class="mb-6">
+    <h1>Nuova iscrizione</h1>
+    <p class="text-secondary">
+      Compila il form sottostante per creare una nuova iscrizione.
+    </p>
+  </header>
+
+  <!-- Middle -->
+  @if (step == 0) {
+  <div class="flex flex-col items-center justify-center">
+    <button
+      class="button-primary w-full md:w-auto"
+      (click)="createFromExistingEnrollment(true)"
+    >
+      Crea da un ragazzo già registrato
+    </button>
+
+    <div class="flex items-center w-full max-w-sm">
+      <div class="flex-grow border-t text-secondary"></div>
+      <p class="mx-2 my-4 text-primary">Oppure</p>
+      <div class="flex-grow border-t text-secondary"></div>
+    </div>
+
+    <button
+      class="button-secondary w-full md:w-auto"
+      (click)="createFromExistingEnrollment(false)"
+    >
+      Crea da un ragazzo nuovo
+    </button>
+  </div>
+  } @else if (step == 1) {
+  <div class="w-full bg-auto p-6 rounded-lg shadow-lg">
+    <app-child
+      [editable]="true"
+      [child]="child"
+      (childChange)="onChildChange($event)"
+      (isValid)="onIsChildValidChange($event)"
+    ></app-child>
+    <div class="my-8"></div>
+    <app-parent
+      [editable]="true"
+      [parent]="parentOne"
+      (parentChange)="onParentChange($event, 1)"
+      (isValid)="onIsParentValidChange($event, 1)"
+    ></app-parent>
+    <div class="my-8"></div>
+    <app-parent
+      [editable]="true"
+      [parent]="parentTwo"
+      (parentChange)="onParentChange($event, 2)"
+      (isValid)="onIsParentValidChange($event, 2)"
+    ></app-parent>
+    <div class="mt-6"></div>
+  </div>
+  }@else if (step == 2) {
+  <div class="flex flex-col justify-center items-center">
+    <div class="w-full bg-auto p-6 rounded-lg shadow-lg mb-6">
+      <div class="flex justify-between mb-2">
+        <h2>Cerca</h2>
+      </div>
+
+      <form [formGroup]="searchForm">
+        <div class="flex flex-wrap -mx-2">
+          <div class="mb-4 w-full px-2">
+            <label class="block required">Nome o Cognome</label>
+            <input type="text" class="w-full" formControlName="query" />
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="w-full bg-auto p-6 rounded-lg shadow-lg">
+      <div class="flex justify-between mb-2">
+        <h2>Risultati</h2>
+      </div>
+
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr>
+            <th class="text-center"></th>
+            <th class="text-start">Nome</th>
+            <th class="text-start">Cognome</th>
+            <th class="text-start">Data di nascita</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (!loading) { @for (child of childs; track child.id) {
+          <tr>
+            <td class="text-center">
+              <input
+                type="radio"
+                [value]="child.id"
+                (change)="onSelectedChildChange(child.id)"
+                [checked]="enrollment.child == child.id"
+              />
+            </td>
+            <td class="text-start">{{ child.name }}</td>
+            <td class="text-start">{{ child.surname }}</td>
+            <td class="text-start">
+              {{ child.birthDate | date : "dd/MM/yyyy" }}
+            </td>
+          </tr>
+          } }
+        </tbody>
+      </table>
+
+      @if (childs.length == 0) {
+      <div class="flex justify-center items-center h-20">
+        <span class="text-secondary">Nessun risultato</span>
+      </div>
+      }
+    </div>
+  </div>
+  } @else if (step == 3) {
+  <div class="flex flex-col justify-center items-center">
+    <div class="w-full md:max-w-lg bg-auto p-6 rounded-lg shadow-lg">
+      <div class="flex flex-col">
+        <label for="year" class="block required">Anno</label>
+        <input
+          type="number"
+          step="1"
+          id="year"
+          [ngModel]="this.enrollment.year"
+          (ngModelChange)="onYearChange($event)"
+        />
+      </div>
+    </div>
+  </div>
+  }@else if (step == 4) {
+  <div
+    class="container min-h-4/5 flex flex-col justify-center items-center p-0 py-6 z-0"
+  >
+    <div class="w-full bg-auto p-6 rounded-lg shadow-lg">
+      <app-enrollment
+        [editable]="true"
+        [year]="this.enrollment.year"
+        (enrollmentChange)="onEnrollmentChange($event)"
+        (isValid)="onIsEnrollmentValidChange($event)"
+      ></app-enrollment>
+    </div>
+  </div>
+  }@else if (step == 5) {
+  <div
+    class="container min-h-4/5 flex flex-col justify-center items-center z-0 p-0"
+  >
+    <div class="w-full bg-auto p-6 rounded-lg shadow-lg">
+      <div class="flex flex-col space-y-4">
+        <div>
+          <div class="mb-2">
+            <h2>Riepilogo finale</h2>
+            <p class="text-secondary">
+              Verifica attentamente le informazioni riportate di seguito prima
+              di procedere con la conferma dell'iscrizione.
+            </p>
+          </div>
+
+          <!-- Condizione: ragazzo esistente -->
+          @if (!existing) {
+          <div>
+            <h2>Soggetti da registrare</h2>
+            <p>
+              <strong>Minore:</strong> {{ child?.name }} {{ child?.surname }}
+            </p>
+            <p>
+              <strong>Genitore 1:</strong> {{ parentOne?.name }}
+              {{ parentOne?.surname }} ({{ parentOne?.gender }})
+            </p>
+            <p>
+              <strong>Genitore 2:</strong> {{ parentTwo?.name }}
+              {{ parentTwo?.surname }} ({{ parentTwo?.gender }})
+            </p>
+          </div>
+
+          }
+        </div>
+
+        <div>
+          <h2>Dati iscrizione</h2>
+          <div>
+            <p>
+              Ragazzo iscritto:
+              <strong>{{ child?.name }} {{ child?.surname }}</strong>
+            </p>
+            <p>
+              Anno: <strong>{{ enrollment.year }}</strong>
+            </p>
+            <p>
+              Scuola
+              <strong>{{
+                enrollment.schoolType == "Primary" ? "Elementare" : "Media"
+              }}</strong
+              >, classe
+              <strong
+                >{{ enrollment.className }}° {{ enrollment.section }}</strong
+              >
+            </p>
+            <p>
+              Numero di settimane:
+              <strong>{{ enrollment.weeks.length }}</strong>
+            </p>
+            @if (enrollment.team) {
+            <p>
+              Squadra assegnata:
+              <strong>{{ enrollment.team ? "Si" : "No" }}</strong>
+            </p>
+            }
+          </div>
+        </div>
+
+        <!-- Bottone di conferma -->
+        <div class="text-center mt-6">
+          <button
+            class="button-primary w-full sm:w-auto"
+            (click)="createEnrollment()"
+          >
+            Conferma iscrizione
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  <div class="my-6 flex justify-center space-x-10 md:space-x-60 sm:space-x-30">
+    <button
+      class="px-4 py-2 h-min button-primary"
+      [disabled]="step == 0"
+      (click)="previousStep()"
+    >
+      «
+    </button>
+
+    <ol class="flex items-center w-full mb-4">
+      <!-- Step 0 - Choose new or existing enrollment -->
+      <li
+        class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block"
+        [ngClass]="{
+          'text-silent': step == 0,
+          'text-primary': step > 0
+        }"
+        (click)="setStep(0)"
+      >
+        <div
+          class="flex items-center text-primary justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 shadow-lg"
+          [ngClass]="{
+            'bg-neon-auto text-secondary': step == 0,
+            'bg-neon-success': step != 0
+          }"
+        >
+          <fa-icon [icon]="faInfo"></fa-icon>
+        </div>
+      </li>
+
+      <!-- Step 1 or 2 - Create new family tree or Choose existing child -->
+      <li
+        class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block"
+        [ngClass]="{
+          'text-silent': step < 3,
+          'text-primary': step > 3
+        }"
+        (click)="setStep(existing ? 2 : 1)"
+      >
+        <div
+          class="flex items-center text-primary justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 shadow-lg"
+          [ngClass]="{
+            'bg-auto text-secondary': step < 1,
+            'bg-neon-auto text-primary': step == 1 || step == 2,
+            'bg-neon-success': step > 2
+          }"
+        >
+          <fa-icon [icon]="faUsers"></fa-icon>
+        </div>
+      </li>
+
+      <!-- Step 3 - Choose year -->
+      <li
+        class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block"
+        [ngClass]="{
+          'text-silent': step < 4,
+          'text-primary': step > 4,
+        }"
+        (click)="setStep(3)"
+      >
+        <div
+          class="flex items-center text-primary justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 shadow-lg bg-neon-auto"
+          [ngClass]="{
+            'bg-auto text-secondary': step < 3,
+            'bg-neon-auto text-primary': step == 3,
+            'bg-neon-success': step > 3
+          }"
+        >
+          <fa-icon [icon]="faCalendar"></fa-icon>
+        </div>
+      </li>
+
+      <!-- Step 4 - Create enrollment -->
+      <li
+        class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block"
+        [ngClass]="{
+          'text-silent': step < 5,
+          'text-primary': step > 5
+        }"
+        (click)="setStep(4)"
+      >
+        <div
+          class="flex items-center text-primary justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 shadow-lg bg-neon-auto"
+          [ngClass]="{
+            'bg-auto text-secondary': step < 4,
+            'bg-neon-auto text-primary': step == 4,
+            'bg-neon-success': step > 4
+          }"
+        >
+          <fa-icon [icon]="faIdCardClip"></fa-icon>
+        </div>
+      </li>
+      <li class="flex items-center" (click)="setStep(5)">
+        <div
+          class="flex items-center text-primary justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 shadow-lg bg-auto"
+          [ngClass]="{
+            'bg-auto text-secondary': step < 5,
+            'bg-neon-auto text-primary': step == 5,
+            'bg-neon-success': step > 5
+          }"
+        >
+          <fa-icon [icon]="faClipboardCheck"></fa-icon>
+        </div>
+      </li>
+    </ol>
+
+    <button
+      class="px-4 py-2 h-min button-primary"
+      [disabled]="step == 5 || maxStep <= step"
+      (click)="nextStep()"
+    >
+      »
+    </button>
+  </div>
+</div>
+
+<app-footer></app-footer>

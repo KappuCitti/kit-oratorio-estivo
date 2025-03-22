@@ -1,0 +1,50 @@
+<div id="child">
+  <div class="flex justify-between mb-2">
+    <h2>Genitore</h2>
+    @if (editable && save) {
+    <button
+      class="text-md button-secondary h-min"
+      [disabled]="!parentForm.valid"
+      (click)="saveParent()"
+    >
+      <fa-icon [icon]="faFloppyDisk"></fa-icon>
+    </button>
+    }
+  </div>
+
+  <details class="w-full">
+    <summary class="cursor-pointer text-lg font-semibold rounded">
+      Anagrafica
+    </summary>
+
+    <form [formGroup]="parentForm">
+      <div class="flex flex-wrap -mx-2">
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block required">Nome</label>
+          <input type="text" class="w-full" formControlName="name" />
+        </div>
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block required">Cognome</label>
+          <input type="text" class="w-full" formControlName="surname" />
+        </div>
+
+        <div class="mb-4 w-full px-2">
+          <label class="block required">Sesso</label>
+          <select class="w-full" formControlName="gender">
+            <option value="M">Maschio</option>
+            <option value="F">Femmina</option>
+          </select>
+        </div>
+
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block required">Email</label>
+          <input type="email" class="w-full" formControlName="email" />
+        </div>
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block required">Telefono</label>
+          <input type="text" class="w-full" formControlName="phoneNumber" />
+        </div>
+      </div>
+    </form>
+  </details>
+</div>

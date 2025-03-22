@@ -1,9 +1,9 @@
 <app-navbar></app-navbar>
-<div class="container min-h-4/5 flex flex-col justify-center items-center px-6">
-  <div class="max-w-3xl w-full bg-auto p-6 rounded-lg shadow-lg">
+<div class="container min-h-4/5 flex flex-col justify-center items-center">
+  <div class="max-w-3xl w-full bg-auto p-6 rounded-lg shadow-lg mb-6">
     @if (user) {
 
-    <h1 class="text-4xl font-bold mb-6 text-center">Ciao {{ user.name }}!</h1>
+    <h1 class="mb-6 text-center">Ciao {{ user.name }}!</h1>
 
     <p class="text-lg font-semibold mb-2">Dati personali</p>
 
@@ -26,7 +26,11 @@
 
         <div class="mb-4 sm:w-2/5 md:w-1/5 w-full px-2">
           <label class="block">Tema</label>
-          <select class="w-full" formControlName="theme" (change)="onChangeTheme()">
+          <select
+            class="w-full"
+            formControlName="theme"
+            (change)="onChangeTheme()"
+          >
             <option value="Dark">Scuro</option>
             <option value="Light">Chiaro</option>
             <option value="System">Sistema</option>
@@ -40,24 +44,23 @@
         Ruoli e permessi
       </summary>
 
-
       <div class="mt-3">
         <h3 class="mb-2">Ruoli</h3>
         <ul class="list-disc pl-5">
           @for ( role of user.roles; track role.id){
           <li class="text-primary">
-            <span class="font-semibold">{{ role.name }}</span> <span class="text-disabled"> (ID: {{ role.id }})</span>
+            <span class="font-semibold">{{ role.name }}</span>
+            <span class="text-disabled"> (ID: {{ role.id }})</span>
           </li>
           }
-
         </ul>
 
         <h3 class="mt-4 mb-2">Permessi</h3>
         <ul class="list-disc pl-5">
           @for ( permission of user.permissions; track permission.id){
           <li class="text-primary">
-            <span class="text-monospace">{{ permission.name }}</span> <span class="text-disabled"> (ID: {{ permission.id
-              }})</span>
+            <span class="text-monospace">{{ permission.name }}</span>
+            <span class="text-disabled"> (ID: {{ permission.id }})</span>
           </li>
           }
         </ul>
@@ -73,11 +76,19 @@
         <div class="flex flex-wrap -mx-2">
           <div class="mb-4 sm:w-1/2 w-full px-2">
             <label class="block">Nuova password</label>
-            <input type="password" class="w-full" formControlName="confirmPasswordOne" />
+            <input
+              type="password"
+              class="w-full"
+              formControlName="confirmPasswordOne"
+            />
           </div>
           <div class="mb-4 sm:w-1/2 w-full px-2">
             <label class="block">Conferma nuova password</label>
-            <input type="password" class="w-full" formControlName="confirmPasswordTwo" />
+            <input
+              type="password"
+              class="w-full"
+              formControlName="confirmPasswordTwo"
+            />
           </div>
           <div class="mb-4 lg:w-1/2 w-full px-2">
             <label class="block">Vecchia password</label>
@@ -85,11 +96,18 @@
           </div>
           <div class="flex justify-center items-end mb-4 lg:w-1/2 w-full px-2">
             <div class="flex w-full space-x-4">
-              <button type="submit" class="button-primary flex-1" [disabled]="!isPasswordFormValid()">
+              <button
+                type="submit"
+                class="button-primary flex-1"
+                [disabled]="!isPasswordFormValid()"
+              >
                 Salva Modifiche
               </button>
-              <button class="button-secondary flex-1" (click)="onResetPasswordForm()"
-                [disabled]="isPasswordFormEmpty()">
+              <button
+                class="button-secondary flex-1"
+                (click)="onResetPasswordForm()"
+                [disabled]="isPasswordFormEmpty()"
+              >
                 Annulla
               </button>
             </div>
@@ -104,5 +122,12 @@
     </div>
     }
   </div>
+  @if (error) {
+  <div
+    class="bg-neon-error p-3 rounded-lg mt-4 shadow-lg w-full max-w-3xl text-center"
+  >
+    {{ error }}
+  </div>
+  }
 </div>
 <app-footer></app-footer>

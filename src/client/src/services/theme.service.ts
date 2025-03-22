@@ -5,7 +5,6 @@ import {
   computed,
   effect,
   inject,
-  Renderer2,
 } from '@angular/core';
 import { CookiesService } from './cookies.service';
 import { Theme, themes } from '../models/Theme.model';
@@ -27,7 +26,6 @@ export class ThemeService {
   });
 
   constructor() {
-    // Effetto reattivo per aggiornare il tema quando cambia la preferenza di sistema
     effect(() => {
       if (
         this.userTheme() === 'System' &&
@@ -45,7 +43,6 @@ export class ThemeService {
       this.setTheme(this.userTheme());
     });
 
-    // Ascolta i cambiamenti del tema di sistema
     window
       .matchMedia('(prefers-color-scheme: dark)')
       .addEventListener('change', (event) => {

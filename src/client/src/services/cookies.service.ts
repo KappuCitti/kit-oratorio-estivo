@@ -16,29 +16,24 @@ import { CookieService as NgxCookieService } from 'ngx-cookie-service';
 export class CookiesService {
   constructor(private cookieService: NgxCookieService) {}
 
-  // Imposta un cookie
   setCookie(name: string, value: string, days: number = 1): void {
     const expireDate = new Date();
     expireDate.setDate(expireDate.getDate() + days);
     this.cookieService.set(name, value, expireDate, '/');
   }
 
-  // Ottieni il valore di un cookie
   getCookie(name: string): string {
     return this.cookieService.get(name);
   }
 
-  // Cancella un cookie
   deleteCookie(name: string): void {
     this.cookieService.delete(name);
   }
 
-  // Cancella tutti i cookie
   deleteAllCookies(): void {
     this.cookieService.deleteAll();
   }
 
-  // Verifica se esiste un cookie
   checkCookie(name: string): boolean {
     return this.cookieService.check(name);
   }

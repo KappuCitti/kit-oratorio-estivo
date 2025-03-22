@@ -1,22 +1,22 @@
-export type Response<T> =  ResponseSuccess<T> | ResponseError | RequestErrror;
+export type Response<T> = ResponseSuccess<T> | ResponseError | RequestErrror;
 
 interface ResponseError {
-    error: string
-    success?: boolean
+  success: false;
+  error: string;
 
-    data: undefined
+  data?: undefined;
 }
 
 interface RequestErrror {
-    error: string[]
-    success: false
+  success: false;
+  error: string[];
 
-    data: undefined
+  data?: undefined;
 }
 
 interface ResponseSuccess<T> {
-    error?: string
-    
-    success: boolean
-    data: T
+  success: boolean;
+  data: T;
+
+  error?: string;
 }

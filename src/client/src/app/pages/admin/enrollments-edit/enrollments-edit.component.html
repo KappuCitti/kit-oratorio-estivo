@@ -1,0 +1,42 @@
+<app-navbar></app-navbar>
+<div class="container min-h-4/5 flex flex-col justify-center items-center">
+  <div class="w-full bg-auto p-6 rounded-lg shadow-lg mb-6">
+    @if (!loading && !error) {
+    <app-enrollment
+      [enrollment]="enrollment"
+      [editable]="true"
+      [save]="saveEnrollment"
+      (enrollmentChange)="onEnrollmentChange($event)"
+    ></app-enrollment>
+    <div class="my-8"></div>
+    <app-child
+      [child]="enrollment?.family?.child || null"
+      [editable]="false"
+    ></app-child>
+    <div class="my-8"></div>
+    <app-parent
+      [parent]="enrollment?.family?.parents?.[0] || null"
+      [editable]="false"
+    ></app-parent>
+    <div class="my-8"></div>
+    <app-parent
+      [parent]="enrollment?.family?.parents?.[1] || null"
+      [editable]="false"
+    ></app-parent>
+    <div class="mt-6"></div>
+    } @else if (error) {
+    <div class="flex justify-center items-center">
+      <div
+        class="bg-neon-error p-3 rounded-lg shadow-lg w-full max-w-md text-center"
+      >
+        {{ error }}
+      </div>
+    </div>
+    } @else {
+    <div class="flex justify-center items-center h-20">
+      <app-loading></app-loading>
+    </div>
+    }
+  </div>
+</div>
+<app-footer></app-footer>

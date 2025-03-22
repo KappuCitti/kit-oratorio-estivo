@@ -1,0 +1,80 @@
+@if (team) {
+<div
+  class="bg-auto py-2 px-3 rounded-lg border-l-8 transition shadow-lg"
+  [ngStyle]="{ 'border-left-color': team.color }"
+>
+  <p
+    class="flex justify-between items-center font-semibold text-lg text-primary"
+  >
+    {{ team.name }}
+    <fa-icon
+      class="button-secondary"
+      [icon]="faPen"
+      (click)="isEditModalOpen = true"
+    ></fa-icon>
+  </p>
+</div>
+}
+
+<!-- Modale modifica squadra -->
+@if (team && isEditModalOpen) {
+<div
+  class="fixed inset-0 bg-black/50 transition-opacity flex items-center justify-center z-50"
+>
+  <div class="bg-auto p-6 rounded-lg shadow-lg max-w-xl w-full">
+    <h2 class="text-xl font-semibold mb-4">Modifica squadra</h2>
+
+    <!-- Form -->
+    <form [formGroup]="teamForm">
+      <div class="flex flex-col space-y-4">
+        <!-- Nome -->
+        <div>
+          <label class="block required">Nome squadra</label>
+          <input type="text" formControlName="name" class="input w-full" />
+        </div>
+
+        <!-- Colore -->
+        <div>
+          <label class="block required">Colore</label>
+          <input
+            type="color"
+            formControlName="color"
+            class="input h-11 p-1 w-full"
+          />
+        </div>
+      </div>
+    </form>
+
+    <!-- Pulsanti -->
+    <div class="flex justify-between items-center mt-6">
+      <!-- Elimina -->
+      <fa-icon
+        class="button-secondary"
+        [icon]="faTrash"
+        (click)="deleteTeam(team.id)"
+      ></fa-icon>
+
+      <!-- Azioni -->
+      <div class="flex space-x-3">
+        <button class="px-4 py-2 button-secondary" (click)="closeEditModal()">
+          Annulla
+        </button>
+        <button
+          class="px-4 py-2 button-primary"
+          (click)="saveTeam()"
+          [disabled]="teamForm.invalid"
+        >
+          Salva
+        </button>
+      </div>
+    </div>
+
+    <!-- Errore -->
+    @if (error) {
+    <div class="bg-neon-error p-3 rounded-lg shadow-lg mt-4 text-center">
+      {{ error }}
+    </div>
+    }
+  </div>
+</div>
+}

@@ -16,18 +16,22 @@
     @apply text-3xl font-bold;
   }
   h2 {
-    @apply text-xl font-semibold;
+    @apply text-2xl font-semibold;
   }
   h5 {
     @apply text-xl font-semibold;
   }
 
   table thead tr {
-    @apply bg-gray-300 dark:bg-gray-700;
+    @apply dark:border-b dark:border-gray-600 dark:bg-gray-600;
+  }
+
+  table tbody tr:nth-child(odd) {
+    @apply bg-gray-200 dark:bg-transparent;
   }
 
   table tbody tr:nth-last-child(n + 2) {
-    @apply border-b border-gray-400 dark:border-gray-600;
+    @apply dark:border-b dark:border-gray-600;
   }
 
   th,
@@ -39,16 +43,21 @@
     @apply block text-gray-600 dark:text-gray-300 text-sm font-semibold mb-2;
   }
 
-  input, select {
+  input,
+  select,
+  textarea {
     @apply px-4 py-2 rounded-lg bg-gray-300 dark:bg-gray-700 border border-gray-300 dark:border-gray-700 focus:outline-none focus:border-gray-400;
   }
   select {
-    @apply border-r-8 border-transparent;
+    @apply border-r-8 border-transparent focus:border-transparent;
   }
-  select:focus {
-    @apply border-transparent;
+  textarea {
+    min-height: 100px;
+    resize: vertical;
   }
-  input:disabled, select:disabled {
+  input:disabled,
+  select:disabled,
+  textarea:disabled {
     @apply opacity-50 cursor-not-allowed;
   }
 
@@ -96,24 +105,38 @@
     @apply border border-gray-400 dark:border-gray-700;
   }
 
+  .text-success {
+    @apply text-emerald-600 dark:text-emerald-500;
+  }
+
+  .text-error {
+    @apply text-rose-600 dark:text-rose-500;
+  }
+
+  .text-warning {
+    @apply text-yellow-500 dark:text-yellow-500;
+  }
+
+  .text-info {
+    @apply text-blue-500 dark:text-blue-500;
+  }
+
   .button-primary {
-    @apply bg-gray-700 hover:bg-gray-600 dark:bg-gray-500 dark:hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition no-underline;
+    @apply bg-gray-700 hover:bg-gray-600 dark:bg-gray-500 dark:hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition no-underline cursor-pointer;
   }
 
   .button-primary:disabled {
     /* @apply bg-gray-600 text-gray-400 cursor-not-allowed; */
     @apply bg-gray-600 dark:bg-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed;
-
   }
 
   .button-secondary {
-    @apply bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-600 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition no-underline;
+    @apply bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-600 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition no-underline cursor-pointer;
   }
 
   .button-secondary:disabled {
     /* @apply bg-gray-300 text-gray-400 cursor-not-allowed; */
     @apply bg-gray-300 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed;
-
   }
 
   .bg-auto {
@@ -138,5 +161,10 @@
 
   .bg-neon-auto {
     @apply bg-gray-800 border-gray-800 dark:bg-gray-700/50  dark:border-gray-500 border-2 rounded-lg text-white;
+  }
+
+  .required::after {
+    @apply text-rose-600 dark:text-rose-500;
+    content: " *";
   }
 }

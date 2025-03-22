@@ -1,0 +1,84 @@
+<app-navbar></app-navbar>
+<div class="container min-h-4/5 justify-between">
+  <header class="mb-6 flex items-center justify-between">
+    <div>
+      <h1>Visualizza squadre</h1>
+      <p class="text-secondary">Consulta le squadre disponibili</p>
+    </div>
+
+    <fa-icon
+      class="button-primary"
+      [icon]="faPlus"
+      (click)="isAddModalOpen = true"
+    ></fa-icon>
+  </header>
+
+  <div
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+  >
+    @for (team of teams; track team.id) {
+    <app-team
+      [team]="team"
+      (teamChange)="onTeamChange($event)"
+      (teamDelete)="onTeamDelete($event)"
+    />
+    }
+  </div>
+</div>
+
+@if (isAddModalOpen) {
+<div
+  class="fixed inset-0 bg-black/50 transition-opacity flex items-center justify-center z-50"
+>
+  <div class="bg-auto p-6 rounded-lg shadow-lg max-w-xl w-full">
+    <h2 class="text-xl font-semibold mb-4">Crea nuova squadra</h2>
+
+    <!-- Form -->
+    <form [formGroup]="teamForm">
+      <div class="flex flex-col space-y-4">
+        <!-- Nome -->
+        <div>
+          <label class="block required">Nome squadra</label>
+          <input type="text" formControlName="name" class="input w-full" />
+        </div>
+
+        <!-- Colore -->
+        <div>
+          <label class="block required">Colore</label>
+          <input
+            type="color"
+            formControlName="color"
+            class="input h-11 p-1 w-full"
+          />
+        </div>
+      </div>
+    </form>
+
+    <!-- Pulsanti -->
+    <div class="flex justify-end items-center mt-6">
+      <!-- Azioni -->
+      <div class="flex space-x-3">
+        <button class="px-4 py-2 button-secondary" (click)="closeEditModal()">
+          Annulla
+        </button>
+        <button
+          class="px-4 py-2 button-primary"
+          (click)="onSaveNewTeam()"
+          [disabled]="teamForm.invalid"
+        >
+          Salva
+        </button>
+      </div>
+    </div>
+
+    <!-- Errore -->
+    @if (error) {
+    <div class="bg-neon-error p-3 rounded-lg shadow-lg mt-4 text-center">
+      {{ error }}
+    </div>
+    }
+  </div>
+</div>
+}
+
+<app-footer></app-footer>

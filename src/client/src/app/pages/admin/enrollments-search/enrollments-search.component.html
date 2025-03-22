@@ -1,0 +1,279 @@
+<app-navbar></app-navbar>
+<div class="container">
+  <header class="mb-6">
+    <h1>Iscrizioni</h1>
+    <p class="text-secondary">
+      Cerca, modifica ed aggiungi le iscrizioni dei ragazzi
+    </p>
+  </header>
+
+  <!-- Campo di ricerca -->
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
+    <div class="flex justify-between mb-2">
+      <h2>Filtro</h2>
+      <fa-icon
+        class="text-md button-secondary"
+        [icon]="faArrowRotateLeft"
+        (click)="onResetSearch()"
+      ></fa-icon>
+    </div>
+
+    <form [formGroup]="searchForm">
+      <div class="flex flex-wrap -mx-2">
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block required">Anno</label>
+          <input type="number" step="1" class="w-full" formControlName="year" />
+        </div>
+
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block">Settimane</label>
+          <select class="w-full" formControlName="week">
+            <option value="">
+              <span class="text-secondary"></span>
+            </option>
+            @for (week of weeks; track week.id) {
+            <option value="{{ week.id }}">
+              {{ week.startDate | date }} - {{ week.endDate | date }}
+            </option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-4 w-full px-2">
+          <label class="block">Nome o cognome</label>
+          <input type="text" class="w-full" formControlName="search" />
+        </div>
+
+        <div class="mb-4 sm:w-1/3 w-full px-2">
+          <label class="block">Tipo scuola</label>
+          <select class="w-full" formControlName="schoolType">
+            <option value="">
+              <span class="text-secondary"></span>
+            </option>
+            <option value="Primary">Elementari</option>
+            <option value="Secondary">Medie</option>
+          </select>
+        </div>
+
+        <div class="mb-4 sm:w-1/3 w-full px-2">
+          <label class="block">Classe</label>
+          <select class="w-full" formControlName="className">
+            <option value="">
+              <span class="text-secondary"></span>
+            </option>
+            <option value="I">I</option>
+            <option value="II">II</option>
+            <option value="III">III</option>
+            <option value="IV">IV</option>
+            <option value="V">V</option>
+          </select>
+        </div>
+        <div class="mb-4 sm:w-1/3 w-full px-2">
+          <label class="block">Squadra</label>
+          <select class="w-full" formControlName="team">
+            <option value="">
+              <span class="text-secondary"></span>
+            </option>
+            @for (team of teams; track team.id) {
+            <option value="{{ team.id }}">{{ team.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabella iscrizioni -->
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
+    <div class="flex justify-between mb-4">
+      <h2>Risultati</h2>
+      <fa-icon
+        class="text-md button-secondary"
+        [icon]="faPlus"
+        [routerLink]="['/admin/enrollments/new']"
+      ></fa-icon>
+    </div>
+
+    <table class="w-full text-left">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Cognome</th>
+          <th class="lg:table-cell hidden">Classe</th>
+          <th class="text-center">Settimane</th>
+          <th class="lg:table-cell hidden text-center">Pagamenti</th>
+          <th class="lg:table-cell hidden text-center">Squadra</th>
+          <th class="lg:table-cell hidden text-center">Autorizzazioni</th>
+          <th class="text-center">Azioni</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (enrollment of enrollments; track enrollment.id) {
+        <tr>
+          <td>{{ enrollment.child.name }}</td>
+          <td>{{ enrollment.child.surname }}</td>
+          <td class="lg:table-cell hidden">
+            Scuola
+            {{
+              enrollment.schoolType.toLowerCase() == "primary"
+                ? "elementare"
+                : "media"
+            }}<br />
+            <span class="text-secondary">
+              Classe {{ enrollment.className }}° {{ enrollment.section }}
+            </span>
+          </td>
+          <td class="text-center space-x-2">
+            @for (week of getWeeksStatus(enrollment.weeks); track week.id) {
+            <span
+              class="rounded-lg px-2 py-1"
+              [ngClass]="{
+                'bg-neon-auto': !week.enrolled && week.isPaid === false,
+                'bg-neon-warning': week.enrolled && week.isPaid === false,
+                'bg-neon-success': week.enrolled && week.isPaid === true
+              }"
+              title="Stato: {{
+                week.enrolled
+                  ? 'Iscritto - ' + (week.isPaid ? 'Pagato' : 'Non pagato')
+                  : 'Non iscritto'
+              }}, Settimana: {{ week.startDate | date : 'dd/MM/yyyy' }} - {{
+                week.endDate | date : 'dd/MM/yyyy'
+              }}"
+              >{{ week.index }}</span
+            >
+            }
+          </td>
+          <td class="lg:table-cell hidden text-center">
+            @if (getTotalWeeksPayed(enrollment.weeks) ==
+            enrollment.weeks.length) {
+            <span>OK</span>
+            } @else {
+            <span
+              class="rounded-lg px-2 py-1"
+              [ngClass]="{
+                'bg-neon-warning': getTotalWeeksPayed(enrollment.weeks) < enrollment.weeks.length,
+              }"
+              >{{ getTotalWeeksPayed(enrollment.weeks) }} /
+              {{ enrollment.weeks.length }}</span
+            >
+            }
+          </td>
+          <td class="lg:table-cell hidden text-center">
+            @if (enrollment.team) {
+            <span
+              class="underline underline-offset-2"
+              [ngStyle]="{
+                'text-decoration-color': enrollment.team.color
+              }"
+            >
+              {{ enrollment.team.name }}
+              <fa-icon
+                [icon]="faDroplet"
+                [style.color]="enrollment.team.color"
+              ></fa-icon>
+            </span>
+            } @else { <span class="text-secondary">-</span> }
+          </td>
+          <td class="lg:table-cell hidden space-x-3 text-center">
+            <fa-icon
+              [icon]="
+                enrollment.dataProcessingConsent
+                  ? faThumbTack
+                  : faThumbTackSlash
+              "
+              [ngClass]="{
+                'text-success': enrollment.dataProcessingConsent,
+                'text-error': !enrollment.dataProcessingConsent
+              }"
+              class="text-xl"
+              [title]="
+                (enrollment.dataProcessingConsent ? 'AUTORIZZA' : 'NEGA') +
+                ' il consenso al trattamento dei dati'
+              "
+            ></fa-icon>
+            <fa-icon
+              [icon]="enrollment.exitAuthorization ? faDoorOpen : faDoorClosed"
+              [ngClass]="{
+                'text-success': enrollment.exitAuthorization,
+                'text-error': !enrollment.exitAuthorization
+              }"
+              class="text-xl"
+              [title]="
+                (enrollment.exitAuthorization ? 'AUTORIZZA' : 'NEGA') +
+                ' le uscite'
+              "
+            ></fa-icon>
+          </td>
+          <td class="space-x-0 sm:space-x-3 space-y-1 text-center text-sm">
+            <button
+              class="button-primary"
+              (click)="editEnrollment(enrollment.id)"
+            >
+              <fa-icon [icon]="faPen"></fa-icon>
+            </button>
+            <button
+              class="button-secondary"
+              (click)="openDeleteModal(enrollment)"
+            >
+              <fa-icon [icon]="faTrash"></fa-icon>
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (enrollments.length == 0) {
+    <div class="flex justify-center items-center h-20">
+      <span class="text-secondary">Nessun risultato</span>
+    </div>
+    }
+
+    <app-pagination
+      [totalItems]="elements"
+      (pageChange)="onPageChange($event)"
+      (itemsPerPageChange)="onSizeChange($event)"
+    ></app-pagination>
+  </div>
+</div>
+
+<!-- Overlay -->
+@if (isDeleteModalOpen) {
+<div
+  class="fixed inset-0 bg-black/50 transition-opacity flex items-center justify-center z-0"
+>
+  <!-- Modale -->
+  <div>
+    <div class="bg-auto p-6 rounded-lg shadow-lg max-w-md w-full">
+      <h2 class="text-xl font-semibold mb-2">Conferma eliminazione</h2>
+      <p class="mb-4">
+        Sei sicuro di voler eliminare l'iscrizione di
+        <b
+          >{{ enrollmentToDelete?.child?.name }}
+          {{ enrollmentToDelete?.child?.surname }}</b
+        >?
+      </p>
+
+      <!-- Pulsanti -->
+      <div class="flex justify-end space-x-3">
+        <button class="px-4 py-2 button-secondary" (click)="closeDeleteModal()">
+          Annulla
+        </button>
+        <button class="px-4 py-2 button-primary" (click)="deleteEnrollment()">
+          Conferma
+        </button>
+      </div>
+    </div>
+    @if (errorDelete) {
+    <div class="bg-auto flex justify-center items-center mt-4">
+      <div
+        class="bg-neon-error p-3 rounded-lg shadow-lg w-full max-w-md text-center"
+      >
+        {{ errorDelete }}
+      </div>
+    </div>
+    }
+  </div>
+</div>
+}
+<app-footer></app-footer>

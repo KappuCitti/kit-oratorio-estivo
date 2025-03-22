@@ -1,8 +1,4 @@
-import {
-  Component,
-  OnInit,
-  signal,
-} from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -16,11 +12,17 @@ import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { ThemeService } from '../../../../services/theme.service';
 import { ApiService } from '../../../../services/api.service';
 import User from '../../../../models/User.model';
-import { LoadingComponent } from "../../../components/loading/loading.component";
+import { LoadingComponent } from '../../../components/loading/loading.component';
+import { UtilsService } from '../../../../services/utils.service';
 
 @Component({
   selector: 'app-my',
-  imports: [ReactiveFormsModule, FooterComponent, NavbarComponent, LoadingComponent],
+  imports: [
+    ReactiveFormsModule,
+    FooterComponent,
+    NavbarComponent,
+    LoadingComponent,
+  ],
   templateUrl: './my.component.html',
   styleUrl: './my.component.css',
 })
@@ -30,11 +32,18 @@ export class MyComponent implements OnInit {
   dataForm: FormGroup;
   passwordForm: FormGroup;
 
+  error: string | null = null;
+
   isPasswordFieldOpened = signal(false); // Signal per gestire lo stato di apertura del details
   isPasswordFormValid = signal(false); // Signal per lo stato della validità del form
   isPasswordFormEmpty = signal(true); // Signal per lo stato di vuotezza dei campi del form
 
-  constructor(private fb: FormBuilder, private theme: ThemeService, private api: ApiService) {
+  constructor(
+    private fb: FormBuilder,
+    private theme: ThemeService,
+    private api: ApiService,
+    private utils: UtilsService
+  ) {
     this.dataForm = this.fb.group({
       surname: [{ value: '', disabled: true }, Validators.required],
       name: [{ value: '', disabled: true }, Validators.required],
@@ -68,7 +77,7 @@ export class MyComponent implements OnInit {
 
         this.dataForm.patchValue(this.user);
       }
-    })
+    });
 
     this.passwordForm.valueChanges.subscribe(() => {
       this.isPasswordFormValid.set(this.passwordForm.valid);
@@ -87,15 +96,29 @@ export class MyComponent implements OnInit {
 
   onSubmit(): void {
     if (this.passwordForm.valid) {
-      this.api.setUserPassword(this.passwordForm.get('password')?.value, this.passwordForm.get('confirmPasswordOne')?.value).subscribe((response) => {
-        if (response.status === 200) {
-          this.onResetPasswordForm();
-        }
-      })
+      this.error = null;
+
+      this.api
+        .setUserPassword(
+          this.passwordForm.get('password')?.value,
+          this.passwordForm.get('confirmPasswordOne')?.value
+        )
+        .subscribe({
+          next: (response) => {
+            if (response.status === 200) {
+              this.onResetPasswordForm();
+            }
+          },
+          error: (error) => {
+            this.error = this.utils.handleResponse(error, null);
+          },
+        });
     }
   }
 
   onResetPasswordForm(): void {
+    this.error = null;
+
     this.passwordForm.reset();
     this.isPasswordFieldOpened.set(false);
     document.querySelector('details')?.removeAttribute('open');

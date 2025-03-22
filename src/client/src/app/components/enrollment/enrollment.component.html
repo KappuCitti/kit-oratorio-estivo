@@ -1,0 +1,139 @@
+<div id="enrollment">
+  <div class="flex justify-between mb-2">
+    <h2>
+      {{ getTitle }}
+    </h2>
+    @if (editable && save) {
+    <button
+      class="text-md button-secondary h-min"
+      [disabled]="!enrollmentForm.valid"
+      (click)="saveEnrollment()"
+    >
+      <fa-icon [icon]="faFloppyDisk"></fa-icon>
+    </button>
+    }
+  </div>
+
+  <details class="w-full" open>
+    <summary class="cursor-pointer text-lg font-semibold rounded">
+      Iscrizione
+    </summary>
+
+    <form [formGroup]="enrollmentForm">
+      <div class="flex flex-wrap -mx-2">
+        <div class="mb-4 sm:w-2/4 w-full px-2">
+          <label class="block required">Tipo scuola</label>
+          <select class="w-full" formControlName="schoolType">
+            <option value="Primary">Elementari</option>
+            <option value="Secondary">Medie</option>
+          </select>
+        </div>
+
+        <div class="mb-4 sm:w-1/4 w-full px-2">
+          <label class="block required">Classe</label>
+          <select class="w-full" formControlName="className">
+            <option value="I">I</option>
+            <option value="II">II</option>
+            <option value="III">III</option>
+            <option value="IV">IV</option>
+            <option value="V">V</option>
+          </select>
+        </div>
+
+        <div class="mb-4 sm:w-1/4 w-full px-2">
+          <label class="block required">Sezione</label>
+          <input type="text" class="w-full" formControlName="section" />
+        </div>
+
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block required"
+            >Consenso a raccolta dati e immagini</label
+          >
+          <input type="checkbox" formControlName="dataProcessingConsent" />
+          <span class="ms-2">{{
+            enrollmentForm.value?.dataProcessingConsent
+              ? "Sì, presto il consenso"
+              : "No, non presto il consenso"
+          }}</span>
+        </div>
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block required">Consenso alle uscite</label>
+          <input type="checkbox" class="" formControlName="exitAuthorization" />
+          <span class="ms-2">{{
+            enrollmentForm.value?.exitAuthorization
+              ? "Sì, presto il consenso"
+              : "No, non presto il consenso"
+          }}</span>
+        </div>
+
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block">Squadra</label>
+          <select class="w-full" formControlName="team">
+            @for(team of teams; track team.id) {
+            <option [value]="team.id">{{ team.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block">Taglia magilietta</label>
+          <select class="w-full" formControlName="shirt">
+            @for(shirt of shirts; track shirt.id) {
+            <option [value]="shirt.id">{{ shirt.sizeName }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-4 w-full px-2">
+          <label class="block">Note dei genitori</label>
+          <textarea class="w-full" formControlName="parentNotes"></textarea>
+        </div>
+        <div class="mb-4 w-full px-2">
+          <label class="block">Note dell'oratorio</label>
+          <textarea class="w-full" formControlName="managerNotes"></textarea>
+        </div>
+      </div>
+    </form>
+  </details>
+
+  <details class="w-full mt-4">
+    <summary class="cursor-pointer text-lg font-semibold rounded">
+      Settimane
+    </summary>
+
+    <table class="w-full text-left">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Data di inizio</th>
+          <th>Data di fine</th>
+          <th class="text-center">Iscritto</th>
+          <th class="text-center">Stato pagamento</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (weeks.length > 0) { @for (week of weeks; track week.id) {
+        <tr>
+          <td>{{ weeks.indexOf(week) + 1 }}</td>
+          <td>{{ week.startDate | date }}</td>
+          <td>{{ week.endDate | date }}</td>
+          <td class="text-center">
+            <input
+              type="checkbox"
+              [checked]="isWeekEnrolled(week.id)"
+              (change)="toggleWeekSelection(week.id, $event, 'e')"
+            />
+          </td>
+          <td class="text-center">
+            <input
+              type="checkbox"
+              [checked]="isWeekPaid(week.id)"
+              (change)="toggleWeekSelection(week.id, $event, 'p')"
+              [disabled]="!isWeekEnrolled(week.id)"
+            />
+          </td>
+        </tr>
+        } }
+      </tbody>
+    </table>
+  </details>
+</div>
