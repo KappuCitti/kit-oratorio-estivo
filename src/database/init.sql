@@ -222,7 +222,7 @@ CREATE TABLE `Week` (
     CONSTRAINT `Week_ID` PRIMARY KEY(`ID`)
 );
 
-ALTER TABLE `Attendance` ADD CONSTRAINT `Attendance_EnrollmentID_Enrollment_ID_fk` FOREIGN KEY (`EnrollmentID`) REFERENCES `Enrollment`(`ID`) ON DELETE no action ON UPDATE no action;
+ALTER TABLE `Attendance` ADD CONSTRAINT `Attendance_EnrollmentID_Enrollment_ID_fk` FOREIGN KEY (`EnrollmentID`) REFERENCES `Enrollment`(`ID`) ON DELETE cascade ON UPDATE no action;
 ALTER TABLE `ChildParent` ADD CONSTRAINT `ChildParent_ChildID_Child_ID_fk` FOREIGN KEY (`ChildID`) REFERENCES `Child`(`ID`) ON DELETE cascade ON UPDATE no action;
 ALTER TABLE `ChildParent` ADD CONSTRAINT `ChildParent_ParentID_Parent_ID_fk` FOREIGN KEY (`ParentID`) REFERENCES `Parent`(`ID`) ON DELETE cascade ON UPDATE no action;
 ALTER TABLE `Child` ADD CONSTRAINT `Child_AddressID_Address_ID_fk` FOREIGN KEY (`AddressID`) REFERENCES `Address`(`ID`) ON DELETE no action ON UPDATE no action;

@@ -177,7 +177,7 @@ export const attendanceTable = mysqlTable('Attendance', {
   id: int('ID').primaryKey().autoincrement(),
   enrollmentId: int('EnrollmentID')
     .notNull()
-    .references(() => enrollmentTable.id),
+    .references(() => enrollmentTable.id, { onDelete: 'cascade' }),
   date: date('Date').notNull(),
   present: boolean('Present').notNull().default(false),
   eatsInOratory: boolean('EatsInOratory').notNull().default(false),
