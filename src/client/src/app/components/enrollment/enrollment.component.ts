@@ -148,7 +148,6 @@ export class EnrollmentComponent implements OnChanges {
   }
 
   updateEnrollment() {
-    console.log('Updated Enrollment:');
     console.table({
       dataProcessingConsent: this.enrollmentForm.value.dataProcessingConsent,
       typeOfDataProcessingConsent:

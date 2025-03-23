@@ -65,7 +65,7 @@
       <form [formGroup]="searchForm">
         <div class="flex flex-wrap -mx-2">
           <div class="mb-4 w-full px-2">
-            <label class="block required">Nome o Cognome</label>
+            <label class="block">Nome o Cognome</label>
             <input type="text" class="w-full" formControlName="query" />
           </div>
         </div>
@@ -112,6 +112,12 @@
         <span class="text-secondary">Nessun risultato</span>
       </div>
       }
+
+      <app-pagination
+        [totalItems]="elements"
+        (pageChange)="onPageChange($event)"
+        (itemsPerPageChange)="onSizeChange($event)"
+      ></app-pagination>
     </div>
   </div>
   } @else if (step == 3) {

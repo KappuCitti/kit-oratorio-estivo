@@ -88,7 +88,7 @@ export class EnrollmentsSearchComponent implements OnInit {
     this.searchForm = this.fb.group({
       year: [this.year, [Validators.required, Validators.min(1980)]],
       week: [''],
-      search: ['', [Validators.maxLength(100)]],
+      query: ['', [Validators.minLength(2), Validators.maxLength(100)]],
       schoolType: [''],
       className: [''],
       team: [''],
@@ -142,8 +142,8 @@ export class EnrollmentsSearchComponent implements OnInit {
     if (this.searchForm.value.week) {
       q.weekId = this.searchForm.value.week;
     }
-    if (this.searchForm.value.search) {
-      q.query = this.searchForm.value.search;
+    if (this.searchForm.value.query) {
+      q.query = this.searchForm.value.query;
     }
     if (this.searchForm.value.schoolType) {
       q.schoolType = this.searchForm.value.schoolType;
@@ -203,7 +203,7 @@ export class EnrollmentsSearchComponent implements OnInit {
     this.searchForm.reset({
       year: now.getFullYear(),
       week: '',
-      search: '',
+      query: '',
       schoolType: '',
       className: '',
       team: '',

@@ -142,7 +142,6 @@ export class TeamComponent implements OnChanges {
             }
           },
           error: (error) => {
-            console.log(error);
             this.error = this.utils.handleResponse(error, null);
           },
         });

@@ -71,7 +71,7 @@ export class PeopleSearchComponent implements OnInit {
     private utils: UtilsService
   ) {
     this.searchForm = this.fb.group({
-      search: ['', [Validators.maxLength(100)]],
+      query: ['', [Validators.minLength(2), Validators.maxLength(100)]],
       gender: [''],
       type: [''],
     });
@@ -97,8 +97,8 @@ export class PeopleSearchComponent implements OnInit {
       size: this.size,
     };
 
-    if (this.searchForm.get('search')?.value) {
-      params.query = this.searchForm.get('search')?.value;
+    if (this.searchForm.get('query')?.value) {
+      params.query = this.searchForm.get('query')?.value;
     }
 
     if (this.searchForm.get('gender')?.value) {

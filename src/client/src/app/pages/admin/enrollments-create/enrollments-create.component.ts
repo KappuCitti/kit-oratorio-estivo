@@ -27,6 +27,7 @@ import { CommonModule } from '@angular/common';
 import { EnrollmentComponent } from '../../../components/enrollment/enrollment.component';
 import { EnrollmentCreateRequest } from '../../../../models/Request.model';
 import { zip } from 'rxjs';
+import { PaginationComponent } from '../../../components/pagination/pagination.component';
 
 /**
  * Steps description:
@@ -50,6 +51,7 @@ import { zip } from 'rxjs';
     CommonModule,
     EnrollmentComponent,
     ReactiveFormsModule,
+    PaginationComponent,
   ],
   templateUrl: './enrollments-create.component.html',
   styleUrl: './enrollments-create.component.css',
@@ -64,6 +66,10 @@ export class EnrollmentsCreateComponent implements OnInit {
   existing: boolean = false;
   step: number = 0;
   maxStep: number = 0;
+
+  elements: number = 0;
+  page: number = 1;
+  size: number = 25;
 
   searchForm: FormGroup;
   childs: ChildSearch[] = [];
@@ -150,14 +156,17 @@ export class EnrollmentsCreateComponent implements OnInit {
       next: (response) => {
         if (response.status === 200 && response.body?.data) {
           this.childs = response.body.data.childs;
+          this.elements = response.body.data.count;
 
-          this.loading = false;
+          console.log(this.elements);
+
           this.step = 2;
           this.maxStep = 2;
 
           if (this.enrollment.child) {
             this.maxStep = 3;
           }
+          this.loading = false;
         }
       },
       error: (error) => {
@@ -239,11 +248,10 @@ export class EnrollmentsCreateComponent implements OnInit {
   }
 
   onEnrollmentChange(enrollment: Enrollment | null) {
-    console.log('Enrollment changed', enrollment);
     this.enrollment = {
       child: this.enrollment.child
         ? parseInt(this.enrollment.child.toString())
-        : -1,
+        : enrollment!.family.child.id,
       team: enrollment!.team?.id || null,
       shirt: enrollment!.shirt?.id || null,
       weeks: enrollment!.weeks.map((week) => ({
@@ -270,9 +278,16 @@ export class EnrollmentsCreateComponent implements OnInit {
     }
   }
 
-  setStep(step: number) {
-    console.log('Setting step from', this.step, 'to', step);
+  onPageChange(page: number) {
+    this.page = page;
+    this.loadChilds();
+  }
+  onSizeChange(size: number) {
+    this.size = size;
+    this.loadChilds();
+  }
 
+  setStep(step: number) {
     if (this.step == 0) {
       this.maxStep = 0;
       this.step = 0;
