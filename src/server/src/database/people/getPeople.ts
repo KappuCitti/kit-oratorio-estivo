@@ -2,7 +2,7 @@ import type { Gender } from '@/models/gender.model';
 import { dbLogger } from '../logger';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { HttpStatusCodes } from '@/codes';
-import { count, eq, like, or, sql } from 'drizzle-orm';
+import { and, count, eq, like, or, sql } from 'drizzle-orm';
 import { db } from '..';
 import { union } from 'drizzle-orm/mysql-core';
 import { childTable, parentTable } from '../schema';
@@ -23,7 +23,7 @@ export async function getPeople(
           or(like(table.name, `%${s}%`), like(table.surname, `%${s}%`))
         );
       if (gender) mappedSearch.push(eq(table.gender, gender));
-      return mappedSearch.length > 0 ? or(...mappedSearch) : undefined;
+      return mappedSearch.length > 0 ? and(...mappedSearch) : undefined;
     }
 
     const parentsQuery = db
