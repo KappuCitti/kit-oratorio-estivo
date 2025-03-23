@@ -64,7 +64,7 @@ export interface FamilyEnrollmentCreateRequest {
   parents: Parent[];
 }
 
-export interface ChildsGetRequest extends Request {
+export interface PeopleGetRequest extends Request {
   query?: string;
   gender?: gender;
 }

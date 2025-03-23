@@ -7,6 +7,14 @@ export interface Family {
 
 export type gender = 'M' | 'F' | 'Other';
 
+export interface PeopleSearch {
+  id: number;
+  name: string;
+  surname: gender;
+  gender: string;
+  type?: string;
+}
+
 export interface Child {
   id: number;
   name: string;
@@ -32,4 +40,11 @@ export interface Parent {
   gender: gender;
   email: string;
   phoneNumber: string;
+}
+
+export interface ParentSearch {
+  id: number;
+  name: string;
+  surname: string;
+  gender: gender;
 }

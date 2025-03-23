@@ -149,7 +149,7 @@ export class EnrollmentsCreateComponent implements OnInit {
     this.api.getChilds({ query: this.searchForm.value.query }).subscribe({
       next: (response) => {
         if (response.status === 200 && response.body?.data) {
-          this.childs = response.body.data;
+          this.childs = response.body.data.childs;
 
           this.loading = false;
           this.step = 2;

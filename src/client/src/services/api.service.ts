@@ -6,7 +6,7 @@ import User from '../models/User.model';
 import { Theme } from '../models/Theme.model';
 import Enrollment, { EnrollmentSearch } from '../models/Enrollment.model';
 import {
-  ChildsGetRequest,
+  PeopleGetRequest,
   EnrollmentCreateRequest,
   EnrollmentGetRequest,
   EnrollmentUpdateRequest,
@@ -17,7 +17,14 @@ import {
 import Week from '../models/Week.model';
 import Team from '../models/Team.model';
 import { Shirt } from '../models/Shirt.model';
-import { Child, ChildSearch, Family, Parent } from '../models/Family.model';
+import {
+  Child,
+  ChildSearch,
+  Family,
+  Parent,
+  ParentSearch,
+  PeopleSearch,
+} from '../models/Family.model';
 @Injectable({
   providedIn: 'root',
 })
@@ -252,16 +259,34 @@ export class ApiService {
   }
 
   // Families
-  getChilds(params: ChildsGetRequest) {
-    return this.http.get<Response<ChildSearch[]>>(`${this.baseUrl}/childs`, {
-      params: { ...params },
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-      responseType: 'json',
-      withCredentials: true,
-      observe: 'response',
-    });
+  getPeople(params: PeopleGetRequest) {
+    return this.http.get<Response<{ people: PeopleSearch[]; count: number }>>(
+      `${this.baseUrl}/people`,
+      {
+        params: { ...params },
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
+  }
+
+  getChilds(params: PeopleGetRequest) {
+    return this.http.get<Response<{ childs: ChildSearch[]; count: number }>>(
+      `${this.baseUrl}/childs`,
+      {
+        params: { ...params },
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
   }
 
   createChild(child: Child) {
@@ -275,6 +300,35 @@ export class ApiService {
     });
   }
 
+  deleteChild(id: string | number) {
+    return this.http.delete<Response<any>>(
+      `${this.baseUrl}/childs/${id.toString()}`,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
+  }
+
+  getParents(params: PeopleGetRequest) {
+    return this.http.get<Response<{ parents: ParentSearch[]; count: number }>>(
+      `${this.baseUrl}/parents`,
+      {
+        params: { ...params },
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
+  }
+
   createParent(parent: Parent) {
     return this.http.post<Response<number>>(`${this.baseUrl}/parents`, parent, {
       headers: new HttpHeaders({
@@ -284,6 +338,20 @@ export class ApiService {
       withCredentials: true,
       observe: 'response',
     });
+  }
+
+  deleteParent(id: string | number) {
+    return this.http.delete<Response<any>>(
+      `${this.baseUrl}/parents/${id.toString()}`,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
   }
 
   createFamilyWithEnrollment(family: FamilyEnrollmentCreateRequest) {

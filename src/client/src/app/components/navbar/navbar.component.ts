@@ -62,7 +62,7 @@ export class NavbarComponent {
       url: '/admin/people',
       icon: this.faAddressBook,
       title: 'Rubrica',
-      disabled: true,
+      disabled: false,
     },
     {
       url: '/admin/enrollments',
