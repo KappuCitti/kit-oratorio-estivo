@@ -227,7 +227,7 @@ ALTER TABLE `ChildParent` ADD CONSTRAINT `ChildParent_ChildID_Child_ID_fk` FOREI
 ALTER TABLE `ChildParent` ADD CONSTRAINT `ChildParent_ParentID_Parent_ID_fk` FOREIGN KEY (`ParentID`) REFERENCES `Parent`(`ID`) ON DELETE cascade ON UPDATE no action;
 ALTER TABLE `Child` ADD CONSTRAINT `Child_AddressID_Address_ID_fk` FOREIGN KEY (`AddressID`) REFERENCES `Address`(`ID`) ON DELETE no action ON UPDATE no action;
 ALTER TABLE `Enrollment` ADD CONSTRAINT `Enrollment_ChildID_Child_ID_fk` FOREIGN KEY (`ChildID`) REFERENCES `Child`(`ID`) ON DELETE cascade ON UPDATE no action;
-ALTER TABLE `Enrollment` ADD CONSTRAINT `Enrollment_TeamID_Team_ID_fk` FOREIGN KEY (`TeamID`) REFERENCES `Team`(`ID`) ON DELETE cascade ON UPDATE no action;
+ALTER TABLE `Enrollment` ADD CONSTRAINT `Enrollment_TeamID_Team_ID_fk` FOREIGN KEY (`TeamID`) REFERENCES `Team`(`ID`) ON DELETE set null ON UPDATE no action;
 ALTER TABLE `Enrollment` ADD CONSTRAINT `Enrollment_ShirtSizeID_ShirtSize_ID_fk` FOREIGN KEY (`ShirtSizeID`) REFERENCES `ShirtSize`(`ID`) ON DELETE set null ON UPDATE no action;
 ALTER TABLE `EnrollmentWeeks` ADD CONSTRAINT `EnrollmentWeeks_EnrollmentID_Enrollment_ID_fk` FOREIGN KEY (`EnrollmentID`) REFERENCES `Enrollment`(`ID`) ON DELETE cascade ON UPDATE no action;
 ALTER TABLE `EnrollmentWeeks` ADD CONSTRAINT `EnrollmentWeeks_WeekID_Week_ID_fk` FOREIGN KEY (`WeekID`) REFERENCES `Week`(`ID`) ON DELETE cascade ON UPDATE no action;

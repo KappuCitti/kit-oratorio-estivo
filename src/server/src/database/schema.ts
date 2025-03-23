@@ -135,7 +135,9 @@ export const enrollmentTable = mysqlTable('Enrollment', {
   childId: int('ChildID')
     .notNull()
     .references(() => childTable.id, { onDelete: 'cascade' }),
-  teamId: int('TeamID').references(() => teamTable.id, { onDelete: 'cascade' }),
+  teamId: int('TeamID').references(() => teamTable.id, {
+    onDelete: 'set null',
+  }),
   shirtSizeId: int('ShirtSizeID').references(() => shirtSizeTable.id, {
     onDelete: 'set null',
   }),
