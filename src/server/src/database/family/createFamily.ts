@@ -18,7 +18,9 @@ import type { EnrollmentWeek } from '@/models/week.model';
 export async function createFamily(family: BodyFamily) {
   try {
     const parents = (
-      await db.insert(parentTable).values(family.parents).$returningId()
+      family.parents.length > 0
+        ? await db.insert(parentTable).values(family.parents).$returningId()
+        : []
     ).map(({ id }) => id);
 
     const childToInsert: Omit<ChildTable, 'id'>[] = [];
@@ -62,7 +64,9 @@ export async function createFamily(family: BodyFamily) {
       }
     }
     const childs = (
-      await db.insert(childTable).values(childToInsert).$returningId()
+      family.childs.length > 0
+        ? await db.insert(childTable).values(childToInsert).$returningId()
+        : []
     ).map(({ id }) => id);
 
     const childParents: { childId: number; parentId: number }[] = [];
@@ -71,7 +75,8 @@ export async function createFamily(family: BodyFamily) {
         childParents.push({ childId, parentId });
       }
     }
-    await db.insert(childParentTable).values(childParents);
+    if (childParents.length > 0)
+      await db.insert(childParentTable).values(childParents);
 
     let enrollmentIds: number[] = [];
     if (enrollments.length > 0) {
