@@ -3,7 +3,10 @@ import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { dateStringSchema, idSchema } from './common.model';
 
-export const bareAttendanceSchema = createSelectSchema(attendanceTable)
+export const attendanceSchema = createSelectSchema(attendanceTable);
+export type Attendance = z.infer<typeof attendanceSchema>;
+
+export const bareAttendanceSchema = attendanceSchema
   .omit({
     date: true,
   })
@@ -15,7 +18,7 @@ export const bareAttendanceSchema = createSelectSchema(attendanceTable)
   });
 export type BareAttendance = z.infer<typeof bareAttendanceSchema>;
 
-export const editAttendanceSchema = createSelectSchema(attendanceTable)
+export const editAttendanceSchema = attendanceSchema
   .extend({
     date: dateStringSchema,
   })
