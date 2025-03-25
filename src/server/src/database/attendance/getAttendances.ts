@@ -9,22 +9,14 @@ import {
   enrollmentWeeksTable,
   weekTable,
 } from '../schema';
-import {
-  and,
-  eq,
-  gte,
-  inArray,
-  isNull,
-  lte,
-  notInArray,
-  sql,
-} from 'drizzle-orm';
+import { and, eq, gte, lte, notInArray, sql } from 'drizzle-orm';
 
-export async function getAttendances(date: Date, page: number, size: number) {
+export async function getAttendances(date: string, page: number, size: number) {
   try {
     const childWithAttendance = db
       .select({
         id: attendanceTable.id,
+        enrollmentId: sql<number>`${enrollmentTable.id}`.as('enrollmentId'),
         childId: enrollmentTable.childId,
         childName: childTable.name,
         childSurname: childTable.surname,
@@ -38,11 +30,13 @@ export async function getAttendances(date: Date, page: number, size: number) {
         eq(attendanceTable.enrollmentId, enrollmentTable.id)
       )
       .innerJoin(childTable, eq(enrollmentTable.childId, childTable.id))
-      .where(eq(attendanceTable.date, date))
+      .where(eq(attendanceTable.date, sql`${date}`))
       .as('attendances');
+
     const childWithoutAttendance = db
       .select({
         id: sql<number>`NULL`,
+        enrollmentId: sql<number>`NULL`.as('enrollmentId'),
         childId: childTable.id,
         childName: childTable.name,
         childSurname: childTable.surname,
@@ -62,13 +56,14 @@ export async function getAttendances(date: Date, page: number, size: number) {
           notInArray(
             childTable.id,
             sql`${db
-              .select({ id: childWithAttendance.id })
+              .select({ id: childWithAttendance.childId })
               .from(childWithAttendance)}`
           ),
-          lte(weekTable.startDate, date),
-          gte(weekTable.endDate, date)
+          lte(weekTable.startDate, sql`${date}`),
+          gte(weekTable.endDate, sql`${date}`)
         )
       );
+
     const attendances = await db
       .select()
       .from(childWithAttendance)

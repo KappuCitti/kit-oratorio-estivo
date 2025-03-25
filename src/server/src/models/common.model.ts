@@ -14,3 +14,5 @@ export const querySizeSchema = z.coerce
   .positive()
   .max(200)
   .default(25);
+
+export const dateStringSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);

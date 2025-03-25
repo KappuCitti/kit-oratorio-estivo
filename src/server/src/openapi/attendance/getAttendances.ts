@@ -1,7 +1,7 @@
 import { HttpStatusCodes } from '@/codes';
 import { hasPermission } from '@/middlewares/hasPermission';
 import { bareAttendanceSchema } from '@/models/attendance.model';
-import { queryPageSchema, querySizeSchema } from '@/models/common.model';
+import { dateStringSchema, queryPageSchema, querySizeSchema } from '@/models/common.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
@@ -13,7 +13,7 @@ export const getAttendaceListRouteDef = createRoute({
   middleware: hasPermission('attendance_get'),
   request: {
     query: z.object({
-      date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      date: dateStringSchema,
       page: queryPageSchema,
       size: querySizeSchema,
     }),
