@@ -1,12 +1,11 @@
 import { attendanceTable } from '@/database/schema';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import { idSchema } from './common.model';
+import { dateStringSchema, idSchema } from './common.model';
 
 export const bareAttendanceSchema = createSelectSchema(attendanceTable)
   .omit({
     date: true,
-    enrollmentId: true,
   })
   .extend({
     id: z.union([idSchema, z.null()]),
@@ -15,3 +14,12 @@ export const bareAttendanceSchema = createSelectSchema(attendanceTable)
     childSurname: z.string().max(255),
   });
 export type BareAttendance = z.infer<typeof bareAttendanceSchema>;
+
+export const editAttendanceSchema = createSelectSchema(attendanceTable)
+  .extend({
+    date: dateStringSchema,
+  })
+  .omit({
+    id: true,
+  });
+export type EditAttendance = z.infer<typeof editAttendanceSchema>;
