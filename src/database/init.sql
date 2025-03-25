@@ -231,7 +231,7 @@ ALTER TABLE `Enrollment` ADD CONSTRAINT `Enrollment_TeamID_Team_ID_fk` FOREIGN K
 ALTER TABLE `Enrollment` ADD CONSTRAINT `Enrollment_ShirtSizeID_ShirtSize_ID_fk` FOREIGN KEY (`ShirtSizeID`) REFERENCES `ShirtSize`(`ID`) ON DELETE set null ON UPDATE no action;
 ALTER TABLE `EnrollmentWeeks` ADD CONSTRAINT `EnrollmentWeeks_EnrollmentID_Enrollment_ID_fk` FOREIGN KEY (`EnrollmentID`) REFERENCES `Enrollment`(`ID`) ON DELETE cascade ON UPDATE no action;
 ALTER TABLE `EnrollmentWeeks` ADD CONSTRAINT `EnrollmentWeeks_WeekID_Week_ID_fk` FOREIGN KEY (`WeekID`) REFERENCES `Week`(`ID`) ON DELETE cascade ON UPDATE no action;
-ALTER TABLE `ExtraordinaryAttendance` ADD CONSTRAINT `ExtraordinaryAttendance_ChildID_Child_ID_fk` FOREIGN KEY (`ChildID`) REFERENCES `Child`(`ID`) ON DELETE no action ON UPDATE no action;
+ALTER TABLE `ExtraordinaryAttendance` ADD CONSTRAINT `ExtraordinaryAttendance_ChildID_Child_ID_fk` FOREIGN KEY (`ChildID`) REFERENCES `Child`(`ID`) ON DELETE cascade ON UPDATE no action;
 ALTER TABLE `Point` ADD CONSTRAINT `Point_TeamID_Team_ID_fk` FOREIGN KEY (`TeamID`) REFERENCES `Team`(`ID`) ON DELETE cascade ON UPDATE no action;
 ALTER TABLE `Point` ADD CONSTRAINT `Point_UserID_User_ID_fk` FOREIGN KEY (`UserID`) REFERENCES `User`(`ID`) ON DELETE set null ON UPDATE no action;
 ALTER TABLE `RolePermission` ADD CONSTRAINT `RolePermission_RoleID_Role_ID_fk` FOREIGN KEY (`RoleID`) REFERENCES `Role`(`ID`) ON DELETE cascade ON UPDATE no action;

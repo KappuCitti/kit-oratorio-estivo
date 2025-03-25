@@ -192,7 +192,7 @@ export const extraordinaryAttendanceTable = mysqlTable(
     id: int('ID').primaryKey().autoincrement(),
     childId: int('ChildID')
       .notNull()
-      .references(() => childTable.id),
+      .references(() => childTable.id, { onDelete: 'cascade' }),
     type: mysqlEnum('Type', ['Join', 'Left']).notNull(),
     time: datetime('Time').notNull(),
     notes: varchar('Notes', { length: 255 }).notNull().default(''),
