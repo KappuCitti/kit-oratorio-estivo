@@ -9,6 +9,7 @@ import {
   enrollmentWeeksTable,
   weekTable,
 } from '../schema';
+import { enrollmentExistsInDate } from '../enrollment/enrollmentExistsInDate';
 
 export async function createAttendance(
   enrollmentId: number,
@@ -25,20 +26,8 @@ export async function createAttendance(
       ),
     }));
     if (attendanceExists) return createErrorResult(HttpStatusCodes.CONFLICT);
-    const enrollment = await db
-      .select()
-      .from(enrollmentWeeksTable)
-      .innerJoin(weekTable, eq(enrollmentWeeksTable.weekId, weekTable.id))
-      .where(
-        and(
-          eq(enrollmentWeeksTable.enrollmentId, enrollmentId),
-          lte(weekTable.startDate, date),
-          gte(weekTable.endDate, date)
-        )
-      )
-      .limit(1);
-    if (enrollment.length < 1)
-      return createErrorResult(HttpStatusCodes.BAD_REQUEST);
+    const validEnrollment = await enrollmentExistsInDate(enrollmentId, date);
+    if (!validEnrollment) return createErrorResult(HttpStatusCodes.BAD_REQUEST);
     const [attendance] = await db
       .insert(attendanceTable)
       .values({

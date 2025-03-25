@@ -1,6 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
 import { createAttendance } from '@/database/attendance/createAttendance';
-import { getAttendances } from '@/database/attendance/getAttendances';
 import type { RouteController } from '@/models/app.model';
 import type { CreateAttendanceRoute } from '@/openapi/attendance/createAttendance';
 import { httpErrorResponse, httpSuccessResponse } from '@/utils/responses';
