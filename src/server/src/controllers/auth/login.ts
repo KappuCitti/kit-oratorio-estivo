@@ -35,7 +35,6 @@ const loginController: RouteController<LoginRoute> = async (c) => {
     return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
   }
   const user = userRes.data;
-  if (!user) return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
   setCookie(c, 'user_theme', user.theme);
   setCookie(c, 'user_token', res.data);
   return httpSuccessResponse(c, null);

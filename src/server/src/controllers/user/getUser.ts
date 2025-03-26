@@ -9,10 +9,14 @@ const getUserController: RouteController<GetUserInfoRoute> = async (c) => {
   const token = getCookie(c, 'user_token');
   if (!token) return httpErrorResponse(c, HttpStatusCodes.UNAUTHORIZED);
   const userRes = await getUserWithPermissionsFromToken(token);
-  if (!userRes.success)
-    return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
-  if (!userRes.data)
-    return httpErrorResponse(c, HttpStatusCodes.UNAUTHORIZED, 'Invalid token');
+  if (!userRes.success) {
+    switch (userRes.error) {
+      case HttpStatusCodes.UNAUTHORIZED:
+        return httpErrorResponse(c, userRes.error, 'Invalid token');
+      default:
+        return httpErrorResponse(c, userRes.error);
+    }
+  }
   return httpSuccessResponse(c, userRes.data);
 };
 

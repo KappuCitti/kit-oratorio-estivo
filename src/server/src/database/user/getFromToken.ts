@@ -17,12 +17,12 @@ export async function getUserFromToken(token: string) {
         sql`${sessionTable.expires} > NOW()`
       ),
     });
-    if (!session) return createSuccessResult(null);
+    if (!session) return createErrorResult(HttpStatusCodes.UNAUTHORIZED);
     const user = await db.query.usersTable.findFirst({
       columns: { password: false },
       where: eq(usersTable.id, session.userId),
     });
-    if (!user) return createSuccessResult(null);
+    if (!user) return createErrorResult(HttpStatusCodes.UNAUTHORIZED);
     return createSuccessResult(user);
   } catch (e) {
     dbLogger.error(e);
@@ -35,7 +35,7 @@ export async function getUserWithPermissionsFromToken(token: string) {
     const userRes = await getUserFromToken(token);
     if (!userRes.success) return userRes;
     const user: FullUser = userRes.data as FullUser;
-    if (!user) return createSuccessResult(null);
+    if (!user) return createErrorResult(HttpStatusCodes.UNAUTHORIZED);
     const roles = await getUserRoles(user.id);
     if (!roles.success) return roles;
     const permissions = await getUserPermissions(user.id);
