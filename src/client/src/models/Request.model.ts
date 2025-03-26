@@ -47,7 +47,7 @@ export interface EnrollmentCreateRequest {
 
 export interface FamilyEnrollmentCreateRequest {
   childs: (Child & {
-    enrollments: {
+    enrollments?: {
       team: number | string | null;
       shirt: number | string | null;
       weeks: { id: number | string; isPaid: boolean }[];

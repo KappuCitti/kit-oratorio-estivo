@@ -61,6 +61,49 @@
     @apply opacity-50 cursor-not-allowed;
   }
 
+  input[type=range] {
+    @apply w-full h-2 bg-gray-300 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    @apply w-4 h-4 bg-gray-500  rounded-full ;
+    appearance: none;
+    -webkit-appearance: none;
+    /* transition: all 0.2s ease-in-out; */
+  }
+
+    /* Stile della traccia dello slider per Mozilla Firefox */
+    input[type="range"]::-moz-range-track {
+      @apply bg-gray-300 dark:bg-gray-700 rounded-lg h-2;
+    }
+
+    /* Stile della traccia dello slider per Microsoft Edge */
+    input[type="range"]::-ms-track {
+      background: transparent;
+      border-color: transparent;
+      color: transparent;
+    }
+
+    /* Stile del "thumb" (maniglia dello slider) per WebKit (Chrome, Safari, Edge) */
+    input[type="range"]::-webkit-slider-thumb {
+      @apply w-5 h-5 bg-gray-500 dark:bg-gray-400 rounded-full border-2 border-gray-700 dark:border-white;
+      -webkit-appearance: none;
+      appearance: none;
+      transition: all 0.2s ease-in-out;
+    }
+
+    /* Stile del "thumb" (maniglia dello slider) per Mozilla Firefox */
+    input[type="range"]::-moz-range-thumb {
+      @apply w-5 h-5 bg-gray-500 dark:bg-gray-400 rounded-full border-2 border-gray-700 dark:border-white;
+      transition: all 0.2s ease-in-out;
+    }
+
+
+    /* Stile del "thumb" per Microsoft Edge */
+    input[type="range"]::-ms-thumb {
+      @apply w-5 h-5 bg-gray-500 dark:bg-gray-400 rounded-full border-2 border-gray-700 dark:border-white;
+    }
+
   hr {
     @apply border-t border-gray-300 dark:border-gray-700;
   }

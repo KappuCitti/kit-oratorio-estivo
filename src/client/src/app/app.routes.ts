@@ -12,6 +12,7 @@ import { DashboardComponent } from './pages/admin/dashboard/dashboard.component'
 import { EnrollmentsCreateComponent } from './pages/admin/enrollments-create/enrollments-create.component';
 import { TeamViewComponent } from './pages/admin/team-view/team-view.component';
 import { PeopleSearchComponent } from './pages/admin/people-search/people-search.component';
+import { PeopleCreateComponent } from './pages/admin/people-create/people-create.component';
 
 export const routes: Routes = [
   // Page for everyone
@@ -29,6 +30,11 @@ export const routes: Routes = [
   {
     path: 'admin/people',
     component: PeopleSearchComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'admin/people/new',
+    component: PeopleCreateComponent,
     canActivate: [AuthGuard],
   },
   {
