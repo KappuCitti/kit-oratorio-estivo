@@ -340,13 +340,14 @@ export class ApiService {
     });
   }
 
-  deleteParent(id: string | number) {
+  deleteParent(id: string | number, deleteChildren: boolean = false) {
     return this.http.delete<Response<any>>(
       `${this.baseUrl}/parents/${id.toString()}`,
       {
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
         }),
+        body: { deleteChildren: deleteChildren },
         responseType: 'json',
         withCredentials: true,
         observe: 'response',
