@@ -23,7 +23,7 @@
           <input type="text" class="w-full" formControlName="query" />
         </div>
 
-        <div class="mb-4 sm:w-1/2 w-full px-2">
+        <div class="mb-2 sm:w-1/2 w-full px-2">
           <label class="block">Sesso</label>
           <select class="w-full" formControlName="gender">
             <option value="">
@@ -34,7 +34,7 @@
           </select>
         </div>
 
-        <div class="mb-4 sm:w-1/2 w-full px-2">
+        <div class="mb-2 sm:w-1/2 w-full px-2">
           <label class="block">Ruolo</label>
           <select class="w-full" formControlName="type">
             <option value="">
@@ -55,7 +55,7 @@
       <fa-icon
         class="text-md button-secondary"
         [icon]="faPlus"
-        [routerLink]="['/admin/family/new']"
+        [routerLink]="['/admin/people/new']"
       ></fa-icon>
     </div>
 
@@ -140,7 +140,7 @@
         <button class="px-4 py-2 button-secondary" (click)="closeDeleteModal()">
           Annulla
         </button>
-        <button class="px-4 py-2 button-primary" (click)="deletePerson()">
+        <button class="px-4 py-2 button-danger" (click)="deletePerson()">
           Conferma
         </button>
       </div>

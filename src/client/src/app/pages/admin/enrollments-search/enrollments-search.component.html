@@ -44,7 +44,7 @@
           <input type="text" class="w-full" formControlName="query" />
         </div>
 
-        <div class="mb-4 sm:w-1/3 w-full px-2">
+        <div class="mb-2 sm:w-1/3 w-full px-2">
           <label class="block">Tipo scuola</label>
           <select class="w-full" formControlName="schoolType">
             <option value="">
@@ -55,7 +55,7 @@
           </select>
         </div>
 
-        <div class="mb-4 sm:w-1/3 w-full px-2">
+        <div class="mb-2 sm:w-1/3 w-full px-2">
           <label class="block">Classe</label>
           <select class="w-full" formControlName="className">
             <option value="">
@@ -68,7 +68,7 @@
             <option value="V">V</option>
           </select>
         </div>
-        <div class="mb-4 sm:w-1/3 w-full px-2">
+        <div class="mb-2 sm:w-1/3 w-full px-2">
           <label class="block">Squadra</label>
           <select class="w-full" formControlName="team">
             <option value="">
@@ -259,7 +259,7 @@
         <button class="px-4 py-2 button-secondary" (click)="closeDeleteModal()">
           Annulla
         </button>
-        <button class="px-4 py-2 button-primary" (click)="deleteEnrollment()">
+        <button class="px-4 py-2 button-danger" (click)="deleteEnrollment()">
           Conferma
         </button>
       </div>
