@@ -1,6 +1,5 @@
 <app-navbar></app-navbar>
-<div class="container">
-  <!-- Dashboard Header -->
+<div class="container min-h-4/5">
   <header class="mb-6">
     <h1>Dashboard Admin</h1>
     <p class="text-secondary">
@@ -21,113 +20,6 @@
     <div class="bg-auto p-4 rounded-lg shadow">
       <h2>Giochi Attivi</h2>
       <p class="text-2xl font-bold">5</p>
-    </div>
-  </div>
-
-  <!-- Collapsible Sections -->
-  <div class="mb-6">
-    <button
-      class="w-full button-primary p-3 text-left"
-      onclick="document.getElementById('collapse1').classList.toggle('hidden')"
-    >
-      <fa-icon [icon]="faChevronDown"></fa-icon> Dettagli Iscrizioni
-    </button>
-    <button
-      class="w-full button-secondary p-3 mt-2 text-left"
-      onclick="document.getElementById('collapse1').classList.toggle('hidden')"
-    >
-      <fa-icon [icon]="faChevronDown"></fa-icon> Dettagli Iscrizioni
-    </button>
-    <div id="collapse1" class="hidden bg-auto p-4 mt-2 rounded-lg">
-      <p>Gestisci e modifica le iscrizioni direttamente da questa sezione.</p>
-    </div>
-  </div>
-
-  <!-- Collapsible Sections -->
-  <div class="mb-6 p-4 bg-auto rounded-lg">
-    <div data-theme="light" class="bg-auto">
-      <button class="w-full button-primary p-3">Bottone primario</button>
-      <button class="w-full button-primary p-3 mt-2" disabled>
-        Bottone primario
-      </button>
-
-      <button class="w-full button-secondary p-3 mt-2">
-        Bottone secondario
-      </button>
-      <button class="w-full button-secondary p-3 mt-2" disabled>
-        Bottone secondario
-      </button>
-
-      <button class="w-full button-danger p-3 mt-2">Bottone pericoloso</button>
-      <button class="w-full button-danger p-3 mt-2" disabled>
-        Bottone pericoloso
-      </button>
-    </div>
-    <div data-theme="dark" class="pt-6">
-      <button class="w-full button-primary p-3">Bottone primario</button>
-      <button class="w-full button-primary p-3 mt-2" disabled>
-        Bottone primario
-      </button>
-
-      <button class="w-full button-secondary p-3 mt-2">
-        Bottone secondario
-      </button>
-      <button class="w-full button-secondary p-3 mt-2" disabled>
-        Bottone secondario
-      </button>
-
-      <button class="w-full button-danger p-3 mt-2">Bottone pericoloso</button>
-      <button class="w-full button-danger p-3 mt-2" disabled>
-        Bottone pericoloso
-      </button>
-    </div>
-  </div>
-
-  <!-- Table Component -->
-  <div class="bg-auto p-6 rounded-lg shadow mb-6">
-    <h2 class="mb-4">Elenco Presenze</h2>
-    <table class="w-full text-left border-collapse">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Cognome</th>
-          <th>Presenza</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Mario</td>
-          <td>Rossi</td>
-          <td class="text-success">Presente</td>
-        </tr>
-        <tr>
-          <td>Luca</td>
-          <td>Bianchi</td>
-          <td class="text-error">Assente</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Showcase Component: Notifications -->
-  <div class="bg-auto p-6 rounded-lg shadow mb-6">
-    <h2 class="mb-4">Notifiche</h2>
-    <div class="bg-auto p-3 rounded-lg mb-2">Sfondo neutro!</div>
-    <div class="bg-neon-info p-3 rounded-lg mb-2">
-      Nuova iscrizione effettuata!
-    </div>
-    <div class="bg-neon-success p-3 rounded-lg mb-2">
-      Squadra aggiunta con successo!
-    </div>
-    <div class="bg-neon-warning p-3 rounded-lg mb-2">
-      Mancano pochi posti disponibili per l'evento!
-    </div>
-    <div class="bg-neon-error p-3 rounded-lg mb-2">
-      Posti esauriti per questo evento!
-    </div>
-
-    <div class="bg-neon-auto p-3 rounded-lg mb-2">
-      Posti esauriti per questo evento!
     </div>
   </div>
 </div>

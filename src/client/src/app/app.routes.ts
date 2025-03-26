@@ -13,8 +13,10 @@ import { EnrollmentsCreateComponent } from './pages/admin/enrollments-create/enr
 import { TeamViewComponent } from './pages/admin/team-view/team-view.component';
 import { PeopleSearchComponent } from './pages/admin/people-search/people-search.component';
 import { PeopleCreateComponent } from './pages/admin/people-create/people-create.component';
+import { environment } from '../environments/environment';
+import { StyleguideComponent } from './pages/styleguide/styleguide.component';
 
-export const routes: Routes = [
+const commonRoutes: Routes = [
   // Page for everyone
   { path: '', component: HomeComponent },
 
@@ -64,3 +66,9 @@ export const routes: Routes = [
   // otherwise redirect
   { path: '**', component: NotFoundComponent },
 ];
+
+const devRoutes: Routes = !environment.production
+  ? [{ path: 'styleguide', component: StyleguideComponent }]
+  : [];
+
+export const routes: Routes = [...devRoutes, ...commonRoutes];
