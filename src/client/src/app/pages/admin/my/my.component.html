@@ -39,28 +39,16 @@
       </div>
     </form>
 
-    <details class="w-full mt-4">
+    <details class="w-full mt-4 mb-6">
       <summary class="cursor-pointer text-lg font-semibold rounded">
-        Ruoli e permessi
+        Ruoli
       </summary>
 
-      <div class="mt-3">
-        <h3 class="mb-2">Ruoli</h3>
-        <ul class="list-disc pl-5">
+      <div>
+        <ul>
           @for ( role of user.roles; track role.id){
           <li class="text-primary">
-            <span class="font-semibold">{{ role.name }}</span>
-            <span class="text-disabled"> (ID: {{ role.id }})</span>
-          </li>
-          }
-        </ul>
-
-        <h3 class="mt-4 mb-2">Permessi</h3>
-        <ul class="list-disc pl-5">
-          @for ( permission of user.permissions; track permission.id){
-          <li class="text-primary">
-            <span class="text-monospace">{{ permission.name }}</span>
-            <span class="text-disabled"> (ID: {{ permission.id }})</span>
+            {{ role.name }}
           </li>
           }
         </ul>
@@ -97,18 +85,18 @@
           <div class="flex justify-center items-end mb-4 lg:w-1/2 w-full px-2">
             <div class="flex w-full space-x-4">
               <button
-                type="submit"
-                class="button-primary flex-1"
-                [disabled]="!isPasswordFormValid()"
-              >
-                Salva Modifiche
-              </button>
-              <button
                 class="button-secondary flex-1"
                 (click)="onResetPasswordForm()"
                 [disabled]="isPasswordFormEmpty()"
               >
                 Annulla
+              </button>
+              <button
+                type="submit"
+                class="button-primary flex-1"
+                [disabled]="!isPasswordFormValid()"
+              >
+                Salva Modifiche
               </button>
             </div>
           </div>
