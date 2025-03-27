@@ -75,7 +75,7 @@
           <td>{{ person.surname }}</td>
           <td>{{ person.name }}</td>
           <td
-            class="text-center cursor-pointer"
+            class="text-center cursor-pointer hover:underline underline-offset-2"
             [ngClass]="{
               'text-error': person.gender == 'F',
               'text-info': person.gender == 'M'
@@ -85,7 +85,7 @@
             {{ person.gender == "F" ? "Femmina" : "Maschio" }}
           </td>
           <td
-            class="text-center cursor-pointer"
+            class="text-center cursor-pointer hover:underline underline-offset-2"
             (click)="
               searchForm.controls['type'].setValue(
                 person.type ?? searchForm.get('type')?.value
