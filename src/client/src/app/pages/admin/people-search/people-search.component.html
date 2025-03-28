@@ -96,7 +96,7 @@
             {{ getPersonType(person) }}
           </td>
           <td class="space-x-0 sm:space-x-3 space-y-1 text-center text-sm">
-            <button class="button-primary" (click)="(undefined)">
+            <button class="button-primary" [routerLink]="['/admin/people', getRawPersonType(person).toLocaleLowerCase(), person.id]">
               <fa-icon [icon]="faPen"></fa-icon>
             </button>
             <button class="button-secondary" (click)="openDeleteModal(person)">

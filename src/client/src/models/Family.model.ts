@@ -1,4 +1,5 @@
 import Address from './Address.model';
+import Enrollment from './Enrollment.model';
 
 export interface Family {
   child: Child;
@@ -33,6 +34,11 @@ export interface ChildSearch {
   birthDate: string;
 }
 
+export type ChildResponse = Child & {
+  enrollments: Enrollment[];
+  parents: Parent[];
+}
+
 export interface Parent {
   id: number;
   name: string;
@@ -48,3 +54,5 @@ export interface ParentSearch {
   surname: string;
   gender: gender;
 }
+
+export type ParentResponse = Parent & { childrens: Child[] }

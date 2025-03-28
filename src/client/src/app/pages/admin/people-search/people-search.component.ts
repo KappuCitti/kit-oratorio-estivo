@@ -144,6 +144,17 @@ export class PeopleSearchComponent implements OnInit {
     return 'Persona';
   }
 
+  getRawPersonType(person: PeopleSearch): string {
+    const type: string = this.searchForm.get('type')?.value;
+
+    if (person.type == 'Parent' || type == 'Parent') {
+      return 'Parent';
+    } else if (person.type == 'Child' || type == 'Child') {
+      return 'Child';
+    }
+    return type;
+  }
+
   getPersonIcon(person: PeopleSearch): IconDefinition {
     const type: string = this.searchForm.get('type')?.value;
 

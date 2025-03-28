@@ -19,9 +19,10 @@ import Team from '../models/Team.model';
 import { Shirt } from '../models/Shirt.model';
 import {
   Child,
+  ChildResponse,
   ChildSearch,
-  Family,
   Parent,
+  ParentResponse,
   ParentSearch,
   PeopleSearch,
 } from '../models/Family.model';
@@ -31,7 +32,7 @@ import {
 export class ApiService {
   private baseUrl = environment.server + '/api/v1';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // User
   login(username: string, password: string) {
@@ -289,6 +290,20 @@ export class ApiService {
     );
   }
 
+  getChildById(id: string | number) {
+    return this.http.get<Response<ChildResponse>>(
+      `${this.baseUrl}/childs/${id.toString()}`,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
+  }
+
   createChild(child: Child) {
     return this.http.post<Response<number>>(`${this.baseUrl}/childs`, child, {
       headers: new HttpHeaders({
@@ -298,6 +313,18 @@ export class ApiService {
       withCredentials: true,
       observe: 'response',
     });
+  }
+
+  updateChild(child: Child) {
+    return this.http.put<Response<null>>(`${this.baseUrl}/childs/${child.id}`, child, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      responseType: 'json',
+      withCredentials: true,
+      observe: 'response',
+    }
+    )
   }
 
   deleteChild(id: string | number) {
@@ -329,6 +356,17 @@ export class ApiService {
     );
   }
 
+  getParentById(id: string | number) {
+    return this.http.get<Response<ParentResponse>>(`${this.baseUrl}/parents/${id}`, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      responseType: 'json',
+      withCredentials: true,
+      observe: 'response',
+    });
+  }
+
   createParent(parent: Parent) {
     return this.http.post<Response<number>>(`${this.baseUrl}/parents`, parent, {
       headers: new HttpHeaders({
@@ -338,6 +376,17 @@ export class ApiService {
       withCredentials: true,
       observe: 'response',
     });
+  }
+
+  updateParent(parent: Parent) {
+    return this.http.put<Response<null>>(`${this.baseUrl}/parents/${parent.id}`, parent, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      responseType: 'json',
+      withCredentials: true,
+      observe: 'response',
+    })
   }
 
   deleteParent(id: string | number, deleteChildren: boolean = false) {

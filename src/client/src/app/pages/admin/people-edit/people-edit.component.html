@@ -1,0 +1,31 @@
+<app-navbar></app-navbar>
+<div class="container">
+  <header class="mb-6">
+    <h1>Modifica persona</h1>
+    <p class="text-secondary">Modifica la persona visualizzata</p>
+  </header>  
+
+  <!-- Tabella iscrizioni -->
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
+    @if (!loading && person) {
+       @if (type == 'parent' && isParent(person)) {
+        <app-parent [parent]="person" [editable]="true" [save]="save" (parentChange)="onPersonEdited($event)"></app-parent>
+
+        @for (child of person.childrens; track child.id) {
+          <div class="my-8"></div>
+          <app-child [child]="child" [editable]="false"></app-child>
+      }
+       } @else if (type == 'child' && isChild(person)) {
+        <app-child [child]="person" [editable]="true" [save]="save" (childChange)="onPersonEdited($event)"></app-child>
+
+        @for (parent of person.parents; track parent.id) {
+            <div class="my-8"></div>
+            <app-parent [parent]="parent" [editable]="false"></app-parent>
+        }
+       }
+    }
+  </div>
+    
+</div>
+
+<app-footer></app-footer>

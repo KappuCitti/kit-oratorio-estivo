@@ -15,6 +15,7 @@ import { PeopleSearchComponent } from './pages/admin/people-search/people-search
 import { PeopleCreateComponent } from './pages/admin/people-create/people-create.component';
 import { environment } from '../environments/environment';
 import { StyleguideComponent } from './pages/styleguide/styleguide.component';
+import { PeopleEditComponent } from './pages/admin/people-edit/people-edit.component';
 
 const commonRoutes: Routes = [
   // Page for everyone
@@ -37,6 +38,11 @@ const commonRoutes: Routes = [
   {
     path: 'admin/people/new',
     component: PeopleCreateComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'admin/people/:type/:id',
+    component: PeopleEditComponent,
     canActivate: [AuthGuard],
   },
   {
