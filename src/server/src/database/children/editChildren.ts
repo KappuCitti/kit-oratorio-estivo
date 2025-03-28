@@ -1,0 +1,39 @@
+import type { Gender } from '@/models/gender.model';
+import { dbLogger } from '../logger';
+import { createErrorResult, createSuccessResult } from '@/utils/createResult';
+import { HttpStatusCodes } from '@/codes';
+import { db } from '..';
+import { eq } from 'drizzle-orm';
+import { childTable } from '../schema';
+
+export async function editChildren(
+  id: number,
+  name?: string,
+  surname?: string,
+  gender?: Gender,
+  birthPlace?: string,
+  birthDate?: string
+) {
+  try {
+    const exists = !!(await db.query.childTable.findFirst({
+      where: eq(childTable.id, id),
+    }));
+    if (!exists) return createErrorResult(HttpStatusCodes.NOT_FOUND);
+
+    await db
+      .update(childTable)
+      .set({
+        name,
+        surname,
+        gender,
+        birthPlace,
+        birthDate,
+      })
+      .where(eq(childTable.id, id));
+
+    return createSuccessResult(null);
+  } catch (e) {
+    dbLogger.error(e);
+    return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
+  }
+}

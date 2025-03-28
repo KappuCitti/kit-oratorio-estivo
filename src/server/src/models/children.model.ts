@@ -14,6 +14,12 @@ export const childSchema = childTableSchema.omit({
 });
 export type BareChild = z.infer<typeof childSchema>;
 
+export const bodyChildSchema = childTableSchema.omit({
+  id: true,
+  addressId: true,
+});
+export type BodyChild = z.infer<typeof bodyChildSchema>;
+
 export const fullChildSchema = createSelectSchema(childTable)
   .omit({
     addressId: true,
