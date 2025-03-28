@@ -1,7 +1,7 @@
 [server]
 port = 3000
 host = '0.0.0.0'
-routes_prefix = '/api/v1'
+routes_prefix = '/api'
 use_https = false
 domain = 'localhost'
 frontend_port = 4200

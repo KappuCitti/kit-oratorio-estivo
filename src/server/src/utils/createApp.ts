@@ -64,7 +64,10 @@ export default function createApp() {
     })
   );
 
-  app.route(config.server.routesPrefix, router());
+  const routers = router();
+  for (const [key, router] of Object.entries(routers)) {
+    app.route(prefixJoin(key), router);
+  }
 
   app.get('*', (c) => {
     return c.redirect('/api/v1');
