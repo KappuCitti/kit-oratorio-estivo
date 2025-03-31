@@ -6,16 +6,16 @@ import { httpErrorResponse, httpSuccessResponse } from '@/utils/responses';
 
 const editChildrenController: RouteController<EditChildRoute> = async (c) => {
   const { id } = await c.req.valid('param');
-  const { name, surname, gender, birthPlace, birthDate } = await c.req.valid(
-    'json'
-  );
+  const { name, surname, gender, birthPlace, birthDate, address } =
+    await c.req.valid('json');
   const res = await editChildren(
     id,
     name,
     surname,
     gender,
     birthPlace,
-    birthDate
+    birthDate,
+    address
   );
   if (!res.success) {
     switch (res.error) {

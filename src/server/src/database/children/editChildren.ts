@@ -5,6 +5,8 @@ import { HttpStatusCodes } from '@/codes';
 import { db } from '..';
 import { eq } from 'drizzle-orm';
 import { childTable } from '../schema';
+import type { BodyAddress } from '@/models/address.model';
+import { createAddressIfNotExists } from '../address/createAddress';
 
 export async function editChildren(
   id: number,
@@ -12,13 +14,22 @@ export async function editChildren(
   surname?: string,
   gender?: Gender,
   birthPlace?: string,
-  birthDate?: string
+  birthDate?: string,
+  address?: BodyAddress
 ) {
   try {
     const exists = !!(await db.query.childTable.findFirst({
       where: eq(childTable.id, id),
     }));
     if (!exists) return createErrorResult(HttpStatusCodes.NOT_FOUND);
+
+    const addressResult = address
+      ? await createAddressIfNotExists(address)
+      : undefined;
+    if (addressResult && !addressResult.success)
+      return createErrorResult(HttpStatusCodes.BAD_REQUEST);
+
+    const addressId = addressResult?.data;
 
     await db
       .update(childTable)
@@ -28,6 +39,7 @@ export async function editChildren(
         gender,
         birthPlace,
         birthDate,
+        addressId,
       })
       .where(eq(childTable.id, id));
 
