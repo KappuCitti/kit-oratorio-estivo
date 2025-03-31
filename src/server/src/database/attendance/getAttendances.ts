@@ -80,7 +80,7 @@ export async function getAttendances(date: string, page: number, size: number) {
       .limit(size)
       .offset((page - 1) * size);
 
-    return createSuccessResult({ count: rows.count, data: attendances });
+    return createSuccessResult({ count: rows.count, elements: attendances });
   } catch (e) {
     dbLogger.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);

@@ -26,7 +26,7 @@ export const getAttendaceListRouteDef = createRoute({
     [HttpStatusCodes.OK]: createJsonResBody(
       true,
       z.object({
-        data: z.array(bareAttendanceSchema),
+        elements: z.array(bareAttendanceSchema),
         count: z.number().nonnegative().int(),
       }),
       'List of Attendances'
