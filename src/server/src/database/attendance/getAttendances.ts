@@ -9,7 +9,7 @@ import {
   enrollmentWeeksTable,
   weekTable,
 } from '../schema';
-import { and, eq, gte, lte, notInArray, sql } from 'drizzle-orm';
+import { and, count, eq, gte, lte, notInArray, sql } from 'drizzle-orm';
 
 export async function getAttendances(date: string, page: number, size: number) {
   try {
@@ -63,16 +63,24 @@ export async function getAttendances(date: string, page: number, size: number) {
           gte(weekTable.endDate, sql`${date}`)
         )
       );
-
-    const attendances = await db
+    const attendanceQuery = db
       .select()
       .from(childWithAttendance)
-      .union(childWithoutAttendance)
+      .union(childWithoutAttendance);
+
+    const [rows] = await db
+      .select({
+        count: count(),
+      })
+      .from(attendanceQuery.as('attendances'))
+      .execute();
+
+    const attendances = await attendanceQuery
       .orderBy(childTable.surname, childTable.name)
       .limit(size)
       .offset((page - 1) * size);
 
-    return createSuccessResult(attendances);
+    return createSuccessResult({ count: rows.count, data: attendances });
   } catch (e) {
     dbLogger.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);

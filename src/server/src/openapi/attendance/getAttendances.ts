@@ -1,7 +1,11 @@
 import { HttpStatusCodes } from '@/codes';
 import { hasPermission } from '@/middlewares/hasPermission';
 import { bareAttendanceSchema } from '@/models/attendance.model';
-import { dateStringSchema, queryPageSchema, querySizeSchema } from '@/models/common.model';
+import {
+  dateStringSchema,
+  queryPageSchema,
+  querySizeSchema,
+} from '@/models/common.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
@@ -21,7 +25,10 @@ export const getAttendaceListRouteDef = createRoute({
   responses: {
     [HttpStatusCodes.OK]: createJsonResBody(
       true,
-      z.array(bareAttendanceSchema),
+      z.object({
+        data: z.array(bareAttendanceSchema),
+        count: z.number().nonnegative().int(),
+      }),
       'List of Attendances'
     ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: createJsonResBody(
