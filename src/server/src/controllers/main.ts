@@ -12,7 +12,7 @@ const mainController: RouteController<MainRoute> = (c) => {
         }/api/v1/docs`
       : undefined;
 
-  const authors = packageJSON.contributors ?? [];
+  const authors = [...(packageJSON.contributors ?? [])];
   authors.unshift(packageJSON.author);
 
   return c.json({
