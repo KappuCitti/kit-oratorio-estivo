@@ -26,6 +26,11 @@ export const editChildRouteDef = createRoute({
       z.string(),
       'Child not found'
     ),
+    [HttpStatusCodes.BAD_REQUEST]: createJsonResBody(
+      false,
+      z.string(),
+      'Child address is invalid'
+    ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: createJsonResBody(
       false,
       z.string(),

@@ -25,6 +25,12 @@ const editChildrenController: RouteController<EditChildRoute> = async (c) => {
           HttpStatusCodes.NOT_FOUND,
           'Child not found'
         );
+      case HttpStatusCodes.BAD_REQUEST:
+        return httpErrorResponse(
+          c,
+          HttpStatusCodes.BAD_REQUEST,
+          'Child address is invalid'
+        );
       default:
         return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
