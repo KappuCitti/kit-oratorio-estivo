@@ -7,8 +7,17 @@ import { httpErrorResponse, httpSuccessResponse } from '@/utils/responses';
 const getAttendancesController: RouteController<GetAttendaceListRoute> = async (
   c
 ) => {
-  const { page, size, date } = await c.req.valid('query');
-  const attendances = await getAttendances(date, page, size);
+  const { page, size, date, className, schoolType, teamId } = await c.req.valid(
+    'query'
+  );
+  const attendances = await getAttendances(
+    date,
+    page,
+    size,
+    teamId,
+    className,
+    schoolType
+  );
   if (!attendances.success)
     return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
   return httpSuccessResponse(c, attendances.data);

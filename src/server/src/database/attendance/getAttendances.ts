@@ -9,10 +9,24 @@ import {
   enrollmentWeeksTable,
   weekTable,
 } from '../schema';
-import { and, count, eq, gte, lte, notInArray, sql } from 'drizzle-orm';
+import { and, count, eq, gte, lte, notInArray, SQL, sql } from 'drizzle-orm';
+import type { SchoolType } from '@/models/schoolTypes.model';
+import type { Class } from '@/models/class.model';
 
-export async function getAttendances(date: string, page: number, size: number) {
+export async function getAttendances(
+  date: string,
+  page: number,
+  size: number,
+  teamId?: number,
+  className?: Class,
+  schoolType?: SchoolType
+) {
   try {
+    const filters: SQL[] = [];
+    if (teamId) filters.push(eq(enrollmentTable.teamId, teamId));
+    if (className) filters.push(eq(enrollmentTable.className, className));
+    if (schoolType) filters.push(eq(enrollmentTable.schoolType, schoolType));
+
     const childWithAttendance = db
       .select({
         id: attendanceTable.id,
@@ -30,7 +44,7 @@ export async function getAttendances(date: string, page: number, size: number) {
         eq(attendanceTable.enrollmentId, enrollmentTable.id)
       )
       .innerJoin(childTable, eq(enrollmentTable.childId, childTable.id))
-      .where(eq(attendanceTable.date, sql`${date}`))
+      .where(and(eq(attendanceTable.date, sql`${date}`), ...filters))
       .as('attendances');
 
     const childWithoutAttendance = db
@@ -60,7 +74,8 @@ export async function getAttendances(date: string, page: number, size: number) {
               .from(childWithAttendance)}`
           ),
           lte(weekTable.startDate, sql`${date}`),
-          gte(weekTable.endDate, sql`${date}`)
+          gte(weekTable.endDate, sql`${date}`),
+          ...filters
         )
       );
     const attendanceQuery = db

@@ -1,11 +1,14 @@
 import { HttpStatusCodes } from '@/codes';
 import { hasPermission } from '@/middlewares/hasPermission';
 import { bareAttendanceSchema } from '@/models/attendance.model';
+import { CLASSES } from '@/models/class.model';
 import {
   dateStringSchema,
+  idSchema,
   queryPageSchema,
   querySizeSchema,
 } from '@/models/common.model';
+import { SCHOOL_TYPES } from '@/models/schoolTypes.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
@@ -20,6 +23,9 @@ export const getAttendaceListRouteDef = createRoute({
       date: dateStringSchema,
       page: queryPageSchema,
       size: querySizeSchema,
+      teamId: idSchema.optional(),
+      className: z.enum(CLASSES).optional(),
+      schoolType: z.enum(SCHOOL_TYPES).optional(),
     }),
   },
   responses: {
