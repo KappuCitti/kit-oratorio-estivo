@@ -22,6 +22,10 @@
     @apply text-xl font-semibold;
   }
 
+  table {
+    @apply min-w-full;
+  }
+
   table thead tr {
     @apply dark:border-b dark:border-gray-600 dark:bg-gray-600;
   }
@@ -115,7 +119,8 @@
     @apply text-gray-900 dark:text-white;
   }
 
-  ul, ol {
+  ul,
+  ol {
     @apply list-inside text-gray-900 dark:text-white;
   }
 
@@ -135,7 +140,10 @@
   }
 
   /* Stile per liste nidificate */
-  ul ul, ul ol, ol ul, ol ol {
+  ul ul,
+  ul ol,
+  ol ul,
+  ol ol {
     @apply mt-1 pl-4;
   }
 
@@ -172,6 +180,10 @@
 
   .container {
     @apply container mx-auto px-4 py-4 -z-10;
+  }
+
+  .container-table {
+    @apply w-full overflow-x-auto;
   }
 
   .text-primary {
@@ -228,6 +240,13 @@
   .button-secondary:disabled {
     /* @apply bg-gray-300 text-gray-400 cursor-not-allowed; */
     @apply bg-gray-300 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed;
+  }
+
+  .button-success {
+    @apply bg-emerald-600 dark:bg-emerald-700 dark:hover:bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition no-underline cursor-pointer;
+  }
+  .button-success:disabled {
+    @apply bg-emerald-600 dark:bg-emerald-700 text-gray-400 dark:text-gray-500 cursor-not-allowed;
   }
 
   .button-danger {

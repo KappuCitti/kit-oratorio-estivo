@@ -16,6 +16,7 @@ import { PeopleCreateComponent } from './pages/admin/people-create/people-create
 import { environment } from '../environments/environment';
 import { StyleguideComponent } from './pages/styleguide/styleguide.component';
 import { PeopleEditComponent } from './pages/admin/people-edit/people-edit.component';
+import { AttendancesSearchComponent } from './pages/admin/attendances-search/attendances-search.component';
 
 const commonRoutes: Routes = [
   // Page for everyone
@@ -58,6 +59,11 @@ const commonRoutes: Routes = [
   {
     path: 'admin/enrollments/:id',
     component: EnrollmentsEditComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'admin/attendances',
+    component: AttendancesSearchComponent,
     canActivate: [AuthGuard],
   },
   {

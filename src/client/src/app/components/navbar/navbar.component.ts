@@ -73,8 +73,8 @@ export class NavbarComponent {
     {
       url: '/admin/attendances',
       icon: this.faHighlighter,
-      title: 'Presenza',
-      disabled: true,
+      title: 'Presenze',
+      disabled: false,
     },
     {
       url: '/admin/staff',

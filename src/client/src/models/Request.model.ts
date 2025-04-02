@@ -1,4 +1,4 @@
-import Enrollment, { className, schoolType } from './Enrollment.model';
+import { className, schoolType } from './Enrollment.model';
 import { Child, gender, Parent } from './Family.model';
 
 export interface Request {
@@ -82,4 +82,12 @@ export interface TeamUpdateRequest {
     type: 'SET' | 'ADD';
     ids: number[];
   };
+}
+
+export interface AttendanceGetRequest extends Request {
+  date: string;
+  schoolType?: schoolType;
+  className?: className;
+  teamId?: number | string;
+  query?: string;
 }

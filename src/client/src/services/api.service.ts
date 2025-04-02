@@ -13,6 +13,7 @@ import {
   FamilyEnrollmentCreateRequest,
   TeamCreateRequest,
   TeamUpdateRequest,
+  AttendanceGetRequest,
 } from '../models/Request.model';
 import Week from '../models/Week.model';
 import Team from '../models/Team.model';
@@ -26,13 +27,14 @@ import {
   ParentSearch,
   PeopleSearch,
 } from '../models/Family.model';
+import Attendance, { AttendanceSearch } from '../models/Attendances.model';
 @Injectable({
   providedIn: 'root',
 })
 export class ApiService {
   private baseUrl = environment.server + '/api/v1';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   // User
   login(username: string, password: string) {
@@ -316,15 +318,18 @@ export class ApiService {
   }
 
   updateChild(child: Child) {
-    return this.http.put<Response<null>>(`${this.baseUrl}/childs/${child.id}`, child, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-      responseType: 'json',
-      withCredentials: true,
-      observe: 'response',
-    }
-    )
+    return this.http.put<Response<null>>(
+      `${this.baseUrl}/childs/${child.id}`,
+      child,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
   }
 
   deleteChild(id: string | number) {
@@ -357,14 +362,17 @@ export class ApiService {
   }
 
   getParentById(id: string | number) {
-    return this.http.get<Response<ParentResponse>>(`${this.baseUrl}/parents/${id}`, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-      responseType: 'json',
-      withCredentials: true,
-      observe: 'response',
-    });
+    return this.http.get<Response<ParentResponse>>(
+      `${this.baseUrl}/parents/${id}`,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
   }
 
   createParent(parent: Parent) {
@@ -379,14 +387,18 @@ export class ApiService {
   }
 
   updateParent(parent: Parent) {
-    return this.http.put<Response<null>>(`${this.baseUrl}/parents/${parent.id}`, parent, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-      responseType: 'json',
-      withCredentials: true,
-      observe: 'response',
-    })
+    return this.http.put<Response<null>>(
+      `${this.baseUrl}/parents/${parent.id}`,
+      parent,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
   }
 
   deleteParent(id: string | number, deleteChildren: boolean = false) {
@@ -413,5 +425,35 @@ export class ApiService {
       withCredentials: true,
       observe: 'response',
     });
+  }
+
+  // Attendance
+  getAttendances(params: AttendanceGetRequest) {
+    return this.http.get<
+      Response<{ elements: AttendanceSearch[]; count: number }>
+    >(`${this.baseUrl}/attendances`, {
+      params: { ...params },
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      responseType: 'json',
+      withCredentials: true,
+      observe: 'response',
+    });
+  }
+
+  updateAttendance(id: string | number, attendance: Attendance) {
+    return this.http.put<Response<null>>(
+      `${this.baseUrl}/attendances/${id}`,
+      attendance,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
   }
 }

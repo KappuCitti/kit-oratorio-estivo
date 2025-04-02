@@ -1,0 +1,231 @@
+<app-navbar></app-navbar>
+<div class="container">
+  <header class="mb-6">
+    <h1>Iscrizioni</h1>
+    <p class="text-secondary">
+      Cerca, modifica ed aggiungi le iscrizioni dei ragazzi
+    </p>
+  </header>
+
+  <!-- Campo di ricerca -->
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
+    <div class="flex justify-between mb-2">
+      <h2>Filtro</h2>
+      <fa-icon
+        class="text-md button-secondary"
+        [icon]="faArrowRotateLeft"
+        (click)="onResetSearch()"
+      ></fa-icon>
+    </div>
+
+    <form [formGroup]="searchForm">
+      <div class="flex flex-wrap -mx-2">
+        <div class="mb-4 sm:w-1/3 w-full px-2">
+          <label class="block required">Giorno</label>
+          <input type="date" step="1" class="w-full" formControlName="date" />
+        </div>
+        <div class="mb-2 sm:w-1/3 w-full px-2">
+          <label class="block">Tipo scuola</label>
+          <select class="w-full" formControlName="schoolType">
+            <option value="">
+              <span class="text-secondary"></span>
+            </option>
+            <option value="Primary">Elementari</option>
+            <option value="Secondary">Medie</option>
+          </select>
+        </div>
+        <div class="mb-2 sm:w-1/3 w-full px-2">
+          <label class="block">Classe</label>
+          <select class="w-full" formControlName="className">
+            <option value="">
+              <span class="text-secondary"></span>
+            </option>
+            <option value="I">I</option>
+            <option value="II">II</option>
+            <option value="III">III</option>
+            <option value="IV">IV</option>
+            <option value="V">V</option>
+          </select>
+        </div>
+
+        <div class="mb-4 w-full px-2">
+          <label class="block">Nome o cognome</label>
+          <input type="text" class="w-full" formControlName="query" />
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabella iscrizioni -->
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
+    <div class="flex justify-between mb-4">
+      <h2>Risultati</h2>
+    </div>
+
+    <div class="container-table">
+      <table class="w-full text-left">
+        <thead>
+          <tr>
+            <th>Cognome</th>
+            <th>Nome</th>
+            <th class="text-center">Presente</th>
+            <th class="text-center">Mangia in oratorio</th>
+            <th class="text-center">Mangia in bianco</th>
+            <th class="text-center">Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (attendance of attendances; track attendance.id) {
+          <tr>
+            <td>{{ attendance.childName }}</td>
+            <td>{{ attendance.childSurname }}</td>
+            <td class="text-center">
+              <input
+                type="checkbox"
+                [id]="'present-' + attendance.id"
+                [checked]="attendance.present"
+                [(ngModel)]="attendance.present"
+                (change)="updateAttendance(attendance)"
+              />
+            </td>
+            <td class="text-center">
+              <input
+                type="checkbox"
+                [id]="'eatsAtOratory-' + attendance.id"
+                [(ngModel)]="attendance.eatsInOratory"
+                [disabled]="!attendance.present"
+                (change)="updateAttendance(attendance)"
+              />
+            </td>
+            <td class="text-center">
+              <input
+                type="checkbox"
+                [id]="'eatsInBianco-' + attendance.id"
+                [(ngModel)]="attendance.eatsPlain"
+                [disabled]="!attendance.present || !attendance.eatsInOratory"
+                (change)="updateAttendance(attendance)"
+              />
+            </td>
+            <td class="space-x-0 sm:space-x-3 space-y-1 text-center text-sm">
+              <button
+                class="button-success"
+                (click)="openExtraordinaryAttendanceModal(attendance, 'Join')"
+                [disabled]="!attendance.present"
+              >
+                <fa-icon [icon]="faRightToBracket"></fa-icon>
+              </button>
+              <button
+                class="button-danger"
+                (click)="openExtraordinaryAttendanceModal(attendance, 'Left')"
+                [disabled]="!attendance.present"
+              >
+                <fa-icon [icon]="faRightFromBracket"></fa-icon>
+              </button>
+              <button class="button-primary" (click)="(undefined)">
+                <fa-icon [icon]="faCalendarDay"></fa-icon>
+              </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (attendances.length == 0) {
+    <div class="flex justify-center items-center h-20">
+      <span class="text-secondary">Nessun risultato</span>
+    </div>
+    }
+
+    <app-pagination
+      [totalItems]="elements"
+      (pageChange)="onPageChange($event)"
+      (itemsPerPageChange)="onSizeChange($event)"
+    ></app-pagination>
+  </div>
+</div>
+
+@if (isExtraordinaryAttendanceModalOpen && selectedAttendance) {
+<div
+  class="fixed inset-0 bg-black/50 transition-opacity flex items-center justify-center z-50"
+>
+  <div class="bg-auto p-6 rounded-lg shadow-lg max-w-xl w-full">
+    <h2 class="text-xl font-semibold">Aggiungi un movimento</h2>
+    <p class="text-secondary mb-4">
+      Aggiungi un movimento per
+      <b>
+        {{ selectedAttendance.childSurname }}
+        {{ selectedAttendance.childName }}</b
+      >
+    </p>
+    <!-- Form -->
+    <form [formGroup]="extraordinaryAttendanceForm">
+      <div class="flex flex-col space-y-4">
+        <div>
+          <label class="block required">Tipo</label>
+          <div class="flex flex-col">
+            <label class="flex items-center">
+              <input
+                type="radio"
+                formControlName="type"
+                value="Join"
+                class="input"
+              />
+              <span class="ms-2">Entrata in ritardo</span>
+            </label>
+
+            <label class="flex items-center">
+              <input
+                type="radio"
+                formControlName="type"
+                value="Left"
+                class="input"
+              />
+              <span class="ms-2">Uscita in anticipo</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block required">Orario</label>
+          <input type="time" formControlName="time" class="input w-full" />
+        </div>
+
+        <div>
+          <label class="block">Note</label>
+          <textarea formControlName="notes" class="input w-full"></textarea>
+        </div>
+      </div>
+    </form>
+
+    <!-- Pulsanti -->
+    <div class="flex justify-end items-center mt-6">
+      <!-- Azioni -->
+      <div class="flex space-x-3">
+        <button
+          class="px-4 py-2 button-secondary"
+          (click)="closeExtraordinaryAttendanceModal()"
+        >
+          Annulla
+        </button>
+        <button
+          class="px-4 py-2 button-primary"
+          (click)="onSaveNewExtraordinaryAttendance()"
+          [disabled]="extraordinaryAttendanceForm.invalid"
+        >
+          Salva
+        </button>
+      </div>
+    </div>
+
+    <!-- Errore -->
+    @if (error) {
+    <div class="bg-neon-error p-3 rounded-lg shadow-lg mt-4 text-center">
+      {{ error }}
+    </div>
+    }
+  </div>
+</div>
+}
+
+<app-footer></app-footer>
