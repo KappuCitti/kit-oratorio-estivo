@@ -27,7 +27,7 @@ export async function editChildren(
       ? await createAddressIfNotExists(address)
       : undefined;
     if (addressResult && !addressResult.success)
-      return createErrorResult(HttpStatusCodes.BAD_REQUEST);
+      return createErrorResult(addressResult.error);
 
     const addressId = addressResult?.data;
 

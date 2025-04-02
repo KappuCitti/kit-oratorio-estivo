@@ -1,7 +1,7 @@
 import { childTable } from '@/database/schema';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import { addressSchema } from './address.model';
+import { bodyAddressSchema } from './address.model';
 import { parentSchema } from './parent.model';
 import { fullEnrollmentSchema } from './enrollment.model';
 
@@ -20,7 +20,7 @@ export const bodyChildSchema = childTableSchema
     addressId: true,
   })
   .extend({
-    address: addressSchema,
+    address: bodyAddressSchema,
   });
 export type BodyChild = z.infer<typeof bodyChildSchema>;
 
@@ -29,7 +29,7 @@ export const fullChildSchema = createSelectSchema(childTable)
     addressId: true,
   })
   .extend({
-    address: addressSchema,
+    address: bodyAddressSchema,
     enrollments: z.array(fullEnrollmentSchema),
   });
 export type FullChild = z.infer<typeof fullChildSchema>;
