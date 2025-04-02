@@ -15,7 +15,7 @@ import {
 import { UtilsService } from '../../../../services/utils.service';
 
 @Component({
-  selector: 'app-team-view',
+  selector: 'app-teams-search',
   imports: [
     FooterComponent,
     NavbarComponent,
@@ -23,10 +23,10 @@ import { UtilsService } from '../../../../services/utils.service';
     FontAwesomeModule,
     ReactiveFormsModule,
   ],
-  templateUrl: './team-view.component.html',
-  styleUrl: './team-view.component.css',
+  templateUrl: './teams-search.component.html',
+  styleUrl: './teams-search.component.css',
 })
-export class TeamViewComponent implements OnInit {
+export class TeamsSearchComponent implements OnInit {
   teams: Team[] = [];
   loading = true;
 

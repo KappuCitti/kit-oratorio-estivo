@@ -10,7 +10,7 @@ import { EnrollmentsSearchComponent } from './pages/admin/enrollments-search/enr
 import { EnrollmentsEditComponent } from './pages/admin/enrollments-edit/enrollments-edit.component';
 import { DashboardComponent } from './pages/admin/dashboard/dashboard.component';
 import { EnrollmentsCreateComponent } from './pages/admin/enrollments-create/enrollments-create.component';
-import { TeamViewComponent } from './pages/admin/team-view/team-view.component';
+import { TeamsSearchComponent } from './pages/admin/teams-search/teams-search.component';
 import { PeopleSearchComponent } from './pages/admin/people-search/people-search.component';
 import { PeopleCreateComponent } from './pages/admin/people-create/people-create.component';
 import { environment } from '../environments/environment';
@@ -68,7 +68,7 @@ const commonRoutes: Routes = [
   },
   {
     path: 'admin/teams',
-    component: TeamViewComponent,
+    component: TeamsSearchComponent,
     canActivate: [AuthGuard],
   },
   { path: 'admin/my', component: MyComponent, canActivate: [AuthGuard] },
