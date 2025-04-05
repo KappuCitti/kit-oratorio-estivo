@@ -1,4 +1,6 @@
+@charset "UTF-8";
 @import "tailwindcss";
+@import "../public/styles/calendar.css";
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @layer base {

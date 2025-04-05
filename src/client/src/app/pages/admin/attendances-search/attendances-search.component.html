@@ -121,7 +121,7 @@
               >
                 <fa-icon [icon]="faRightFromBracket"></fa-icon>
               </button>
-              <button class="button-primary" (click)="(undefined)">
+              <button class="button-primary" [routerLink]="['/admin/attendances', attendance.childId]">
                 <fa-icon [icon]="faCalendarDay"></fa-icon>
               </button>
             </td>

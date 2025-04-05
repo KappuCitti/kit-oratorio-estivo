@@ -17,6 +17,7 @@ import { environment } from '../environments/environment';
 import { StyleguideComponent } from './pages/styleguide/styleguide.component';
 import { PeopleEditComponent } from './pages/admin/people-edit/people-edit.component';
 import { AttendancesSearchComponent } from './pages/admin/attendances-search/attendances-search.component';
+import { AttendancesEditComponent } from './pages/admin/attendances-edit/attendances-edit.component';
 
 const commonRoutes: Routes = [
   // Page for everyone
@@ -64,6 +65,11 @@ const commonRoutes: Routes = [
   {
     path: 'admin/attendances',
     component: AttendancesSearchComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'admin/attendances/:id',
+    component: AttendancesEditComponent,
     canActivate: [AuthGuard],
   },
   {

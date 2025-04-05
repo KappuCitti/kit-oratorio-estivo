@@ -25,6 +25,7 @@ import Attendance, {
   AttendanceSearch,
 } from '../../../../models/Attendances.model';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-attendances-search',
@@ -36,6 +37,7 @@ import { CommonModule } from '@angular/common';
     NavbarComponent,
     CommonModule,
     FormsModule,
+    RouterLink
   ],
   templateUrl: './attendances-search.component.html',
   styleUrl: './attendances-search.component.css',
