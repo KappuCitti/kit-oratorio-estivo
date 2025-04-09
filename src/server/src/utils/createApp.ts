@@ -5,11 +5,13 @@ import type { Bindings } from '@/models/app.model';
 import { configureOpenApi } from './openApi';
 import config from '@/config';
 import router from '@/router';
+import path from 'path';
 import { cors } from 'hono/cors';
 import { parseZodError } from './parseZodError';
 import { httpErrorResponse } from './responses';
 import { HttpStatusCodes } from '@/codes';
 import { prefixJoin } from './joinPrefix';
+import { serveStatic } from 'hono/serve-static';
 
 export function createRouter() {
   return new OpenAPIHono<Bindings>({
@@ -41,6 +43,16 @@ export default function createApp() {
       'Not found - ' + c.req.method.toUpperCase() + ' ' + c.req.path
     );
   });
+
+  app.use(
+    '/static/*',
+    serveStatic({
+      root: path.join(__dirname, '../../global/'),
+      getContent: async (path) => {
+        return await Bun.file(path).text();
+      },
+    })
+  );
 
   app.onError((err, c) => {
     c.var.logger.error(err.message, err);
