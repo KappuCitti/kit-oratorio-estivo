@@ -228,6 +228,7 @@
 
   .button-primary {
     @apply bg-gray-700 hover:bg-gray-600 dark:bg-gray-500 dark:hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition no-underline cursor-pointer;
+    @apply transform active:scale-90 transition-transform duration-100 ease-in-out;
   }
 
   .button-primary:disabled {
@@ -237,6 +238,7 @@
 
   .button-secondary {
     @apply bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-600 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg transition no-underline cursor-pointer;
+    @apply transform active:scale-90 transition-transform duration-100 ease-in-out;
   }
 
   .button-secondary:disabled {
@@ -246,6 +248,7 @@
 
   .button-success {
     @apply bg-emerald-600 dark:bg-emerald-700 dark:hover:bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition no-underline cursor-pointer;
+    @apply transform active:scale-90 transition-transform duration-100 ease-in-out;
   }
   .button-success:disabled {
     @apply bg-emerald-600 dark:bg-emerald-700 text-gray-400 dark:text-gray-500 cursor-not-allowed;
@@ -253,6 +256,7 @@
 
   .button-danger {
     @apply bg-rose-600 dark:bg-rose-700 dark:hover:bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-6 rounded-lg transition no-underline cursor-pointer;
+    @apply transform active:scale-90 transition-transform duration-100 ease-in-out;
   }
 
   .button-danger:disabled {
