@@ -51,6 +51,7 @@ export default function createApp() {
       getContent: async (path) => {
         return await Bun.file(path).text();
       },
+      rewriteRequestPath: (path) => path.replace('/static/', '/'),
     })
   );
 
