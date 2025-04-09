@@ -45,12 +45,14 @@ export class TeamComponent implements OnChanges {
   teamForm!: FormGroup;
 
   error: string | null = null;
+  errorDelete: string | null = null;
 
   faFloppyDisk = faFloppyDisk;
   faPen = faPen;
   faTrash = faTrash;
 
   isEditModalOpen = false;
+  isDeleteModalOpen = false;
 
   constructor(
     private api: ApiService,
@@ -92,8 +94,9 @@ export class TeamComponent implements OnChanges {
     }
   }
 
-  deleteTeam(id: number) {
-    this.api.deleteTeam(id).subscribe(() => {
+  deleteTeam() {
+    if (!this.team) return;
+    this.api.deleteTeam(this.team?.id).subscribe(() => {
       this.teamDelete.emit(this.team!.id);
       this.closeEditModal();
     });

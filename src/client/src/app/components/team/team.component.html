@@ -3,16 +3,21 @@
   class="bg-auto py-2 px-3 rounded-lg border-l-8 transition shadow-lg"
   [ngStyle]="{ 'border-left-color': team.color }"
 >
-  <p
-    class="flex justify-between items-center font-semibold text-lg text-primary"
-  >
-    {{ team.name }}
-    <fa-icon
-      class="button-secondary"
-      [icon]="faPen"
-      (click)="isEditModalOpen = true"
-    ></fa-icon>
-  </p>
+  <div class="flex justify-between items-center">
+    <p class="font-semibold text-lg text-primary">{{ team.name }}</p>
+    <div class="flex space-x-2">
+      <fa-icon
+        class="button-primary"
+        [icon]="faPen"
+        (click)="isEditModalOpen = true"
+      ></fa-icon>
+      <fa-icon
+        class="button-secondary"
+        [icon]="faTrash"
+        (click)="isDeleteModalOpen = true"
+      ></fa-icon>
+    </div>
+  </div>
 </div>
 }
 
@@ -46,14 +51,7 @@
     </form>
 
     <!-- Pulsanti -->
-    <div class="flex justify-between items-center mt-6">
-      <!-- Elimina -->
-      <fa-icon
-        class="button-secondary"
-        [icon]="faTrash"
-        (click)="deleteTeam(team.id)"
-      ></fa-icon>
-
+    <div class="flex justify-end items-center mt-6">
       <!-- Azioni -->
       <div class="flex space-x-3">
         <button class="px-4 py-2 button-secondary" (click)="closeEditModal()">
@@ -73,6 +71,44 @@
     @if (error) {
     <div class="bg-neon-error p-3 rounded-lg shadow-lg mt-4 text-center">
       {{ error }}
+    </div>
+    }
+  </div>
+</div>
+} @if (team && isDeleteModalOpen) {
+<div
+  class="fixed inset-0 bg-black/50 transition-opacity flex items-center justify-center z-0"
+>
+  <!-- Modale -->
+  <div>
+    <div class="bg-auto p-6 rounded-lg shadow-lg max-w-md w-full">
+      <h2 class="text-xl font-semibold mb-2">Conferma eliminazione</h2>
+      <p class="mb-4">
+        Sei sicuro di voler eliminare la squadra
+        <b>{{ teamForm.get("name")?.value }}</b
+        >?
+      </p>
+
+      <!-- Pulsanti -->
+      <div class="flex justify-end space-x-3">
+        <button
+          class="px-4 py-2 button-secondary"
+          (click)="isDeleteModalOpen = false"
+        >
+          Annulla
+        </button>
+        <button class="px-4 py-2 button-danger" (click)="deleteTeam()">
+          Conferma
+        </button>
+      </div>
+    </div>
+    @if (errorDelete) {
+    <div class="bg-auto flex justify-center items-center mt-4">
+      <div
+        class="bg-neon-error p-3 rounded-lg shadow-lg w-full max-w-md text-center"
+      >
+        {{ errorDelete }}
+      </div>
     </div>
     }
   </div>
