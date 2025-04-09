@@ -49,7 +49,7 @@ export default function createApp() {
     serveStatic({
       root: path.join(__dirname, '../../global/'),
       getContent: async (path) => {
-        return await Bun.file(path).text();
+        return await Bun.file(path).bytes();
       },
       rewriteRequestPath: (path) => path.replace('/static/', '/'),
     })
