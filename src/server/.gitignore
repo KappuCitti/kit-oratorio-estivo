@@ -176,3 +176,5 @@ dist
 
 # Default certificate folder
 ssl/
+
+global/
