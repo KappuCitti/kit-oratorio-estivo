@@ -110,6 +110,7 @@ export class MyComponent implements OnInit {
             }
           },
           error: (error) => {
+            console.error(error);
             this.error = this.utils.handleResponse(error, null);
           },
         });

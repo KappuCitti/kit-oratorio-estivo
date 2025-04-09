@@ -45,6 +45,7 @@ export class LoginComponent {
           this.handleResponse(response);
         },
         error: (error) => {
+          console.error(error);
           this.handleResponse(error);
         },
       });

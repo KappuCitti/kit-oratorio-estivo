@@ -191,6 +191,7 @@ export class PeopleSearchComponent implements OnInit {
           }
         },
         error: (error) => {
+          console.error(error);
           this.errorDelete = this.utils.handleResponse(error, null);
         },
       });
@@ -203,6 +204,7 @@ export class PeopleSearchComponent implements OnInit {
           }
         },
         error: (error) => {
+          console.error(error);
           this.errorDelete = this.utils.handleResponse(error, null);
         },
       });

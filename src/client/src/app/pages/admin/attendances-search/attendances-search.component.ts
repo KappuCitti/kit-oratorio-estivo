@@ -37,7 +37,7 @@ import { RouterLink } from '@angular/router';
     NavbarComponent,
     CommonModule,
     FormsModule,
-    RouterLink
+    RouterLink,
   ],
   templateUrl: './attendances-search.component.html',
   styleUrl: './attendances-search.component.css',
@@ -140,6 +140,7 @@ export class AttendancesSearchComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
+        console.error(error);
         this.error = this.utils.handleResponse(error, null);
         this.loading = false;
       },

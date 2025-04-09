@@ -170,8 +170,9 @@ export class EnrollmentsCreateComponent implements OnInit {
         }
       },
       error: (error) => {
-        this.loading = false;
+        console.error(error);
         this.error = this.utils.handleResponse(error, null);
+        this.loading = false;
       },
     });
   }

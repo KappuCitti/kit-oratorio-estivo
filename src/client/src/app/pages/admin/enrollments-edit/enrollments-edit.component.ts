@@ -60,8 +60,9 @@ export class EnrollmentsEditComponent implements OnInit {
           }
         },
         error: (error) => {
-          this.loading = false;
+          console.log(error);
           this.error = this.utils.handleResponse(error, null);
+          this.loading = false;
         },
       });
     }
