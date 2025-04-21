@@ -135,7 +135,6 @@ export class AttendancesSearchComponent implements OnInit {
         if (response.status == 200 && response.body?.data) {
           this.elements = response.body?.data.count;
           this.attendances = response.body?.data.elements;
-          console.log(this.attendances);
         }
         this.loading = false;
       },

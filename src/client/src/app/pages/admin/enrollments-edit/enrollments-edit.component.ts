@@ -54,8 +54,6 @@ export class EnrollmentsEditComponent implements OnInit {
           if (response.status === 200 && response.body?.data) {
             this.enrollment = response.body?.data;
 
-            console.log(this.enrollment.family.parents);
-
             this.loading = false;
           }
         },
@@ -73,12 +71,10 @@ export class EnrollmentsEditComponent implements OnInit {
   }
 
   saveEnrollment = () => {
-    console.log('Save function for update Enrollment:');
     console.table({
       dataProcessingConsent: this.updatedEnrollment?.dataProcessingConsent,
       exitAuthorization: this.updatedEnrollment?.exitAuthorization,
     });
-    console.log(this.updatedEnrollment);
 
     if (
       this.enrollment &&

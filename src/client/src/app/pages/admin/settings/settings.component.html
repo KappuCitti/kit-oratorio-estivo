@@ -1,0 +1,146 @@
+<app-navbar></app-navbar>
+<div class="container min-h-4/5">
+  <header class="mb-6">
+    <h1>Impostazioni</h1>
+    <!-- Impostazioni del gestionale -->
+    <p class="text-secondary">
+      Gestisci le impostazioni sulle Gite e sul top Oratorio in modo semplice ed
+      efficace
+    </p>
+  </header>
+
+  <!-- Sezione Stato Generale -->
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
+    <div class="flex justify-between mb-2">
+      <h2>Aperture iscrizioni oratorio estivo</h2>
+      <fa-icon
+        class="text-md button-secondary"
+        [icon]="faPlus"
+        [routerLink]="[]"
+      ></fa-icon>
+    </div>
+
+    <ul class="list-none space-y-2 ps-0"></ul>
+  </div>
+
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-8">
+    <div class="flex justify-between mb-2">
+      <h2>Settimane di oratorio estivo</h2>
+      <fa-icon
+        class="text-md button-secondary"
+        [icon]="faPlus"
+        [routerLink]="[]"
+      ></fa-icon>
+    </div>
+    <ul class="list-none space-y-2 ps-0"></ul>
+  </div>
+
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-8">
+    <div class="flex justify-between mb-2">
+      <h2>Magliette</h2>
+      <fa-icon
+        class="text-md button-secondary"
+        [icon]="faPlus"
+        [routerLink]="[]"
+      ></fa-icon>
+    </div>
+
+    <table class="w-full text-left">
+      <!-- <thead>
+        <tr>
+          <th>Nome</th>
+          <th class="lg:table-cell hidden">Dimensioni</th>
+          <th class="lg:table-cell hidden text-center">Stato</th>
+          <th class="lg:text-end text-center">Azioni</th>
+        </tr>
+      </thead> -->
+      <tbody>
+        @for (shirt of shirts; track shirt.id) {
+        <tr>
+          <td class="ps-0">{{ shirt.sizeName }}</td>
+
+          <td class="lg:table-cell hidden">
+            {{ shirt.width }} cm x {{ shirt.height }} cm
+          </td>
+
+          <td class="lg:table-cell hidden space-x-3 text-center">
+            <fa-icon
+              [icon]="shirt.isAvailable ? faEye : faEyeLowVision"
+              [ngClass]="{
+                'text-success': shirt.isAvailable,
+                'text-error': !shirt.isAvailable
+              }"
+              class="text-xl"
+              [title]="shirt.isAvailable ? 'Visibile' : 'Non visibile'"
+            ></fa-icon>
+          </td>
+          <td class="space-x-3 space-y-1 text-end text-sm pe-0">
+            <button class="button-primary" (click)="(undefined)">
+              <fa-icon [icon]="faPen"></fa-icon>
+            </button>
+            <button class="button-secondary" (click)="(undefined)">
+              <fa-icon [icon]="faTrash"></fa-icon>
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (shirts.length === 0) {
+    <div class="flex justify-center items-center h-20">
+      <span class="text-secondary">Ancora nessuna maglietta inserita</span>
+    </div>
+    }
+  </div>
+
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-8">
+    <div class="flex justify-between mb-2">
+      <h2>I tuoi documenti</h2>
+      <fa-icon
+        class="text-md button-secondary"
+        [icon]="faPlus"
+        [routerLink]="[]"
+      ></fa-icon>
+    </div>
+    <ul class="list-none space-y-2 ps-0"></ul>
+  </div>
+
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-8">
+    <div class="flex justify-between mb-2">
+      <h2>Attivita' durante l'oratorio</h2>
+      <fa-icon
+        class="text-md button-secondary"
+        [icon]="faPlus"
+        [routerLink]="[]"
+      ></fa-icon>
+    </div>
+    <ul class="list-none space-y-2 ps-0"></ul>
+  </div>
+
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-8">
+    <div class="flex justify-between mb-2">
+      <h2>SQL Query</h2>
+      <fa-icon
+        class="text-md button-secondary"
+        [icon]="faPlus"
+        [routerLink]="[]"
+      ></fa-icon>
+    </div>
+    <ul class="list-none space-y-2 ps-0"></ul>
+  </div>
+
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-8">
+    <div class="flex justify-between mb-2">
+      <h2>SMTP Server</h2>
+      <fa-icon
+        class="text-md button-secondary"
+        [icon]="faPlus"
+        [routerLink]="[]"
+      ></fa-icon>
+    </div>
+    <ul class="list-none space-y-2 ps-0"></ul>
+  </div>
+</div>
+
+<app-footer></app-footer>

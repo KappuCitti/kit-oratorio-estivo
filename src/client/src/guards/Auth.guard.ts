@@ -26,8 +26,7 @@ export const LoginGuard: CanActivateFn = (route, state) => {
       if (response.status === 200) {
         router.navigate(['/admin']);
         return false;
-      } else
-        return true;
+      } else return true;
     }),
     tap((isValid) => {
       if (isValid) router.navigate(['/admin']);
@@ -46,7 +45,9 @@ export const AuthGuard: CanActivateFn = (route, state) => {
   if (!userToken) {
     router.navigate(['/login']);
     return false;
-  };
+  }
+
+  // TODO - Add permissions check
 
   return api.getUser().pipe(
     map((response) => {
@@ -55,13 +56,12 @@ export const AuthGuard: CanActivateFn = (route, state) => {
       } else {
         api.logout();
         router.navigate(['/login']);
-        return false
+        return false;
       }
     }),
     catchError(() => {
       router.navigate(['/login']);
       return of(false);
-    }),
-
+    })
   );
-}
+};

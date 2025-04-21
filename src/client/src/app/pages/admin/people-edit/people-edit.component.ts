@@ -1,19 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Child, ChildResponse, Parent, ParentResponse } from '../../../../models/Family.model';
+import {
+  Child,
+  ChildResponse,
+  Parent,
+  ParentResponse,
+} from '../../../../models/Family.model';
 import { ApiService } from '../../../../services/api.service';
 import { UtilsService } from '../../../../services/utils.service';
-import { FooterComponent } from "../../../components/footer/footer.component";
-import { NavbarComponent } from "../../../components/navbar/navbar.component";
-import { ParentComponent } from "../../../components/parent/parent.component";
-import { ChildComponent } from "../../../components/child/child.component";
+import { FooterComponent } from '../../../components/footer/footer.component';
+import { NavbarComponent } from '../../../components/navbar/navbar.component';
+import { ParentComponent } from '../../../components/parent/parent.component';
+import { ChildComponent } from '../../../components/child/child.component';
 import Enrollment from '../../../../models/Enrollment.model';
 
 @Component({
   selector: 'app-people-edit',
   imports: [FooterComponent, NavbarComponent, ParentComponent, ChildComponent],
   templateUrl: './people-edit.component.html',
-  styleUrl: './people-edit.component.css'
+  styleUrl: './people-edit.component.css',
 })
 export class PeopleEditComponent implements OnInit {
   type: 'child' | 'parent' | null = null;
@@ -24,14 +29,17 @@ export class PeopleEditComponent implements OnInit {
   loading: boolean = true;
   error: string | null = null;
 
-  constructor(private route: ActivatedRoute, private api: ApiService, private utils: UtilsService) { }
+  constructor(
+    private route: ActivatedRoute,
+    private api: ApiService,
+    private utils: UtilsService
+  ) {}
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.subscribe((params) => {
       const type = params.get('type');
       if (type == 'child') this.type = 'child';
       else if (type == 'parent') this.type = 'parent';
-
 
       const id = params.get('id');
       if (id) this.id = Number.isNaN(parseInt(id)) ? null : parseInt(id);
@@ -39,7 +47,6 @@ export class PeopleEditComponent implements OnInit {
       if (!this.type || !this.id) window.location.href = '/admin/people';
 
       this.loadPerson();
-
     });
   }
 
@@ -61,7 +68,6 @@ export class PeopleEditComponent implements OnInit {
         },
       });
     } else if (this.type == 'child') {
-
       this.api.getChildById(this.id).subscribe({
         next: (response) => {
           if (response.status == 200 && response.body?.data)
@@ -90,18 +96,15 @@ export class PeopleEditComponent implements OnInit {
   }
 
   save = () => {
-    console.log('Saving...');
-
     console.table({
       id: this.id,
       type: this.type,
       person: this.person?.surname,
       isParent: this.isParent(this.person),
-      isChild: this.isChild(this.person)
-    })
+      isChild: this.isChild(this.person),
+    });
 
     if (this.isParent(this.personCopy)) {
-      console.log('Saving parent');
       this.api.updateParent(this.personCopy).subscribe({
         next: (response) => {
           this.loading = false;
@@ -111,9 +114,8 @@ export class PeopleEditComponent implements OnInit {
           this.error = this.utils.handleResponse(error, '/admin/people');
           this.loading = false;
         },
-      })
+      });
     } else if (this.isChild(this.personCopy)) {
-      console.log('Saving child');
       this.api.updateChild(this.personCopy).subscribe({
         next: (response) => {
           this.loading = false;
@@ -123,7 +125,7 @@ export class PeopleEditComponent implements OnInit {
           this.error = this.utils.handleResponse(error, '/admin/people');
           this.loading = false;
         },
-      })
+      });
     }
-  }
+  };
 }

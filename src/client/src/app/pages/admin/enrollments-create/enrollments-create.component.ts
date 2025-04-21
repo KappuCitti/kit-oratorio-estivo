@@ -158,8 +158,6 @@ export class EnrollmentsCreateComponent implements OnInit {
           this.childs = response.body.data.childs;
           this.elements = response.body.data.count;
 
-          console.log(this.elements);
-
           this.step = 2;
           this.maxStep = 2;
 

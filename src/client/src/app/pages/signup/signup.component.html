@@ -1,0 +1,67 @@
+<div
+  class="min-h-screen flex flex-col justify-center items-center px-4 sm:px-0"
+>
+  <div class="bg-auto p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-2xl">
+    <h1 class="mb-6 text-center text-2xl sm:text-3xl font-bold">
+      Crea un account
+    </h1>
+    <app-parent
+      [editable]="true"
+      (parentChange)="onParentChange($event)"
+      (isValid)="onIsParentValidChange($event)"
+    ></app-parent>
+    <form [formGroup]="form" (ngSubmit)="signup()" class="mt-4">
+      <div class="flex flex-wrap -mx-2">
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block required">Password</label>
+          <input
+            type="password"
+            class="w-full input"
+            formControlName="confirmPasswordOne"
+          />
+        </div>
+
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label for="confirmPassword" class="block required"
+            >Conferma Password</label
+          >
+          <input
+            type="password"
+            class="w-full input"
+            formControlName="confirmPasswordTwo"
+          />
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        class="w-full button-primary transition"
+        [disabled]="!form.valid"
+      >
+        Registrati
+      </button>
+    </form>
+
+    <!-- Link per tornare al login -->
+    <div class="text-center mt-4 text-sm sm:text-base">
+      Hai già un account?
+      <a routerLink="/login">Accedi</a>
+    </div>
+  </div>
+
+  <a
+    routerLink="/"
+    class="fixed top-2 left-2 sm:top-4 sm:left-4 button-secondary shadow-lg transition text-sm sm:text-base"
+  >
+    <fa-icon [icon]="faArrowLeft"></fa-icon>
+    <span class="ml-1">Torna alla home</span>
+  </a>
+
+  @if (error) {
+  <div
+    class="bg-neon-error p-3 rounded-lg mt-4 shadow-lg w-full max-w-md text-center text-sm sm:text-base"
+  >
+    {{ error }}
+  </div>
+  }
+</div>

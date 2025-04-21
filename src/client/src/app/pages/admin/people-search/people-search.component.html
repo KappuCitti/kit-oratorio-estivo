@@ -96,7 +96,14 @@
             {{ getPersonType(person) }}
           </td>
           <td class="space-x-0 sm:space-x-3 space-y-1 text-center text-sm">
-            <button class="button-primary" [routerLink]="['/admin/people', getRawPersonType(person).toLocaleLowerCase(), person.id]">
+            <button
+              class="button-primary"
+              [routerLink]="[
+                '/admin/people',
+                getRawPersonType(person).toLocaleLowerCase(),
+                person.id
+              ]"
+            >
               <fa-icon [icon]="faPen"></fa-icon>
             </button>
             <button class="button-secondary" (click)="openDeleteModal(person)">
@@ -128,7 +135,7 @@
   class="fixed inset-0 bg-black/50 transition-opacity flex items-center justify-center z-0"
 >
   <div>
-    <div class="bg-auto p-6 rounded-lg shadow-lg max-w-md w-full">
+    <div class="bg-auto p-4 rounded-lg shadow-lg max-w-md w-full">
       <h2 class="text-xl font-semibold mb-2">Conferma eliminazione</h2>
       <p class="mb-4">
         Sei sicuro di voler eliminare il/la {{ getPersonType(peopleToDelete) }}

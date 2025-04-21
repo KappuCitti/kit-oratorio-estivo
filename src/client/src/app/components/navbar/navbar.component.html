@@ -1,7 +1,7 @@
 <nav>
   <div class="container mx-auto flex items-center justify-between p-4">
     <!-- Icona Home -->
-    <a routerLink="/admin" class="text-xl hidden xl:flex text-primary">
+    <a [routerLink]="baseURL()" class="text-xl hidden xl:flex text-primary">
       <fa-icon [icon]="faHouse"></fa-icon>
     </a>
 
@@ -15,12 +15,10 @@
     <!-- Contenuto Collapse -->
     <div class="hidden xl:flex xl:items-center xl:space-x-6 w-full xl:w-auto">
       <ul class="list-none pl-0 xl:flex space-y-4 xl:space-y-0 xl:space-x-6">
-        @for ( page of pages; track page.title){
+        @for ( page of pages(); track page.title){ @if (page.display ) {
         <li>
           <a
-            [routerLink]="
-              page.disabled || page.enabled == false ? undefined : page.url
-            "
+            [routerLink]="page.disabled || !page.display ? undefined : page.url"
             class="flex items-center space-x-2 text-primary no-underline"
             [ngClass]="{
               'text-disabled cursor-not-allowed hover:no-underline':
@@ -31,7 +29,7 @@
             <span>{{ page.title }}</span></a
           >
         </li>
-        }
+        } }
       </ul>
     </div>
 
@@ -45,7 +43,7 @@
         class="absolute right-0 mt-2 w-48 bg-white rounded shadow-lg"
       >
         <a
-          routerLink="/admin/my"
+          [routerLink]="[baseURL(), 'my']"
           class="block px-4 py-2 hover:bg-gray-200 text-gray-900 dark:text-gray-900 cursor-pointer rounded no-underline"
           >Profilo</a
         >
@@ -70,7 +68,7 @@
   <div class="flex items-center justify-between">
     <div>
       <a
-        routerLink="/admin"
+        [routerLink]="[baseURL()]"
         class="flex items-center text-primary no-underline"
       >
         <fa-icon [icon]="faHouse"></fa-icon>
@@ -87,12 +85,10 @@
 
   <div class="flex flex-col space-y-4">
     <ul class="space-y-4 list-none pl-0">
-      @for ( page of pages; track page.title){
+      @for ( page of pages(); track page.title){ @if (page.display ) {
       <li>
         <a
-          [routerLink]="
-            page.disabled || page.enabled == false ? undefined : page.url
-          "
+          [routerLink]="page.disabled || !page.display ? undefined : page.url"
           class="flex items-center space-x-2 text-primary no-underline"
           [ngClass]="{
             'text-disabled cursor-not-allowed hover:no-underline':
@@ -103,7 +99,7 @@
           <span>{{ page.title }}</span></a
         >
       </li>
-      }
+      } }
     </ul>
   </div>
 </div>

@@ -1,22 +1,26 @@
 <div
-  class="min-h-screen flex flex-col justify-center items-center"
-  data-theme="dark"
+  class="min-h-screen flex flex-col justify-center items-center px-4 text-center"
 >
-  <div class="max-w-3xl text-center">
-    <h1 class="text-4xl font-bold mb-4">Pagina non trovata</h1>
+  <div class="w-full max-w-md sm:max-w-max">
+    <h1 class="text-3xl sm:text-4xl font-bold mb-4">Pagina non trovata</h1>
 
-    <p class="text-lg mb-6">
-      Sembra che la pagina che stai cercando non esiste o sia stata spostata.
+    <p class="text-base sm:text-lg mb-4">
+      Sembra che la pagina che stai cercando non esista o sia stata spostata.
     </p>
 
-    <!-- Messaggio personalizzabile -->
-    <p class="text-lg text-secondary mb-6">
+    <p class="text-sm sm:text-lg text-secondary mb-6">
       {{ message }}
     </p>
 
-    <div class="flex justify-center space-x-4">
-      <a routerLink="/" class="button-primary"> Torna alla Home </a>
-      <a routerLink="/login" class="button-secondary"> Accedi come admin </a>
+    <div
+      class="flex flex-col sm:flex-row justify-center sm:space-x-4 space-y-3 sm:space-y-0"
+    >
+      <a routerLink="/" class="button-primary w-full sm:w-auto"
+        >Torna alla Home</a
+      >
+      <a routerLink="/login" class="button-secondary w-full sm:w-auto"
+        >Accedi come admin</a
+      >
     </div>
   </div>
 </div>

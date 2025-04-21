@@ -13,7 +13,6 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 export class StyleguideComponent implements OnInit {
   faChevronDown = faChevronDown;
   ngOnInit() {
-    console.log(`Production: ${environment.production}`);
     if (!environment.production) return;
     window.location.href = '/login';
   }

@@ -1,182 +1,219 @@
 <app-navbar></app-navbar>
 <div class="container">
-    <header class="mb-6">
-        <h1>Registro movimenti</h1>
-        <p class="text-secondary">
-            Visualizza e modifica tutti i movimento di {{undefined}} {{undefined}}
-        </p>
-    </header>
+  <header class="mb-6">
+    <h1>Registro movimenti</h1>
+    <p class="text-secondary">
+      Visualizza e modifica tutti i movimento di {{ undefined }} {{ undefined }}
+    </p>
+  </header>
 
-    <!-- Campo di ricerca -->
-    <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
-        <div class="flex justify-between mb-2">
-            <h2>Filtro</h2>
-            <fa-icon class="text-md button-secondary" [icon]="faArrowRotateLeft" (click)="onResetSearch()"></fa-icon>
-        </div>
-
-        <form [formGroup]="searchForm">
-            <div class="flex flex-wrap -mx-2">
-                <div class="mb-4 sm:w-1/2 w-full px-2">
-                    <label class="block">Giorno</label>
-                    <input type="date" step="1" class="w-full" formControlName="date" />
-                </div>
-
-                <div class="mb-2 sm:w-1/2 w-full px-2">
-                    <label class="block">Tipo</label>
-                    <select class="w-full" formControlName="type">
-                        <option value="">
-                            <span class="text-secondary"></span>
-                        </option>
-                        <option value="Join" class="text-success">Entrata in ritardo</option>
-                        <option value="Left" class="text-error">Uscita anticipata</option>
-                    </select>
-                </div>
-            </div>
-        </form>
+  <!-- Campo di ricerca -->
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
+    <div class="flex justify-between mb-2">
+      <h2>Filtro</h2>
+      <fa-icon
+        class="text-md button-secondary"
+        [icon]="faArrowRotateLeft"
+        (click)="onResetSearch()"
+      ></fa-icon>
     </div>
 
-    <!-- Tabella iscrizioni -->
-    <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
-        <div class="flex justify-between mb-4">
-            <h2>Risultati</h2>
+    <form [formGroup]="searchForm">
+      <div class="flex flex-wrap -mx-2">
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block">Giorno</label>
+          <input type="date" step="1" class="w-full" formControlName="date" />
         </div>
 
-        <div class="container-table">
-            <table class="w-full text-left">
-                <thead>
-                    <tr>
-                        <th>Cognome</th>
-                        <th>Nome</th>
-                        <th class="text-center">Data</th>
-                        <th class="text-center">Tipo</th>
-                        <th class="text-center">Descrizione</th>
-                        <th class="text-center">Azioni</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (extraordinaryAttendance of extraordinaryAttendances; track extraordinaryAttendance.id) {
-                    <tr>
-                        <td>{{ extraordinaryAttendance.childName }}</td>
-                        <td>{{ extraordinaryAttendance.childSurname }}</td>
-                        <td>Data</td>
-                        <td class="text-center">
-
-                        </td>
-                        <td class="text-center">
-
-                        </td>
-                        <td class="space-x-0 sm:space-x-3 space-y-1 text-center text-sm">
-                            <button class="button-success"
-                                (click)="openExtraordinaryAttendanceModal(extraordinaryAttendance)"
-                                [disabled]="!extraordinaryAttendance.present">
-                                <fa-icon [icon]="faRightToBracket"></fa-icon>
-                            </button>
-                            <button class="button-danger"
-                                (click)="openExtraordinaryAttendanceModal(extraordinaryAttendance)"
-                                [disabled]="!extraordinaryAttendance.present">
-                                <fa-icon [icon]="faRightFromBracket"></fa-icon>
-                            </button>
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
+        <div class="mb-2 sm:w-1/2 w-full px-2">
+          <label class="block">Tipo</label>
+          <select class="w-full" formControlName="type">
+            <option value="">
+              <span class="text-secondary"></span>
+            </option>
+            <option value="Join" class="text-success">
+              Entrata in ritardo
+            </option>
+            <option value="Left" class="text-error">Uscita anticipata</option>
+          </select>
         </div>
+      </div>
+    </form>
+  </div>
 
-        @if (extraordinaryAttendances.length == 0) {
-        <div class="flex justify-center items-center h-20">
-            <span class="text-secondary">Nessun risultato</span>
-        </div>
-        }
-
-        <app-pagination [totalItems]="elements" (pageChange)="onPageChange($event)"
-            (itemsPerPageChange)="onSizeChange($event)"></app-pagination>
+  <!-- Tabella iscrizioni -->
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
+    <div class="flex justify-between mb-4">
+      <h2>Risultati</h2>
     </div>
 
-    <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
-        <div class="flex justify-between mb-4">
-            <button class="button-secondary" (click)="previousMonth()">«</button>
-            <h2> {{ today | date: 'MMMM yyyy' }}            </h2>
-            <button class="button-secondary" (click)="nextMonth()">»</button>
-        </div>
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
-            <!-- Titolo mese centrato -->
-            <div class="text-center w-full sm:w-auto font-bold text-xl mb-4 sm:mb-0">
-            </div>
-
-            <!-- Bottoni navigazione -->
-            <div class="flex justify-center gap-2">
-
-            </div>
-        </div>
-        <mwl-calendar-month-view [viewDate]="getDate()" [events]="events" [refresh]="refresh"
-            [weekStartsOn]="1"
-            (dayClicked)="onDayClicked($event)"></mwl-calendar-month-view>
+    <div class="container-table">
+      <table class="w-full text-left">
+        <thead>
+          <tr>
+            <th>Cognome</th>
+            <th>Nome</th>
+            <th class="text-center">Data</th>
+            <th class="text-center">Tipo</th>
+            <th class="text-center">Descrizione</th>
+            <th class="text-center">Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (extraordinaryAttendance of extraordinaryAttendances; track
+          extraordinaryAttendance.id) {
+          <tr>
+            <td>{{ extraordinaryAttendance.childName }}</td>
+            <td>{{ extraordinaryAttendance.childSurname }}</td>
+            <td>Data</td>
+            <td class="text-center"></td>
+            <td class="text-center"></td>
+            <td class="space-x-0 sm:space-x-3 space-y-1 text-center text-sm">
+              <button
+                class="button-success"
+                (click)="
+                  openExtraordinaryAttendanceModal(extraordinaryAttendance)
+                "
+                [disabled]="!extraordinaryAttendance.present"
+              >
+                <fa-icon [icon]="faRightToBracket"></fa-icon>
+              </button>
+              <button
+                class="button-danger"
+                (click)="
+                  openExtraordinaryAttendanceModal(extraordinaryAttendance)
+                "
+                [disabled]="!extraordinaryAttendance.present"
+              >
+                <fa-icon [icon]="faRightFromBracket"></fa-icon>
+              </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
     </div>
+
+    @if (extraordinaryAttendances.length == 0) {
+    <div class="flex justify-center items-center h-20">
+      <span class="text-secondary">Nessun risultato</span>
+    </div>
+    }
+
+    <app-pagination
+      [totalItems]="elements"
+      (pageChange)="onPageChange($event)"
+      (itemsPerPageChange)="onSizeChange($event)"
+    ></app-pagination>
+  </div>
+
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
+    <div class="flex justify-between mb-4">
+      <button class="button-secondary" (click)="previousMonth()">«</button>
+      <h2>{{ today | date : "MMMM yyyy" }}</h2>
+      <button class="button-secondary" (click)="nextMonth()">»</button>
+    </div>
+    <div
+      class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4"
+    >
+      <!-- Titolo mese centrato -->
+      <div
+        class="text-center w-full sm:w-auto font-bold text-xl mb-4 sm:mb-0"
+      ></div>
+
+      <!-- Bottoni navigazione -->
+      <div class="flex justify-center gap-2"></div>
+    </div>
+    <mwl-calendar-month-view
+      [viewDate]="getDate()"
+      [events]="events"
+      [refresh]="refresh"
+      [weekStartsOn]="1"
+      (dayClicked)="onDayClicked($event)"
+    ></mwl-calendar-month-view>
+  </div>
 </div>
 
-
 @if (isExtraordinaryAttendanceModalOpen && selectedExtraordinaryAttendance) {
-<div class="fixed inset-0 bg-black/50 transition-opacity flex items-center justify-center z-50">
-    <div class="bg-auto p-6 rounded-lg shadow-lg max-w-xl w-full">
-        <h2 class="text-xl font-semibold">Aggiungi un movimento</h2>
-        <p class="text-secondary mb-4">
-            Aggiungi un movimento per
-            <b>
-                {{ selectedExtraordinaryAttendance.childSurname }}
-                {{ selectedExtraordinaryAttendance.childName }}</b>
-        </p>
-        <!-- Form -->
-        <form [formGroup]="extraordinaryAttendanceForm">
-            <div class="flex flex-col space-y-4">
-                <div>
-                    <label class="block required">Tipo</label>
-                    <div class="flex flex-col">
-                        <label class="flex items-center">
-                            <input type="radio" formControlName="type" value="Join" class="input" />
-                            <span class="ms-2">Entrata in ritardo</span>
-                        </label>
+<div
+  class="fixed inset-0 bg-black/50 transition-opacity flex items-center justify-center z-50"
+>
+  <div class="bg-auto p-4 rounded-lg shadow-lg max-w-xl w-full">
+    <h2 class="text-xl font-semibold">Aggiungi un movimento</h2>
+    <p class="text-secondary mb-4">
+      Aggiungi un movimento per
+      <b>
+        {{ selectedExtraordinaryAttendance.childSurname }}
+        {{ selectedExtraordinaryAttendance.childName }}</b
+      >
+    </p>
+    <!-- Form -->
+    <form [formGroup]="extraordinaryAttendanceForm">
+      <div class="flex flex-col space-y-4">
+        <div>
+          <label class="block required">Tipo</label>
+          <div class="flex flex-col">
+            <label class="flex items-center">
+              <input
+                type="radio"
+                formControlName="type"
+                value="Join"
+                class="input"
+              />
+              <span class="ms-2">Entrata in ritardo</span>
+            </label>
 
-                        <label class="flex items-center">
-                            <input type="radio" formControlName="type" value="Left" class="input" />
-                            <span class="ms-2">Uscita in anticipo</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block required">Orario</label>
-                    <input type="time" formControlName="time" class="input w-full" />
-                </div>
-
-                <div>
-                    <label class="block">Note</label>
-                    <textarea formControlName="notes" class="input w-full"></textarea>
-                </div>
-            </div>
-        </form>
-
-        <!-- Pulsanti -->
-        <div class="flex justify-end items-center mt-6">
-            <!-- Azioni -->
-            <div class="flex space-x-3">
-                <button class="px-4 py-2 button-secondary" (click)="closeExtraordinaryAttendanceModal()">
-                    Annulla
-                </button>
-                <button class="px-4 py-2 button-primary" (click)="onSaveEditedExtraordinaryAttendance()"
-                    [disabled]="extraordinaryAttendanceForm.invalid">
-                    Salva
-                </button>
-            </div>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                formControlName="type"
+                value="Left"
+                class="input"
+              />
+              <span class="ms-2">Uscita in anticipo</span>
+            </label>
+          </div>
         </div>
 
-        <!-- Errore -->
-        @if (error) {
-        <div class="bg-neon-error p-3 rounded-lg shadow-lg mt-4 text-center">
-            {{ error }}
+        <div>
+          <label class="block required">Orario</label>
+          <input type="time" formControlName="time" class="input w-full" />
         </div>
-        }
+
+        <div>
+          <label class="block">Note</label>
+          <textarea formControlName="notes" class="input w-full"></textarea>
+        </div>
+      </div>
+    </form>
+
+    <!-- Pulsanti -->
+    <div class="flex justify-end items-center mt-6">
+      <!-- Azioni -->
+      <div class="flex space-x-3">
+        <button
+          class="px-4 py-2 button-secondary"
+          (click)="closeExtraordinaryAttendanceModal()"
+        >
+          Annulla
+        </button>
+        <button
+          class="px-4 py-2 button-primary"
+          (click)="onSaveEditedExtraordinaryAttendance()"
+          [disabled]="extraordinaryAttendanceForm.invalid"
+        >
+          Salva
+        </button>
+      </div>
     </div>
+
+    <!-- Errore -->
+    @if (error) {
+    <div class="bg-neon-error p-3 rounded-lg shadow-lg mt-4 text-center">
+      {{ error }}
+    </div>
+    }
+  </div>
 </div>
 }
 

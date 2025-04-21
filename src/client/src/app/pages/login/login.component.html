@@ -1,23 +1,29 @@
-<div class="min-h-screen flex flex-col justify-center items-center">
-  <div class="bg-auto p-8 rounded-lg shadow-lg w-full max-w-md">
-    <h1 class="mb-6 text-center">Accedi</h1>
+<div
+  class="min-h-screen flex flex-col justify-center items-center px-4 sm:px-0"
+>
+  <div class="bg-auto p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-md">
+    <h1 class="mb-6 text-center text-2xl sm:text-3xl font-bold">Accedi</h1>
     <form [formGroup]="form" (ngSubmit)="login()">
       <div class="mb-4">
-        <label for="username">Username o Email</label>
+        <label for="username" class="block text-sm sm:text-base mb-1"
+          >Username o Email</label
+        >
         <input
           type="text"
           id="username"
-          class="w-full"
+          class="w-full input"
           placeholder="Inserisci il tuo username o email"
           formControlName="username"
         />
       </div>
       <div class="mb-4">
-        <label for="password">Password</label>
+        <label for="password" class="block text-sm sm:text-base mb-1"
+          >Password</label
+        >
         <input
           type="password"
           id="password"
-          class="w-full"
+          class="w-full input"
           placeholder="Inserisci la tua password"
           formControlName="password"
         />
@@ -30,16 +36,25 @@
         Accedi
       </button>
     </form>
+
+    <!-- Link per creare un nuovo account -->
+    <div class="text-center mt-4 text-sm sm:text-base">
+      Non hai un account?
+      <a routerLink="/signup">Registrati</a>
+    </div>
   </div>
+
   <a
     routerLink="/"
-    class="fixed top-4 left-4 button-secondary rounded-full shadow-lg transition"
+    class="fixed top-2 left-2 sm:top-4 sm:left-4 button-secondary shadow-lg transition text-sm sm:text-base"
   >
-    <fa-icon [icon]="faArrowLeft"></fa-icon> Torna alla home
+    <fa-icon [icon]="faArrowLeft"></fa-icon>
+    <span class="ml-1">Torna alla home</span>
   </a>
+
   @if (error) {
   <div
-    class="bg-neon-error p-3 rounded-lg mt-4 shadow-lg w-full max-w-md text-center"
+    class="bg-neon-error p-3 rounded-lg mt-4 shadow-lg w-full max-w-md text-center text-sm sm:text-base"
   >
     {{ error }}
   </div>

@@ -55,8 +55,6 @@ export class PeopleCreateComponent {
 
   onParentChange(parent: Parent | null, index: number) {
     this.parents[index] = parent;
-
-    this.logAll();
   }
 
   onIsParentValidChange(isValid: boolean, index: number) {
@@ -68,8 +66,6 @@ export class PeopleCreateComponent {
     this.childs[index] = child;
     this.isValid[index + this.parents.length] =
       child !== null && child.name !== '';
-
-    this.logAll();
   }
 
   onIsChildValidChange(isValid: boolean, index: number) {
@@ -79,14 +75,6 @@ export class PeopleCreateComponent {
   // return tree if all fields are valid
   isFieldsValid() {
     return this.isValid.every((isValid) => isValid);
-  }
-
-  logAll() {
-    console.log('Logging all parents and childs');
-    console.log(this.parents);
-    console.log(this.childs);
-    console.log(this.isValid);
-    console.log(this.isFieldsValid());
   }
 
   onCreateFamily() {

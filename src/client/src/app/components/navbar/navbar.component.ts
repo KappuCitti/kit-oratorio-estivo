@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, Signal, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Component, computed, OnInit, Signal, signal } from '@angular/core';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import {
   FontAwesomeModule,
   IconDefinition,
@@ -19,14 +19,18 @@ import {
   faMusic,
   faUserGear,
   faUsers,
+  faUserPen,
+  faMountainCity,
+  faMountainSun,
 } from '@fortawesome/free-solid-svg-icons';
 import { ApiService } from '../../../services/api.service';
+import { filter } from 'rxjs';
 
 interface Page {
   url: string;
   icon: IconDefinition;
   title: string;
-  enabled?: boolean; // Don't show the button
+  display?: boolean; // Don't show the button
   disabled?: boolean; // Shows a disabled style
 }
 
@@ -36,18 +40,20 @@ interface Page {
   styleUrls: ['./navbar.component.scss'],
   imports: [RouterLink, CommonModule, FontAwesomeModule],
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   faHouse = faHouse;
   faBars = faBars;
   faChevronLeft = faChevronLeft;
   faAddressBook = faAddressBook;
   faUsers = faUsers;
+  faUserPen = faUserPen;
   faHighlighter = faHighlighter;
   faUserGear = faUserGear;
   faFlag = faFlag;
   faChartLine = faChartLine;
   faDragon = faDragon;
   faMusic = faMusic;
+  faMountainSun = faMountainSun;
   faGears = faGears;
   faCircleUser = faCircleUser;
 
@@ -57,64 +63,107 @@ export class NavbarComponent {
   isMenuOpen = computed(() => this.isMenuOpenSignal());
   isDropdownOpen = computed(() => this.isDropdownOpenSignal());
 
-  pages: Page[] = [
+  isAdmin = signal(false);
+  baseURL = computed(() => (this.isAdmin() ? '/admin' : '/user'));
+
+  // TODO - Replace all display with a proper check for the user role
+
+  pages = computed<Page[]>(() => [
+    // Admin pages
     {
-      url: '/admin/people',
+      url: `${this.baseURL()}/people`,
       icon: this.faAddressBook,
       title: 'Rubrica',
+      display: this.isAdmin() && true,
       disabled: false,
     },
     {
-      url: '/admin/enrollments',
-      icon: this.faUsers,
+      // User and admins
+      url: `${this.baseURL()}/enrollments`,
+      icon: this.isAdmin() ? this.faUsers : this.faUserPen,
       title: 'Iscrizioni',
+      display: true,
       disabled: false,
     },
     {
-      url: '/admin/attendances',
+      url: `${this.baseURL()}/attendances`,
       icon: this.faHighlighter,
       title: 'Presenze',
+      display: this.isAdmin() && true,
       disabled: false,
     },
     {
-      url: '/admin/staff',
+      url: `${this.baseURL()}/trips`,
+      icon: this.faMountainSun,
+      title: 'Gite',
+      display: this.isAdmin() && true,
+      disabled: true,
+    },
+    {
+      url: `${this.baseURL()}/staff`,
       icon: this.faUserGear,
       title: 'Staff',
+      display: this.isAdmin() && true,
       disabled: true,
     },
     {
-      url: '/admin/teams',
+      url: `${this.baseURL()}/teams`,
       icon: this.faFlag,
       title: 'Squadre',
+      display: this.isAdmin() && true,
       disabled: false,
     },
     {
-      url: '/admin/leaderboard',
+      url: `${this.baseURL()}/leaderboard`,
       icon: this.faChartLine,
       title: 'Classifica',
+      display: this.isAdmin() && true,
       disabled: true,
     },
     {
-      url: '/admin/games',
+      url: `${this.baseURL()}/games`,
       icon: this.faDragon,
       title: 'Giochi',
+      display: this.isAdmin() && true,
       disabled: true,
     },
     {
-      url: '/admin/music',
+      url: `${this.baseURL()}/music`,
       icon: this.faMusic,
       title: 'Musica',
+      display: this.isAdmin() && true,
       disabled: true,
     },
     {
-      url: '/admin/settings',
+      url: `${this.baseURL()}/settings`,
       icon: this.faGears,
       title: 'Impostazioni',
-      disabled: true,
+      display: this.isAdmin() && true,
+      disabled: false,
     },
-  ];
 
-  constructor(private api: ApiService, private router: Router) {}
+    // User pages
+    {
+      url: `${this.baseURL()}/people`,
+      icon: this.faUsers,
+      title: 'Famiglia',
+      display: !this.isAdmin() && true,
+      disabled: false,
+    },
+  ]);
+
+  constructor(private api: ApiService, private router: Router) {
+    this.isAdmin.set(false);
+
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        const url = event.urlAfterRedirects || event.url;
+        this.isAdmin.set(url.includes('/admin/') ? true : false);
+      });
+  }
+
+  ngOnInit(): void {}
 
   toggleMenu(): void {
     this.isMenuOpenSignal.set(!this.isMenuOpenSignal());
