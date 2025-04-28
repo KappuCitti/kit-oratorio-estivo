@@ -6,18 +6,19 @@ import {
   mysqlEnum,
   mysqlTable,
   text,
+  varchar,
 } from 'drizzle-orm/mysql-core';
-import { childTable } from './child';
 import { teamTable } from './team';
 import { shirtSizeTable } from './shirt';
 import { SCHOOL_TYPES } from '@/models/schoolTypes.model';
 import { CLASSES } from '@/models/class.model';
+import { usersTable } from './user';
 
 export const enrollmentTable = mysqlTable('enrollments', {
   id: int().primaryKey().autoincrement(),
-  childId: int()
+  userId: varchar({ length: 16 })
     .notNull()
-    .references(() => childTable.id, { onDelete: 'cascade' }),
+    .references(() => usersTable.id, { onDelete: 'cascade' }),
   teamId: int().references(() => teamTable.id, {
     onDelete: 'set null',
   }),

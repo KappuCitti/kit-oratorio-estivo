@@ -5,15 +5,15 @@ import {
   mysqlTable,
   varchar,
 } from 'drizzle-orm/mysql-core';
-import { childTable } from './child';
+import { usersTable } from './user';
 
 export const extraordinaryAttendanceTable = mysqlTable(
   'extraordinary_attendances',
   {
     id: int().primaryKey().autoincrement(),
-    childId: int()
+    userId: varchar({ length: 16 })
       .notNull()
-      .references(() => childTable.id, { onDelete: 'cascade' }),
+      .references(() => usersTable.id, { onDelete: 'cascade' }),
     type: mysqlEnum(['Join', 'Left']).notNull(),
     time: datetime().notNull(),
     notes: varchar({ length: 255 }).notNull().default(''),
