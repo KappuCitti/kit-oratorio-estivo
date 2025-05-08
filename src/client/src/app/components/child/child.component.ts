@@ -27,6 +27,7 @@ export class ChildComponent implements OnChanges {
   @Output() childChange = new EventEmitter<Child | null>();
   @Output() isValid = new EventEmitter<boolean>(false);
 
+  @Input() title: string | null = "Ragazzo";
   @Input() editable: boolean = false;
   @Input() save: (() => void) | null = null;
 

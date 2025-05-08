@@ -27,6 +27,7 @@ export class ParentComponent implements OnChanges {
   @Output() parentChange = new EventEmitter<Parent | null>();
   @Output() isValid = new EventEmitter<boolean>(false);
 
+  @Input() title: string | null = "Genitore"
   @Input() editable: boolean = false;
   @Input() save: Function | null = null;
 

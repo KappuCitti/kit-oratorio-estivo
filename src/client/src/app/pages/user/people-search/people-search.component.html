@@ -1,14 +1,19 @@
 <app-navbar></app-navbar>
 <div class="container min-h-4/5">
-  <header class="mb-6">
-    <h1>La tua famiglia</h1>
-    <p class="text-secondary">
-      Visualizza e gestisci i membri della tua famiglia
-    </p>
+
+  <header class="mb-6 flex items-center justify-between">
+    <div>
+      <h1>La tua famiglia</h1>
+      <p class="text-secondary">
+        Visualizza e gestisci i membri della tua famiglia
+      </p>
+    </div>
+
+    <fa-icon class="button-primary" [icon]="faPlus" [routerLink]="['/user/people/new']"></fa-icon>
   </header>
 
   <div class="w-full bg-auto p-4 rounded-lg shadow-lg mb-6">
-    <app-parent [editable]="true"></app-parent>
+    <app-parent [editable]="true" [title]="'La mia anagrafica'"></app-parent>
   </div>
 </div>
 

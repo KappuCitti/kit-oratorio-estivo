@@ -26,7 +26,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CommonModule } from '@angular/common';
 import { EnrollmentComponent } from '../../../components/enrollment/enrollment.component';
 import { EnrollmentCreateRequest } from '../../../../models/Request.model';
-import { zip } from 'rxjs';
 import { PaginationComponent } from '../../../components/pagination/pagination.component';
 
 /**

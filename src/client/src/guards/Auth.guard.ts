@@ -13,6 +13,9 @@ import { CookieService } from 'ngx-cookie-service';
  * @returns A boolean indicating if the navigation is allowed
  */
 export const LoginGuard: CanActivateFn = (route, state) => {
+  // TOOD - Delete this line
+  // return true;
+
   const api = inject(ApiService);
   const router = inject(Router);
   const cookieService = inject(CookieService);
@@ -36,6 +39,9 @@ export const LoginGuard: CanActivateFn = (route, state) => {
 };
 
 export const AuthGuard: CanActivateFn = (route, state) => {
+  // TOOD - Delete this line
+  // return true;
+
   const api = inject(ApiService);
   const router = inject(Router);
   const cookieService = inject(CookieService);

@@ -25,6 +25,7 @@ import { DashboardComponent as UserDashboardComponent } from './pages/user/dashb
 import { EnrollmentsSearchComponent as UserEnrollmentsSearchComponent } from './pages/user/enrollments-search/enrollments-search.component';
 import { EnrollmentsCreateComponent as UserEnrollmentsCreateComponent } from './pages/user/enrollments-create/enrollments-create.component';
 import { PeopleSearchComponent as UserPeopleSearchComponent } from './pages/user/people-search/people-search.component';
+import { PeopleCreateComponent as UserPeopleCreateComponent } from './pages/user/people-create/people-create.component';
 import { SettingsComponent } from './pages/admin/settings/settings.component';
 import { SignupComponent } from './pages/signup/signup.component';
 
@@ -55,6 +56,11 @@ const commonRoutes: Routes = [
   {
     path: 'user/people',
     component: UserPeopleSearchComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'user/people/new',
+    component: UserPeopleCreateComponent,
     canActivate: [AuthGuard],
   },
   { path: 'user/my', component: MyComponent, canActivate: [AuthGuard] },

@@ -1,0 +1,29 @@
+<app-navbar></app-navbar>
+<div class="container py-16">
+    <label for="theme-switcher"
+        class="shadow-two relative inline-flex cursor-pointer select-none items-center rounded-md bg-white dark:bg-dark-2 p-1">
+        <input type="checkbox" id="theme-switcher" class="sr-only" />
+
+        <!-- Light Mode -->
+        <span
+            class="text-primary bg-gray dark:bg-dark-3 flex items-center space-x-1 rounded py-2 px-4 text-sm font-medium group-has-checked:text-body-color group-has-checked:bg-transparent">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="mr-1">
+                <path
+                    d="M8 0a.667.667 0 0 1 .667.667V2a.667.667 0 0 1-1.334 0V.667A.667.667 0 0 1 8 0Zm0 5.333a2.667 2.667 0 1 0 0 5.334 2.667 2.667 0 0 0 0-5.334Zm0 8a.667.667 0 0 1 .667.667v1.334a.667.667 0 0 1-1.334 0v-1.334A.667.667 0 0 1 8 13.333ZM2.341 2.342a.667.667 0 0 1 .943 0l.946.946a.667.667 0 1 1-.943.943l-.946-.946a.667.667 0 0 1 0-.943ZM13.657 13.658a.667.667 0 0 1-.943 0l-.946-.946a.667.667 0 0 1 .943-.943l.946.946a.667.667 0 0 1 0 .943ZM0 8a.667.667 0 0 1 .667-.667H2a.667.667 0 1 1 0 1.334H.667A.667.667 0 0 1 0 8Zm14-.667a.667.667 0 1 1 0 1.334h1.333a.667.667 0 0 1 0-1.334H14ZM2.341 13.658a.667.667 0 0 1 0-.943l.946-.946a.667.667 0 0 1 .943.943l-.946.946a.667.667 0 0 1-.943 0Zm11.316-11.316a.667.667 0 0 1 0 .943l-.946.946a.667.667 0 0 1-.943-.943l.946-.946a.667.667 0 0 1 .943 0Z" />
+            </svg>
+            Ragazzo
+        </span>
+
+        <!-- Dark Mode -->
+        <span
+            class="text-body-color flex items-center space-x-1 rounded py-2 px-4 text-sm font-medium group-has-checked:text-primary group-has-checked:bg-gray group-has-checked:dark:bg-dark-3">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="mr-1">
+                <path
+                    d="M8.055 1.673a.667.667 0 0 1 .401.724 5.333 5.333 0 0 0 5.537 6.136.667.667 0 0 1 .608 1.006 6.667 6.667 0 0 1-11.707 1.89 6.667 6.667 0 0 1 5.161-9.756Z" />
+            </svg>
+            Genitore
+        </span>
+    </label>
+</div>
+
+<app-footer></app-footer>

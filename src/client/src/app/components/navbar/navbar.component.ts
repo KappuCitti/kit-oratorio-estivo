@@ -95,7 +95,7 @@ export class NavbarComponent implements OnInit {
     {
       url: `${this.baseURL()}/trips`,
       icon: this.faMountainSun,
-      title: 'Gite',
+      title: 'Eventi',
       display: this.isAdmin() && true,
       disabled: true,
     },
