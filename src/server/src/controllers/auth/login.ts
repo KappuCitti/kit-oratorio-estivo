@@ -21,14 +21,16 @@ const loginController: RouteController<LoginRoute> = async (c) => {
   const { username, password } = await c.req.valid('json');
   const res = await login(username, password);
   if (!res.success) {
-    return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
-  }
-  if (!res.data) {
-    return httpErrorResponse(
-      c,
-      HttpStatusCodes.UNAUTHORIZED,
-      'Invalid username or password'
-    );
+    switch (res.error) {
+      case HttpStatusCodes.UNAUTHORIZED:
+        return httpErrorResponse(
+          c,
+          HttpStatusCodes.UNAUTHORIZED,
+          'Invalid username or password'
+        );
+      default:
+        return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
+    }
   }
   const userRes = await getUserFromToken(res.data);
   if (!userRes.success) {

@@ -3,7 +3,7 @@ import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { dbLogger } from '../logger';
 import { db } from '..';
 import { eq } from 'drizzle-orm';
-import { shirtSizeTable } from '../schema';
+import { shirtSizeTable } from '../schema/shirt';
 
 export async function editShirt(
   id: number,
@@ -13,18 +13,18 @@ export async function editShirt(
   isAvailable?: boolean
 ) {
   try {
-    const validId = !!(await db.query.shirtSizeTable.findFirst({
+    const validId = !!(await db.query.shirts.findFirst({
       where: eq(shirtSizeTable.id, id),
     }));
     if (!validId) return createErrorResult(HttpStatusCodes.NOT_FOUND);
 
     if (sizeName) {
-      const alreadyExists = !!(await db.query.shirtSizeTable.findFirst({
+      const alreadyExists = !!(await db.query.shirts.findFirst({
         where: eq(shirtSizeTable.sizeName, sizeName),
       }));
       if (alreadyExists) return createErrorResult(HttpStatusCodes.CONFLICT);
     }
-    
+
     await db
       .update(shirtSizeTable)
       .set({

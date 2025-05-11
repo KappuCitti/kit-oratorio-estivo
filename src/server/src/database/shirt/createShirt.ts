@@ -3,7 +3,7 @@ import { dbLogger } from '../logger';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { db } from '..';
 import { eq } from 'drizzle-orm';
-import { shirtSizeTable } from '../schema';
+import { shirtSizeTable } from '../schema/shirt';
 
 export async function createShirt(
   sizeName: string,
@@ -12,7 +12,7 @@ export async function createShirt(
   isAvailable?: boolean
 ) {
   try {
-    const exists = !!(await db.query.shirtSizeTable.findFirst({
+    const exists = !!(await db.query.shirts.findFirst({
       where: eq(shirtSizeTable.sizeName, sizeName),
     }));
     if (exists) return createErrorResult(HttpStatusCodes.CONFLICT);

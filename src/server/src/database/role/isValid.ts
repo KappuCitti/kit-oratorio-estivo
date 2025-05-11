@@ -2,8 +2,8 @@ import { count, eq } from 'drizzle-orm';
 import { db } from '..';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { HttpStatusCodes } from '@/codes';
-import { roleTable } from '../schema';
 import { dbLogger } from '../logger';
+import { roleTable } from '../schema/role';
 
 export async function isValidRole(roleId: number) {
   try {

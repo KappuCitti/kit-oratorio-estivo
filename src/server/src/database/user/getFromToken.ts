@@ -1,16 +1,17 @@
 import { and, eq, sql } from 'drizzle-orm';
 import { db } from '..';
-import { sessionTable, usersTable } from '../schema';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import type { FullUser } from '@/models/user.model';
-import { getUserRoles } from '../role/getUserRoles';
 import { getUserPermissions } from '../permissions/getUserPermissions';
 import { HttpStatusCodes } from '@/codes';
 import { dbLogger } from '../logger';
+import { sessionTable } from '../schema/session';
+import { usersTable } from '../schema/user';
+import { roleTable } from '../schema/role';
 
 export async function getUserFromToken(token: string) {
   try {
-    const session = await db.query.sessionTable.findFirst({
+    const session = await db.query.sessions.findFirst({
       columns: { userId: true },
       where: and(
         eq(sessionTable.token, token),
@@ -18,7 +19,7 @@ export async function getUserFromToken(token: string) {
       ),
     });
     if (!session) return createErrorResult(HttpStatusCodes.UNAUTHORIZED);
-    const user = await db.query.usersTable.findFirst({
+    const user = await db.query.users.findFirst({
       columns: { password: false },
       where: eq(usersTable.id, session.userId),
     });
@@ -36,11 +37,13 @@ export async function getUserWithPermissionsFromToken(token: string) {
     if (!userRes.success) return userRes;
     const user: FullUser = userRes.data as FullUser;
     if (!user) return createErrorResult(HttpStatusCodes.UNAUTHORIZED);
-    const roles = await getUserRoles(user.id);
-    if (!roles.success) return roles;
     const permissions = await getUserPermissions(user.id);
     if (!permissions.success) return permissions;
-    user.roles = roles.data;
+    user.role = (
+      await db.query.roles.findMany({
+        where: eq(roleTable.id, user.roleId),
+      })
+    )[0];
     user.permissions = permissions.data;
     return createSuccessResult(user);
   } catch (e) {

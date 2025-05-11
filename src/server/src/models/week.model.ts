@@ -1,4 +1,5 @@
-import { enrollmentWeeksTable, weekTable } from '@/database/schema';
+import { enrollmentWeeksTable } from '@/database/schema/enrollmentWeek';
+import { weekTable } from '@/database/schema/week';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 

@@ -10,8 +10,6 @@ export const configSchema = z
       domain: z.string().default('localhost'),
       frontendPort: z.number().int().positive().default(443),
     }),
-    logLevel: z.enum(LOG_LEVELS).default('info'),
-    logFolder: z.string().default('./logs'),
     musicFolder: z.string().default('../public/music'),
     database: z.object({
       host: z.string(),
@@ -22,6 +20,10 @@ export const configSchema = z
       waitForConnections: z.boolean().default(true),
       connectionLimit: z.number().int().positive().default(10),
       queueLimit: z.number().int().positive().default(10),
+    }),
+    logs: z.object({
+      logLevel: z.enum(LOG_LEVELS).default('info'),
+      logFolder: z.string().default('logs'),
     }),
   })
   .and(

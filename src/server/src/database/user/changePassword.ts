@@ -2,9 +2,10 @@ import { HttpStatusCodes } from '@/codes';
 import { createErrorResult } from '@/utils/createResult';
 import { db } from '..';
 import { and, eq, sql } from 'drizzle-orm';
-import { sessionTable, usersTable } from '../schema';
 import { hashPassword } from '@/utils/password';
 import { dbLogger } from '../logger';
+import { sessionTable } from '../schema/session';
+import { usersTable } from '../schema/user';
 
 export async function changePassword(
   token: string,
@@ -12,7 +13,7 @@ export async function changePassword(
   newPassword: string
 ) {
   try {
-    const session = await db.query.sessionTable.findFirst({
+    const session = await db.query.sessions.findFirst({
       where: and(
         eq(sessionTable.token, token),
         sql`${sessionTable.expires} > NOW()`
@@ -20,7 +21,7 @@ export async function changePassword(
     });
     if (!session) return createErrorResult(HttpStatusCodes.UNAUTHORIZED);
     const userId = session.userId;
-    const [user] = await db.query.usersTable.findMany({
+    const [user] = await db.query.users.findMany({
       where: eq(usersTable.id, userId),
       limit: 1,
     });

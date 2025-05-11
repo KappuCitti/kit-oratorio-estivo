@@ -15,7 +15,7 @@ import { CLASSES } from '@/models/class.model';
 import { usersTable } from './user';
 
 export const enrollmentTable = mysqlTable('enrollments', {
-  id: int().primaryKey().autoincrement(),
+  id: int().primaryKey().autoincrement().notNull(),
   userId: varchar({ length: 16 })
     .notNull()
     .references(() => usersTable.id, { onDelete: 'cascade' }),

@@ -1,60 +1,68 @@
 import { HttpStatusCodes } from '@/codes';
 import { db } from '@/database';
-import {
-  permissionTable,
-  rolePermissionTable,
-  roleTable,
-  sessionTable,
-  userRoleTable,
-} from '@/database/schema';
+import { dbLogger } from '@/database/logger';
+import { roleTable } from '@/database/schema/role';
+import { rolePermissionTable } from '@/database/schema/rolePermission';
+import { sessionTable } from '@/database/schema/session';
+import { usersTable } from '@/database/schema/user';
 import type { Bindings } from '@/models/app.model';
 import type { Permission } from '@/models/permissions.model';
 import { httpErrorResponse } from '@/utils/responses';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, gt } from 'drizzle-orm';
 import type { Context, Next } from 'hono';
 import { getCookie } from 'hono/cookie';
 
-export function hasPermission(permission: Permission) {
+export function can(permission: Permission) {
   return async (c: Context<Bindings, any, {}>, next: Next) => {
-    const token = getCookie(c, 'user_token');
-    if (!token)
-      return httpErrorResponse(
-        c,
-        HttpStatusCodes.UNAUTHORIZED,
-        'Missing token'
-      );
-    const user = await db.query.sessionTable.findFirst({
-      where: eq(sessionTable.token, token),
-      columns: { userId: true },
-    });
-    if (!user)
-      return httpErrorResponse(
-        c,
-        HttpStatusCodes.UNAUTHORIZED,
-        'Invalid token'
-      );
-    const hasPermission =
-      (
-        await db
-          .select()
-          .from(permissionTable)
-          .innerJoin(
-            rolePermissionTable,
-            eq(permissionTable.id, rolePermissionTable.permissionId)
+    try {
+      const token = getCookie(c, 'user_token');
+      if (!token)
+        return httpErrorResponse(
+          c,
+          HttpStatusCodes.UNAUTHORIZED,
+          'Missing token'
+        );
+      const permissionsRes = await db
+        .select({
+          permission: rolePermissionTable.permission,
+        })
+        .from(sessionTable)
+        .innerJoin(usersTable, eq(usersTable.id, sessionTable.userId))
+        .innerJoin(roleTable, eq(usersTable.roleId, roleTable.id))
+        .innerJoin(
+          rolePermissionTable,
+          eq(rolePermissionTable.roleId, roleTable.id)
+        )
+        .where(
+          and(
+            eq(sessionTable.token, token),
+            gt(sessionTable.expires, new Date())
           )
-          .innerJoin(
-            userRoleTable,
-            eq(userRoleTable.roleId, rolePermissionTable.roleId)
-          )
-          .where(
-            and(
-              eq(permissionTable.name, permission),
-              eq(userRoleTable.userId, user.userId)
-            )
-          )
-      ).length > 0;
-    return hasPermission
-      ? next()
-      : httpErrorResponse(c, HttpStatusCodes.FORBIDDEN);
+        );
+      if (permissionsRes.length === 0)
+        return httpErrorResponse(
+          c,
+          HttpStatusCodes.UNAUTHORIZED,
+          'Missing token'
+        );
+      if (!permissionsRes) {
+        return httpErrorResponse(
+          c,
+          HttpStatusCodes.UNAUTHORIZED,
+          'Missing token'
+        );
+      }
+      const permissions = permissionsRes.map((p) => p.permission);
+      if (!permissions.includes(permission))
+        return httpErrorResponse(
+          c,
+          HttpStatusCodes.FORBIDDEN,
+          'Missing permission'
+        );
+      next();
+    } catch (e) {
+      dbLogger.error(e);
+      return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
+    }
   };
 }

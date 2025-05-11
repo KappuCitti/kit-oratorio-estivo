@@ -6,8 +6,7 @@ import { attendanceTable } from './schema/attendance';
 import { enrollmentTable } from './schema/enrollment';
 import { enrollmentWeeksTable } from './schema/enrollmentWeek';
 import { extraordinaryAttendanceTable } from './schema/extraordinaryAttendance';
-import { manageTable } from './schema/manage';
-import { permissionTable } from './schema/permission';
+import { managesTable } from './schema/manages';
 import { roleTable } from './schema/role';
 import { rolePermissionTable } from './schema/rolePermission';
 import { sessionTable } from './schema/session';
@@ -15,30 +14,27 @@ import { shirtSizeTable } from './schema/shirt';
 import { teamTable } from './schema/team';
 import { tripTable } from './schema/trip';
 import { usersTable } from './schema/user';
-import { userRoleTable } from './schema/userRole';
 import { userTripTable } from './schema/userTrip';
 import { weekTable } from './schema/week';
 
 const client = createPool(config.database);
 
 const schema = {
-  address: addressTable,
-  attendance: attendanceTable,
-  enrollment: enrollmentTable,
+  addresses: addressTable,
+  attendances: attendanceTable,
+  enrollments: enrollmentTable,
   enrollmentWeeks: enrollmentWeeksTable,
-  extraordinaryAttendance: extraordinaryAttendanceTable,
-  manage: manageTable,
-  permission: permissionTable,
-  role: roleTable,
+  extraordinaryAttendances: extraordinaryAttendanceTable,
+  manages: managesTable,
+  roles: roleTable,
   rolePermissions: rolePermissionTable,
-  session: sessionTable,
-  shirt: shirtSizeTable,
-  team: teamTable,
-  trip: tripTable,
-  user: usersTable,
-  userRoles: userRoleTable,
-  userTrip: userTripTable,
-  week: weekTable,
+  sessions: sessionTable,
+  shirts: shirtSizeTable,
+  teams: teamTable,
+  trips: tripTable,
+  users: usersTable,
+  userTrips: userTripTable,
+  weeks: weekTable,
 };
 
 export const db = drizzle(client, {

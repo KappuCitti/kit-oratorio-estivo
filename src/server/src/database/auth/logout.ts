@@ -1,9 +1,9 @@
 import { HttpStatusCodes } from '@/codes';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { db } from '@/database';
-import { sessionTable } from '../schema';
 import { eq } from 'drizzle-orm';
 import { dbLogger } from '../logger';
+import { sessionTable } from '../schema/session';
 
 export async function logout(token: string) {
   try {

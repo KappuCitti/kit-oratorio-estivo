@@ -1,4 +1,4 @@
-import { int, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
+import { date, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
 import { usersTable } from './user';
 
 export const sessionTable = mysqlTable('sessions', {
@@ -6,8 +6,8 @@ export const sessionTable = mysqlTable('sessions', {
     .primaryKey()
     .notNull()
     .$defaultFn(() => crypto.randomUUID()),
-  expires: varchar({ length: 255 }).notNull(),
-  userId: int()
+  expires: date().notNull(),
+  userId: varchar({ length: 16 })
     .notNull()
     .references(() => usersTable.id, { onDelete: 'cascade' }),
 });

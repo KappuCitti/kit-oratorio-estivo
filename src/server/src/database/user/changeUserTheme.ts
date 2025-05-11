@@ -3,12 +3,13 @@ import type { Theme } from '@/models/theme.model';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { db } from '..';
 import { and, eq, sql } from 'drizzle-orm';
-import { sessionTable, usersTable } from '../schema';
 import { dbLogger } from '../logger';
+import { sessionTable } from '../schema/session';
+import { usersTable } from '../schema/user';
 
 export async function changeUserTheme(token: string, theme: Theme) {
   try {
-    const session = await db.query.sessionTable.findFirst({
+    const session = await db.query.sessions.findFirst({
       where: and(
         eq(sessionTable.token, token),
         sql`${sessionTable.expires} > NOW()`

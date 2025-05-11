@@ -1,9 +1,9 @@
 import { eq } from 'drizzle-orm';
 import { db } from '..';
 import { dbLogger } from '../logger';
-import { shirtSizeTable } from '../schema';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { HttpStatusCodes } from '@/codes';
+import { shirtSizeTable } from '../schema/shirt';
 
 export async function deleteShirt(id: number) {
   try {

@@ -12,6 +12,7 @@ export const registerRouteDef = createRoute({
   request: {
     body: createRequiredJsonBody(
       z.object({
+        cf: z.string().length(16),
         name: z
           .string()
           .min(2, 'Name must be at least 2 characters long')
@@ -24,8 +25,8 @@ export const registerRouteDef = createRoute({
           .string()
           .min(5, 'Password must be at least 5 characters long')
           .max(255, 'Password must be at most 255 characters long'),
-        roleIds: z.array(z.number()).min(1, 'At least one role is required'),
-        email: z.string().optional(),
+        role: z.string(),
+        email: z.string().email().optional(),
       }),
       'User info and password'
     ),
@@ -36,10 +37,10 @@ export const registerRouteDef = createRoute({
       z.null(),
       'User successfully registered'
     ),
-    [HttpStatusCodes.BAD_REQUEST]: createJsonResBody(
+    [HttpStatusCodes.FORBIDDEN]: createJsonResBody(
       false,
       z.string(),
-      'Missing or invalid registration data'
+      'Role invalid or not allowed'
     ),
     [HttpStatusCodes.CONFLICT]: createJsonResBody(
       false,

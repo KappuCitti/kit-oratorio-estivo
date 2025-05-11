@@ -1,4 +1,4 @@
-import { addressTable } from '@/database/schema';
+import { addressTable } from '@/database/schema/address';
 import { createSelectSchema } from 'drizzle-zod';
 import type { z } from 'zod';
 

@@ -10,7 +10,7 @@ import { usersTable } from './user';
 export const extraordinaryAttendanceTable = mysqlTable(
   'extraordinary_attendances',
   {
-    id: int().primaryKey().autoincrement(),
+    id: int().primaryKey().autoincrement().notNull(),
     userId: varchar({ length: 16 })
       .notNull()
       .references(() => usersTable.id, { onDelete: 'cascade' }),

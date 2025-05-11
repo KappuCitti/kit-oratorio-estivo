@@ -1,42 +1,45 @@
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { db } from '..';
-import { count, sql } from 'drizzle-orm';
-import { userRoleTable, usersTable } from '../schema';
+import { eq } from 'drizzle-orm';
 import { hashPassword } from '@/utils/password';
 import { HttpStatusCodes } from '@/codes';
 import { dbLogger } from '../logger';
+import { usersTable } from '../schema/user';
+import { personalInfoTable } from '../schema/personalInfo';
+import { getRoleIdIfCanRegister } from '../role/canRoleRegister';
 
 export async function register(
+  cf: string,
   name: string,
   surname: string,
   password: string,
-  roleId: number[],
+  role: string,
   email: string | null = null
 ) {
   try {
-    const [rows] = await db
-      .select({ count: count() })
-      .from(usersTable)
-      .where(
-        sql`(${usersTable.name} = ${name.toLowerCase()} AND ${
-          usersTable.surname
-        } = ${surname.toLowerCase()}) OR (${usersTable.email} != NULL AND ${
-          usersTable.email
-        } = ${email})`
-      );
-    if (rows.count > 0) return createErrorResult(HttpStatusCodes.CONFLICT);
-    const passwordHash = await hashPassword(password);
-    const [inserted] = await db
-      .insert(usersTable)
-      .values({
-        name,
-        surname,
-        password: passwordHash,
-        email,
-      })
-      .$returningId();
-    const toInsert = roleId.map((id) => ({ userId: inserted.id, roleId: id }));
-    await db.insert(userRoleTable).values(toInsert);
+    const exists = !!(await db.query.user.findFirst({
+      where: eq(usersTable.id, cf),
+    }));
+    if (exists) return createErrorResult(HttpStatusCodes.CONFLICT);
+    await db.insert(personalInfoTable).values({
+      id: cf,
+      name,
+      surname,
+    });
+    const roleId = await getRoleIdIfCanRegister(role);
+    if (!roleId.success) {
+      return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    if (!roleId.data) {
+      return createErrorResult(HttpStatusCodes.FORBIDDEN);
+    }
+    await db.insert(usersTable).values({
+      id: cf,
+      roleId: roleId.data,
+      email: email,
+      password: await hashPassword(password),
+      theme: 'System',
+    });
     return createSuccessResult(HttpStatusCodes.OK);
   } catch (e) {
     dbLogger.error(e);

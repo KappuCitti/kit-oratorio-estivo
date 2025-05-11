@@ -1,5 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
-import { hasPermission } from '@/middlewares/hasPermission';
+import { can } from '@/middlewares/hasPermission';
 import { CLASSES } from '@/models/class.model';
 import {
   coercedIdSchema,
@@ -15,8 +15,8 @@ import { z } from 'zod';
 export const getEnrollmentListRouteDef = createRoute({
   tags: ['Enrollment'],
   method: 'get',
-  middleware: hasPermission('enrollment_get'),
   path: '/enrollments',
+  middleware: can('see_users'),
   request: {
     query: z.object({
       page: queryPageSchema,
@@ -33,7 +33,7 @@ export const getEnrollmentListRouteDef = createRoute({
     [HttpStatusCodes.OK]: createJsonResBody(
       true,
       z.object({
-        enrollments: z.array(bareEnrollmentSchema),
+        elements: z.array(bareEnrollmentSchema),
         count: z.number().int().positive(),
       }),
       'List of enrollments'

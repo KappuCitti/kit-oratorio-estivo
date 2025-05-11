@@ -1,5 +1,4 @@
 import { HttpStatusCodes } from '@/codes';
-import { hasPermission } from '@/middlewares/hasPermission';
 import { paramIdSchema } from '@/models/common.model';
 import { bodyShirtSchema } from '@/models/shirt.model';
 import {
@@ -13,7 +12,6 @@ export const editShirtRouteDef = createRoute({
   tags: ['Shirt'],
   method: 'put',
   path: '/shirts/{id}',
-  middleware: hasPermission('shirt_update'),
   request: {
     params: paramIdSchema,
     body: createRequiredJsonBody(

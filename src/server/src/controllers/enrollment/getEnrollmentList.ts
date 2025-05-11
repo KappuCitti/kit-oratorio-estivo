@@ -7,7 +7,7 @@ import { httpErrorResponse, httpSuccessResponse } from '@/utils/responses';
 const getEnrollmentsController: RouteController<
   GetEnrollmentListRoute
 > = async (c) => {
-  const { page, size, year, className, query, schoolType, teamId, weekId } =
+  const { page, size, schoolType, className, query, weekId, teamId, year } =
     await c.req.valid('query');
   const enrollments = await getEnrollmentList(
     page,

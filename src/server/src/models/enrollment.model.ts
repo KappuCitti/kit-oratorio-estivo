@@ -1,13 +1,11 @@
-import {
-  addressTable,
-  childTable,
-  enrollmentTable,
-  enrollmentWeeksTable,
-  parentTable,
-  shirtSizeTable,
-  teamTable,
-  weekTable,
-} from '@/database/schema';
+import { addressTable } from '@/database/schema/address';
+import { enrollmentTable } from '@/database/schema/enrollment';
+import { enrollmentWeeksTable } from '@/database/schema/enrollmentWeek';
+import { personalInfoTable } from '@/database/schema/personalInfo';
+import { shirtSizeTable } from '@/database/schema/shirt';
+import { teamTable } from '@/database/schema/team';
+import { usersTable } from '@/database/schema/user';
+import { weekTable } from '@/database/schema/week';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
@@ -16,7 +14,7 @@ export type EnrollmentTable = z.infer<typeof enrollmentTableSchema>;
 
 export const fullEnrollmentSchema = enrollmentTableSchema
   .omit({
-    childId: true,
+    userId: true,
     teamId: true,
     shirtSizeId: true,
   })
@@ -32,24 +30,9 @@ export const fullEnrollmentSchema = enrollmentTableSchema
 
 export type FullEnrollment = z.infer<typeof fullEnrollmentSchema>;
 
-export const fullEnrollmentWithFamilySchema = fullEnrollmentSchema.extend({
-  family: z.object({
-    child: createSelectSchema(childTable)
-      .omit({ addressId: true })
-      .extend({
-        address: createSelectSchema(addressTable).omit({ id: true }),
-      }),
-    parents: z.array(createSelectSchema(parentTable)).max(2),
-  }),
-});
-
-export type FullEnrollmentWithFamily = z.infer<
-  typeof fullEnrollmentWithFamilySchema
->;
-
 export const bareEnrollmentSchema = createSelectSchema(enrollmentTable)
   .omit({
-    childId: true,
+    userId: true,
     teamId: true,
     shirtSizeId: true,
     dateOfEnrollment: true,
@@ -58,11 +41,20 @@ export const bareEnrollmentSchema = createSelectSchema(enrollmentTable)
     parentNotes: true,
   })
   .extend({
-    child: createSelectSchema(childTable).omit({
-      addressId: true,
-      birthDate: true,
-      birthPlace: true,
-    }),
+    user: createSelectSchema(usersTable)
+      .omit({
+        password: true,
+        theme: true,
+        roleId: true,
+      })
+      .and(
+        createSelectSchema(personalInfoTable).omit({
+          id: true,
+          addressId: true,
+          birthDate: true,
+          birthPlace: true,
+        })
+      ),
     weeks: z.array(
       createSelectSchema(enrollmentWeeksTable).omit({
         enrollmentId: true,

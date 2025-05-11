@@ -5,7 +5,7 @@ import { dbLogger } from '../logger';
 
 export async function getTeamList() {
   try {
-    const teams = await db.query.teamTable.findMany();
+    const teams = await db.query.teams.findMany();
     return createSuccessResult(teams);
   } catch (e) {
     dbLogger.error(e);

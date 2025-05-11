@@ -1,17 +1,15 @@
-import { createErrorResult, createSuccessResult } from '@/utils/createResult';
-import { db } from '@/database';
-import type { BareEnrollment } from '@/models/enrollment.model';
-import { and, count, eq, getTableColumns, like, or } from 'drizzle-orm';
-import {
-  childTable,
-  enrollmentTable,
-  enrollmentWeeksTable,
-  teamTable,
-} from '../schema';
-import { HttpStatusCodes } from '@/codes';
-import type { SchoolType } from '@/models/schoolTypes.model';
 import type { Class } from '@/models/class.model';
+import type { SchoolType } from '@/models/schoolTypes.model';
 import { dbLogger } from '../logger';
+import { createErrorResult, createSuccessResult } from '@/utils/createResult';
+import { HttpStatusCodes } from '@/codes';
+import { db } from '..';
+import { enrollmentTable } from '../schema/enrollment';
+import { teamTable } from '../schema/team';
+import { and, count, eq, like, or, SQL, sql } from 'drizzle-orm';
+import { enrollmentWeeksTable } from '../schema/enrollmentWeek';
+import { usersTable } from '../schema/user';
+import { personalInfoTable } from '../schema/personalInfo';
 
 export async function getEnrollmentList(
   page: number,
@@ -19,85 +17,93 @@ export async function getEnrollmentList(
   year: number,
   weekId?: number,
   teamId?: number,
-  query?: string,
+  query: string = '',
   schoolType?: SchoolType,
   className?: Class
 ) {
   try {
-    const filters: any[] = [];
-    if (teamId) filters.push(eq(enrollmentTable.teamId, teamId));
-    if (query) {
-      query
-        .split(' ')
-        .filter((s) => s.trim().length > 0)
-        .forEach((s) => {
-          filters.push(
-            or(
-              like(childTable.name, `%${s}%`),
-              like(childTable.surname, `%${s}%`)
-            )
-          );
-        });
-    }
+    const filters = [eq(enrollmentTable.year, year)];
     if (schoolType) filters.push(eq(enrollmentTable.schoolType, schoolType));
     if (className) filters.push(eq(enrollmentTable.className, className));
-    const [rows] = await db
-      .select({
-        count: count(),
-      })
-      .from(enrollmentTable)
-      .innerJoin(childTable, eq(enrollmentTable.childId, childTable.id))
-      .where(and(eq(enrollmentTable.year, year), ...filters))
-      .limit(size)
-      .offset((page - 1) * size);
+    if (weekId)
+      filters.push(sql`${enrollmentWeeksTable.weekId} IN (${weekId})`);
+    if (teamId) filters.push(eq(enrollmentTable.teamId, teamId));
+    if (query)
+      filters.push(
+        or(
+          like(personalInfoTable.name, `%${query}%`),
+          like(personalInfoTable.surname, `%${query}%`)
+        ) as SQL
+      );
 
-    const eIds = await db
+    const enrollmentQuery = db
       .select({
-        ...getTableColumns(enrollmentTable),
-      })
-      .from(enrollmentTable)
-      .innerJoin(childTable, eq(enrollmentTable.childId, childTable.id))
-      .where(and(eq(enrollmentTable.year, year), ...filters))
-      .limit(size)
-      .offset((page - 1) * size);
-    const enrollments: BareEnrollment[] = [];
-    for (const enroll of eIds) {
-      const weeks = await db.query.enrollmentWeeksTable.findMany({
-        where: eq(enrollmentWeeksTable.enrollmentId, enroll.id),
-        columns: {
-          enrollmentId: false,
+        id: enrollmentTable.id,
+        className: enrollmentTable.className,
+        schoolType: enrollmentTable.schoolType,
+        year: enrollmentTable.year,
+        dataProcessingConsent: enrollmentTable.dataProcessingConsent,
+        exitAuthorization: enrollmentTable.exitAuthorization,
+        imageProcessingConsent: enrollmentTable.imageProcessingConsent,
+        specialDiet: enrollmentTable.specialDiet,
+        team: {
+          id: sql<number>`${teamTable.id}`.as('teamId'),
+          name: sql<string>`${teamTable.name}`.as('teamName'),
+          color: teamTable.color,
         },
-      });
-      if (weekId && !weeks.map((w) => w.weekId).includes(weekId)) continue;
+        section: enrollmentTable.section,
+        weeks: sql<
+          { isPaid: boolean; weekId: number }[]
+        >`JSON_EXTRACT(COALESCE(JSON_ARRAYAGG(JSON_OBJECT('isPaid', ${enrollmentWeeksTable.isPaid}, 'weekId', ${enrollmentWeeksTable.weekId})), '[]'), '$')`.as(
+          'weeks'
+        ),
+        user: {
+          id: sql<string>`${usersTable.id}`.as('userId'),
+          email: usersTable.email,
+          name: sql<string>`${personalInfoTable.name}`.as('userName'),
+          surname: personalInfoTable.surname,
+        },
+      })
+      .from(enrollmentTable)
+      .leftJoin(
+        enrollmentWeeksTable,
+        eq(enrollmentTable.id, enrollmentWeeksTable.enrollmentId)
+      )
+      .innerJoin(usersTable, eq(enrollmentTable.userId, usersTable.id))
+      .innerJoin(personalInfoTable, eq(usersTable.id, personalInfoTable.id))
+      .leftJoin(teamTable, eq(enrollmentTable.teamId, teamTable.id))
+      .where(and(...filters))
+      .groupBy(
+        enrollmentTable.id,
+        enrollmentTable.className,
+        enrollmentTable.schoolType,
+        enrollmentTable.year,
+        enrollmentTable.dataProcessingConsent,
+        enrollmentTable.exitAuthorization,
+        enrollmentTable.imageProcessingConsent,
+        enrollmentTable.specialDiet,
+        enrollmentTable.section,
+        teamTable.id,
+        teamTable.name,
+        teamTable.color,
+        usersTable.id,
+        usersTable.email,
+        personalInfoTable.name,
+        personalInfoTable.surname
+      );
 
-      enrollments.push({
-        id: enroll.id,
-        className: enroll.className,
-        section: enroll.section,
-        dataProcessingConsent: enroll.dataProcessingConsent,
-        exitAuthorization: enroll.exitAuthorization,
-        schoolType: enroll.schoolType,
-        child: (
-          await db.query.childTable.findMany({
-            where: eq(childTable.id, enroll.childId),
-            columns: {
-              addressId: false,
-              birthDate: false,
-              birthPlace: false,
-            },
-          })
-        )[0],
-        weeks,
-        team: enroll.teamId
-          ? (
-              await db.query.teamTable.findMany({
-                where: eq(teamTable.id, enroll.teamId),
-              })
-            )[0]
-          : null,
-      });
-    }
-    return createSuccessResult({ enrollments, count: rows?.count ?? 0 });
+    const [enrollmentCount] = await db
+      .select({ count: count() })
+      .from(enrollmentQuery.as('enrollments'))
+      .limit(1);
+
+    const enrollments = await enrollmentQuery
+      .limit(size)
+      .offset((page - 1) * size);
+    return createSuccessResult({
+      elements: enrollments,
+      count: enrollmentCount.count,
+    });
   } catch (e) {
     dbLogger.error(e);
     return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);

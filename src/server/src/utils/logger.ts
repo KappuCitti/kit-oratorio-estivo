@@ -4,7 +4,7 @@ import path from 'path';
 
 export function createLogger(name?: string, format?: string) {
   return pino({
-    level: config.logLevel,
+    level: config.logs.logLevel,
     name,
     transport: {
       pipeline: [
@@ -19,7 +19,7 @@ export function createLogger(name?: string, format?: string) {
         {
           target: 'pino-roll',
           options: {
-            file: path.join(config.logFolder, 'log'),
+            file: path.join(config.logs.logFolder, 'log'),
             extension: '.log',
             frequency: 'daily',
             dateFormat: 'yyyy-MM-dd',

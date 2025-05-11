@@ -5,7 +5,7 @@ import { dbLogger } from '../logger';
 
 export async function getShirtList() {
   try {
-    const shirts = await db.query.shirtSizeTable.findMany();
+    const shirts = await db.query.shirts.findMany();
     return createSuccessResult(shirts);
   } catch (e) {
     dbLogger.error(e);
