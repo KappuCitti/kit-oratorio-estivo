@@ -61,7 +61,7 @@ export const envSchema = z.object({
   DB_USER: z.string().optional(),
   DB_PASSWORD: z.string().optional(),
   DB_DATABASE: z.string().optional(),
-  DB_WAIT_FOR_CONNECTIONS: z.boolean().optional(),
+  DB_WAIT_FOR_CONNECTIONS: z.coerce.boolean().optional(),
   DB_CONNECTION_LIMIT: z.coerce.number().int().positive().optional(),
   DB_QUEUE_LIMIT: z.coerce.number().int().positive().optional(),
 });
