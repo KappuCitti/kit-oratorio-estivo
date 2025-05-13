@@ -6,7 +6,7 @@ import {
 } from '@/utils/createOpenApiBody';
 import { createRoute, z } from '@hono/zod-openapi';
 
-export const getUserInfoRouteDef = createRoute({
+export const registerManagedUserRouteDef = createRoute({
   tags: ['User'],
   method: 'post',
   path: '/user',
@@ -14,10 +14,12 @@ export const getUserInfoRouteDef = createRoute({
   request: {
     body: createRequiredJsonBody(
       z.object({
+        cf: z.string(),
+        password: z.string(),
         name: z.string(),
         surname: z.string(),
         email: z.string().email().optional(),
-        birthDate: z.coerce.date(),
+        birthDate: z.string().date(),
         birthPlace: z.string(),
         sex: z.enum(['M', 'F']),
         address: z.object({
@@ -26,6 +28,7 @@ export const getUserInfoRouteDef = createRoute({
           postalCode: z.string(),
           country: z.string(),
         }),
+        role: z.string(),
       }),
       'Info of the user to register'
     ),
@@ -39,7 +42,17 @@ export const getUserInfoRouteDef = createRoute({
     [HttpStatusCodes.BAD_REQUEST]: createJsonResBody(
       false,
       z.string(),
-      'Username or email already exists'
+      'Invalid data provided'
+    ),
+    [HttpStatusCodes.FORBIDDEN]: createJsonResBody(
+      false,
+      z.string(),
+      'Role cannot register'
+    ),
+    [HttpStatusCodes.CONFLICT]: createJsonResBody(
+      false,
+      z.string(),
+      'User already exists'
     ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: createJsonResBody(
       false,
@@ -49,4 +62,4 @@ export const getUserInfoRouteDef = createRoute({
   },
 });
 
-export type GetUserInfoRoute = typeof getUserInfoRouteDef;
+export type RegisterManagedUserRoute = typeof registerManagedUserRouteDef;

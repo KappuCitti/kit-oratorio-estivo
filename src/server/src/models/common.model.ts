@@ -1,3 +1,4 @@
+import type { db } from '@/database';
 import { z } from 'zod';
 
 export const idSchema = z.number().int().nonnegative();
@@ -16,3 +17,7 @@ export const querySizeSchema = z.coerce
   .default(25);
 
 export const dateStringSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+
+export type Transaction = Parameters<
+  Parameters<(typeof db)['transaction']>[0]
+>[0];
