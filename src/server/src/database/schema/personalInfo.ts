@@ -1,4 +1,4 @@
-import { int, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
+import { int, mysqlEnum, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
 import { addressTable } from './address';
 import { usersTable } from './user';
 
@@ -9,6 +9,7 @@ export const personalInfoTable = mysqlTable('personal_info', {
     .references(() => usersTable.id, { onDelete: 'cascade' }),
   name: varchar({ length: 100 }).notNull(),
   surname: varchar({ length: 100 }).notNull(),
+  sex: mysqlEnum(['M', 'F']),
   birthDate: varchar({ length: 100 }),
   birthPlace: varchar({ length: 255 }),
   addressId: int().references(() => addressTable.id),

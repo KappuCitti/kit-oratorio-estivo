@@ -1,6 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
 import { THEMES } from '@/models/theme.model';
-import { fullUserSchema } from '@/models/user.model';
 import {
   createJsonResBody,
   createRequiredJsonBody,
