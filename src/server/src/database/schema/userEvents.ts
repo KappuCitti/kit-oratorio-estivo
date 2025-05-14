@@ -6,20 +6,20 @@ import {
   varchar,
 } from 'drizzle-orm/mysql-core';
 import { usersTable } from './user';
-import { activityTable } from './activities';
+import { eventsTable } from './events';
 
-export const userTripTable = mysqlTable(
-  'user_trips',
+export const userEventTable = mysqlTable(
+  'user_events',
   {
     userId: varchar({ length: 16 })
       .notNull()
       .references(() => usersTable.id, {
         onDelete: 'cascade',
       }),
-    tripId: int().references(() => activityTable.id, {
+    eventId: int().references(() => eventsTable.id, {
       onDelete: 'cascade',
     }),
     isPaid: boolean().notNull().default(false),
   },
-  (table) => [primaryKey({ columns: [table.userId, table.tripId] })]
+  (table) => [primaryKey({ columns: [table.userId, table.eventId] })]
 );

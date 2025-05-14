@@ -7,7 +7,7 @@ import {
   varchar,
 } from 'drizzle-orm/mysql-core';
 
-export const activityTable = mysqlTable('activities', {
+export const eventsTable = mysqlTable('events', {
   id: int().primaryKey().autoincrement().notNull(),
   title: varchar({ length: 255 }).notNull(),
   description: text(),

@@ -12,9 +12,9 @@ import { rolePermissionTable } from './schema/rolePermission';
 import { sessionTable } from './schema/session';
 import { shirtSizeTable } from './schema/shirt';
 import { teamTable } from './schema/team';
-import { activityTable } from './schema/activities';
+import { eventsTable } from './schema/events';
 import { usersTable } from './schema/user';
-import { userTripTable } from './schema/userTrip';
+import { userEventTable } from './schema/userEvents';
 import { weekTable } from './schema/week';
 
 const client = createPool(config.database);
@@ -24,6 +24,7 @@ const schema = {
   attendances: attendanceTable,
   enrollments: enrollmentTable,
   enrollmentWeeks: enrollmentWeeksTable,
+  events: eventsTable,
   extraordinaryAttendances: extraordinaryAttendanceTable,
   manages: managesTable,
   roles: roleTable,
@@ -31,9 +32,8 @@ const schema = {
   sessions: sessionTable,
   shirts: shirtSizeTable,
   teams: teamTable,
-  activities: activityTable,
   users: usersTable,
-  userTrips: userTripTable,
+  userEvents: userEventTable,
   weeks: weekTable,
 };
 
