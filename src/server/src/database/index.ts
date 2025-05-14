@@ -16,6 +16,7 @@ import { eventsTable } from './schema/events';
 import { usersTable } from './schema/user';
 import { userEventTable } from './schema/userEvents';
 import { weekTable } from './schema/week';
+import { eventClassesTable } from './schema/eventClasses';
 
 const client = createPool(config.database);
 
@@ -25,6 +26,7 @@ const schema = {
   enrollments: enrollmentTable,
   enrollmentWeeks: enrollmentWeeksTable,
   events: eventsTable,
+  eventClasses: eventClassesTable,
   extraordinaryAttendances: extraordinaryAttendanceTable,
   manages: managesTable,
   roles: roleTable,
