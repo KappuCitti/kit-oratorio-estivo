@@ -45,7 +45,7 @@ export async function addManagedUser(
     if (cfExists) return createErrorResult(HttpStatusCodes.CONFLICT);
     if (isNaN(new Date(birthDate).getTime()))
       return createErrorResult(HttpStatusCodes.BAD_REQUEST);
-    db.transaction(async (tx) => {
+    await db.transaction(async (tx) => {
       const addressId = await txCreateAddressIfNotExists(tx, {
         street,
         city,
