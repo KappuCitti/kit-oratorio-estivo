@@ -6,7 +6,7 @@ import {
   varchar,
 } from 'drizzle-orm/mysql-core';
 import { usersTable } from './user';
-import { tripTable } from './trip';
+import { activityTable } from './activities';
 
 export const userTripTable = mysqlTable(
   'user_trips',
@@ -16,7 +16,7 @@ export const userTripTable = mysqlTable(
       .references(() => usersTable.id, {
         onDelete: 'cascade',
       }),
-    tripId: int().references(() => tripTable.id, {
+    tripId: int().references(() => activityTable.id, {
       onDelete: 'cascade',
     }),
     isPaid: boolean().notNull().default(false),

@@ -12,7 +12,7 @@ import { rolePermissionTable } from './schema/rolePermission';
 import { sessionTable } from './schema/session';
 import { shirtSizeTable } from './schema/shirt';
 import { teamTable } from './schema/team';
-import { tripTable } from './schema/trip';
+import { activityTable } from './schema/activities';
 import { usersTable } from './schema/user';
 import { userTripTable } from './schema/userTrip';
 import { weekTable } from './schema/week';
@@ -31,7 +31,7 @@ const schema = {
   sessions: sessionTable,
   shirts: shirtSizeTable,
   teams: teamTable,
-  trips: tripTable,
+  activities: activityTable,
   users: usersTable,
   userTrips: userTripTable,
   weeks: weekTable,
