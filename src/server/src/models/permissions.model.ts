@@ -10,5 +10,9 @@ export const PERMISSIONS = [
   'manage_personal_info',
   'be_enrolled',
   'register_child_users',
+  'be_selected',
+  'manage_attendances',
+  'manage_events',
+  'manage_activities',
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];
