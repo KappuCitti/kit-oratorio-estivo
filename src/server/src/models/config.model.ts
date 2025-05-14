@@ -35,7 +35,7 @@ export const configSchema = z
           key: z.string().default('ssl/key.pem'),
         }),
       }),
-      z.object({ useHttps: z.literal(false), ssl: z.undefined() }),
+      z.object({ useHttps: z.literal(false) }),
     ])
   );
 export type Config = z.infer<typeof configSchema>;
@@ -68,33 +68,41 @@ export const envSchema = z.object({
 export type EnvConfig = z.infer<typeof envSchema>;
 
 export const tomlSchema = z.object({
-  server: z.object({
-    port: z.number().int().positive().optional(),
-    host: z.string().optional(),
-    routes_prefix: z.string().optional(),
-    use_https: z.boolean().optional(),
-    domain: z.string().optional(),
-    frontend_port: z.number().int().positive().optional(),
-    music_folder: z.string().optional(),
-  }),
-  https: z.object({
-    cert: z.string().optional(),
-    key: z.string().optional(),
-  }),
-  logs: z.object({
-    log_level: z.enum(LOG_LEVELS).optional(),
-    log_folder: z.string().optional(),
-  }),
-  database: z.object({
-    host: z.string().optional(),
-    port: z.number().int().positive().optional(),
-    user: z.string().optional(),
-    password: z.string().optional(),
-    database: z.string().optional(),
-    wait_for_connections: z.boolean().optional(),
-    connection_limit: z.number().int().positive().optional(),
-    queue_limit: z.number().int().positive().optional(),
-    idleTimeout: z.number().int().positive().optional(),
-  }),
+  server: z
+    .object({
+      port: z.number().int().positive().optional(),
+      host: z.string().optional(),
+      routes_prefix: z.string().optional(),
+      use_https: z.boolean().optional(),
+      domain: z.string().optional(),
+      frontend_port: z.number().int().positive().optional(),
+      music_folder: z.string().optional(),
+    })
+    .optional(),
+  https: z
+    .object({
+      cert: z.string().optional(),
+      key: z.string().optional(),
+    })
+    .optional(),
+  logs: z
+    .object({
+      log_level: z.enum(LOG_LEVELS).optional(),
+      log_folder: z.string().optional(),
+    })
+    .optional(),
+  database: z
+    .object({
+      host: z.string().optional(),
+      port: z.number().int().positive().optional(),
+      user: z.string().optional(),
+      password: z.string().optional(),
+      database: z.string().optional(),
+      wait_for_connections: z.boolean().optional(),
+      connection_limit: z.number().int().positive().optional(),
+      queue_limit: z.number().int().positive().optional(),
+      idleTimeout: z.number().int().positive().optional(),
+    })
+    .optional(),
 });
 export type TomlConfig = z.infer<typeof tomlSchema>;

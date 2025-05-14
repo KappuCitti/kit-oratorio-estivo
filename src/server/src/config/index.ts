@@ -30,35 +30,35 @@ const tomlFile = tomlFileRes.data;
 
 const config = configSchema.safeParse({
   server: {
-    host: env.SERVER_HOST ?? tomlFile.server.host,
-    port: env.SERVER_PORT ?? tomlFile.server.port,
-    routesPrefix: env.SERVER_ROUTES_PREFIX ?? tomlFile.server.routes_prefix,
-    domain: env.SERVER_DOMAIN ?? tomlFile.server.domain,
-    frontendPort: env.SERVER_FRONTEND_PORT ?? tomlFile.server.frontend_port,
+    host: env.SERVER_HOST ?? tomlFile.server?.host,
+    port: env.SERVER_PORT ?? tomlFile.server?.port,
+    routesPrefix: env.SERVER_ROUTES_PREFIX ?? tomlFile.server?.routes_prefix,
+    domain: env.SERVER_DOMAIN ?? tomlFile.server?.domain,
+    frontendPort: env.SERVER_FRONTEND_PORT ?? tomlFile.server?.frontend_port,
   },
-  useHttps: env.SERVER_USE_HTTPS ?? tomlFile.server.use_https ? true : false,
+  useHttps: env.SERVER_USE_HTTPS ?? tomlFile.server?.use_https ? true : false,
   https: {
-    cert: env.HTTPS_CERT ?? tomlFile.https.cert,
-    key: env.HTTPS_KEY ?? tomlFile.https.key,
+    cert: env.HTTPS_CERT ?? tomlFile.https?.cert,
+    key: env.HTTPS_KEY ?? tomlFile.https?.key,
   },
   logs: {
-    logLevel: env.LOG_LEVEL ?? tomlFile.logs.log_level,
-    logFolder: env.LOG_FOLDER ?? tomlFile.logs.log_folder,
+    logLevel: env.LOG_LEVEL ?? tomlFile.logs?.log_level,
+    logFolder: env.LOG_FOLDER ?? tomlFile.logs?.log_folder,
   },
   database: {
-    host: env.DB_HOST ?? tomlFile.database.host,
-    port: env.DB_PORT ?? tomlFile.database.port,
-    user: env.DB_USER ?? tomlFile.database.user,
-    password: env.DB_PASSWORD ?? tomlFile.database.password,
-    database: env.DB_DATABASE ?? tomlFile.database.database,
+    host: env.DB_HOST ?? tomlFile.database?.host,
+    port: env.DB_PORT ?? tomlFile.database?.port,
+    user: env.DB_USER ?? tomlFile.database?.user,
+    password: env.DB_PASSWORD ?? tomlFile.database?.password,
+    database: env.DB_DATABASE ?? tomlFile.database?.database,
     waitForConnections:
-      env.DB_WAIT_FOR_CONNECTIONS ?? tomlFile.database.wait_for_connections,
+      env.DB_WAIT_FOR_CONNECTIONS ?? tomlFile.database?.wait_for_connections,
     connectionLimit:
-      env.DB_CONNECTION_LIMIT ?? tomlFile.database.connection_limit,
-    queueLimit: env.DB_QUEUE_LIMIT ?? tomlFile.database.queue_limit,
+      env.DB_CONNECTION_LIMIT ?? tomlFile.database?.connection_limit,
+    queueLimit: env.DB_QUEUE_LIMIT ?? tomlFile.database?.queue_limit,
     idleTimeout: 60 * 60 * 24 * 365,
   },
-  musicFolder: env.MUSIC_FOLDER ?? tomlFile.server.music_folder,
+  musicFolder: env.MUSIC_FOLDER ?? tomlFile.server?.music_folder,
 });
 if (!config.success) {
   console.error('Error while parsing config');
