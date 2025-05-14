@@ -5,10 +5,17 @@ import type { RegisterRoute } from '@/openapi/auth/register';
 import { httpErrorResponse, httpSuccessResponse } from '@/utils/responses';
 
 const registerController: RouteController<RegisterRoute> = async (c) => {
-  const { cf, name, surname, password, role, email } = await c.req.valid(
-    'json'
+  const { cf, name, surname, password, role, email, phoneNumber } =
+    await c.req.valid('json');
+  const registerRes = await register(
+    cf,
+    name,
+    surname,
+    password,
+    role,
+    phoneNumber,
+    email
   );
-  const registerRes = await register(cf, name, surname, password, role, email);
   if (!registerRes.success) {
     switch (registerRes.error) {
       case HttpStatusCodes.CONFLICT:

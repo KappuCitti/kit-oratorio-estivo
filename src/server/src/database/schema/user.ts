@@ -7,6 +7,7 @@ export const usersTable = mysqlTable('users', {
   email: varchar({ length: 255 }),
   password: varchar({ length: 255 }).notNull(),
   theme: mysqlEnum(THEMES).notNull().default('System'),
+  phone: varchar({ length: 15 }),
   roleId: int()
     .notNull()
     .references(() => roleTable.id),

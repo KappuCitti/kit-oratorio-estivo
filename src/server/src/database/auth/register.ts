@@ -14,10 +14,11 @@ export async function register(
   surname: string,
   password: string,
   role: string,
+  phone: string,
   email: string | null = null
 ) {
   try {
-    const exists = !!(await db.query.user.findFirst({
+    const exists = !!(await db.query.users.findFirst({
       where: eq(usersTable.id, cf),
     }));
     if (exists) return createErrorResult(HttpStatusCodes.CONFLICT);
@@ -39,6 +40,7 @@ export async function register(
       email: email,
       password: await hashPassword(password),
       theme: 'System',
+      phone,
     });
     return createSuccessResult(HttpStatusCodes.OK);
   } catch (e) {
