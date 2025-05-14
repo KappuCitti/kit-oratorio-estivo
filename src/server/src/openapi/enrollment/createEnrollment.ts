@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { can } from '@/middlewares/hasPermission';
 import { CLASSES } from '@/models/class.model';
 import { SCHOOL_TYPES } from '@/models/schoolTypes.model';
 import { weekEnrollmentSchema } from '@/models/week.model';
@@ -13,6 +14,7 @@ export const createEnrollmentRouteDef = createRoute({
   tags: ['Enrollment'],
   method: 'post',
   path: '/enrollments',
+  middleware: can('manage_self_child_users'),
   request: {
     body: createRequiredJsonBody(
       z.object({
