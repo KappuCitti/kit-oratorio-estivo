@@ -16,16 +16,16 @@ export const createEnrollmentRouteDef = createRoute({
   request: {
     body: createRequiredJsonBody(
       z.object({
-        child: z.number().int().positive(),
-        team: z.union([z.number().int().positive(), z.null()]).optional(),
+        user: z.string(),
         shirt: z.union([z.number().int().positive(), z.null()]).optional(),
         weeks: z.array(weekEnrollmentSchema),
         dataProcessingConsent: z.boolean(),
+        imageProcessingConsent: z.boolean(),
         exitAuthorization: z.boolean(),
         schoolType: z.enum(SCHOOL_TYPES),
         className: z.enum(CLASSES),
         section: z.string().max(1, 'Section must be 1 character long'),
-        year: z.number().int().positive(),
+        specialDiet: z.union([z.string().max(255), z.null()]).optional(),
         parentNotes: z
           .union([
             z.string().max(255, 'Max parent notes size reached'),
@@ -52,6 +52,16 @@ export const createEnrollmentRouteDef = createRoute({
       false,
       z.string(),
       'One or more ids are invalid'
+    ),
+    [HttpStatusCodes.FORBIDDEN]: createJsonResBody(
+      false,
+      z.string(),
+      'Invalid user'
+    ),
+    [HttpStatusCodes.CONFLICT]: createJsonResBody(
+      false,
+      z.string(),
+      'Child is already enrolled for the year or year is invalid'
     ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: createJsonResBody(
       false,
