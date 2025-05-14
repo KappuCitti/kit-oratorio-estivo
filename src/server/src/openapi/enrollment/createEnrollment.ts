@@ -26,7 +26,6 @@ export const createEnrollmentRouteDef = createRoute({
         exitAuthorization: z.boolean(),
         schoolType: z.enum(SCHOOL_TYPES),
         className: z.enum(CLASSES),
-        section: z.string().max(1, 'Section must be 1 character long'),
         specialDiet: z.union([z.string().max(255), z.null()]).optional(),
         parentNotes: z
           .union([
