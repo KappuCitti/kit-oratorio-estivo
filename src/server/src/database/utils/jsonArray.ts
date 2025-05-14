@@ -4,10 +4,10 @@ import type { MySqlColumn } from 'drizzle-orm/mysql-core';
 export function jsonArray<T extends Record<string, MySqlColumn>>(schema: T) {
   type JsonArrayResult = {
     [K in keyof typeof schema]: (typeof schema)[K]['_']['notNull'] extends true
-      ? (typeof schema)[K]['_']['hasDefault'] extends true
-        ? (typeof schema)[K]['_']['data']
-        : (typeof schema)[K]['_']['data'] | null | undefined
-      : (typeof schema)[K]['_']['data'];
+      ? (typeof schema)[K]['_']['data']
+      : (typeof schema)[K]['_']['hasDefault'] extends true
+      ? (typeof schema)[K]['_']['data']
+      : (typeof schema)[K]['_']['data'] | null | undefined;
   };
   const jsonObjectParts: SQL[] = [sql`JSON_OBJECT(`];
   for (const key in Object.keys(schema)) {
@@ -18,9 +18,16 @@ export function jsonArray<T extends Record<string, MySqlColumn>>(schema: T) {
   }
   jsonObjectParts.pop();
   jsonObjectParts.push(sql`)`);
+  console.log(
+    sql.join([
+      sql`JSON_EXTRACT(COALESCE(JSON_ARRAYAGG(`,
+      sql.join(jsonObjectParts),
+      sql`), '[]'), '$')`,
+    ])
+  );
   return sql.join([
     sql`JSON_EXTRACT(COALESCE(JSON_ARRAYAGG(`,
     sql.join(jsonObjectParts),
     sql`), '[]'), '$')`,
-  ]) as SQL<JsonArrayResult>;
+  ]) as SQL<JsonArrayResult[]>;
 }
