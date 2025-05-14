@@ -5,6 +5,7 @@ import enrollment from './enrollment';
 import week from './week';
 import team from './team';
 import shirt from './shirt';
+import user from './user';
 
 export default (router: HonoApp) => {
   auth(router);
@@ -12,5 +13,6 @@ export default (router: HonoApp) => {
   main(router);
   shirt(router);
   team(router);
+  user(router);
   week(router);
 };
