@@ -53,20 +53,21 @@ export async function getEnrollmentList(
           color: teamTable.color,
         },
         section: enrollmentTable.section,
-        // weeks: sql<
-        //   { isPaid: boolean; weekId: number }[]
-        // >`JSON_EXTRACT(COALESCE(JSON_ARRAYAGG(JSON_OBJECT('isPaid', ${enrollmentWeeksTable.isPaid}, 'weekId', ${enrollmentWeeksTable.weekId})), '[]'), '$')`.as(
-        //   'weeks'
-        // ),
-        weeks: jsonArray({
-          isPaid: enrollmentWeeksTable.isPaid,
-          weekId: enrollmentWeeksTable.weekId,
-        }).as('weeks'),
+        weeks: sql<
+          { isPaid: boolean; weekId: number }[]
+        >`JSON_EXTRACT(COALESCE(JSON_ARRAYAGG(JSON_OBJECT('isPaid', ${enrollmentWeeksTable.isPaid}, 'weekId', ${enrollmentWeeksTable.weekId})), '[]'), '$')`.as(
+          'weeks'
+        ),
+        // weeks: jsonArray({
+        //   isPaid: enrollmentWeeksTable.isPaid,
+        //   weekId: enrollmentWeeksTable.weekId,
+        // }).as('weeks'),
         user: {
           id: sql<string>`${usersTable.id}`.as('userId'),
           email: usersTable.email,
           name: sql<string>`${personalInfoTable.name}`.as('userName'),
           surname: personalInfoTable.surname,
+          sex: personalInfoTable.sex,
         },
       })
       .from(enrollmentTable)
@@ -94,7 +95,8 @@ export async function getEnrollmentList(
         usersTable.id,
         usersTable.email,
         personalInfoTable.name,
-        personalInfoTable.surname
+        personalInfoTable.surname,
+        personalInfoTable.sex
       );
 
     const [enrollmentCount] = await db
