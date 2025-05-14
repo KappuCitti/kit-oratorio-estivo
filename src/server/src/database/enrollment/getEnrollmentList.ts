@@ -10,6 +10,7 @@ import { and, count, eq, like, or, SQL, sql } from 'drizzle-orm';
 import { enrollmentWeeksTable } from '../schema/enrollmentWeek';
 import { usersTable } from '../schema/user';
 import { personalInfoTable } from '../schema/personalInfo';
+import { jsonArray } from '../utils/jsonArray';
 
 export async function getEnrollmentList(
   page: number,
@@ -52,11 +53,15 @@ export async function getEnrollmentList(
           color: teamTable.color,
         },
         section: enrollmentTable.section,
-        weeks: sql<
-          { isPaid: boolean; weekId: number }[]
-        >`JSON_EXTRACT(COALESCE(JSON_ARRAYAGG(JSON_OBJECT('isPaid', ${enrollmentWeeksTable.isPaid}, 'weekId', ${enrollmentWeeksTable.weekId})), '[]'), '$')`.as(
-          'weeks'
-        ),
+        // weeks: sql<
+        //   { isPaid: boolean; weekId: number }[]
+        // >`JSON_EXTRACT(COALESCE(JSON_ARRAYAGG(JSON_OBJECT('isPaid', ${enrollmentWeeksTable.isPaid}, 'weekId', ${enrollmentWeeksTable.weekId})), '[]'), '$')`.as(
+        //   'weeks'
+        // ),
+        weeks: jsonArray({
+          isPaid: enrollmentWeeksTable.isPaid,
+          weekId: enrollmentWeeksTable.weekId,
+        }).as('weeks'),
         user: {
           id: sql<string>`${usersTable.id}`.as('userId'),
           email: usersTable.email,
