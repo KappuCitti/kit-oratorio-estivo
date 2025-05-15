@@ -13,6 +13,7 @@ export const PERMISSIONS = [
   'manage_users',
   'register',
   'register_child_users',
+  'see_activities',
   'see_personal_info',
   'see_users',
 ] as const;
