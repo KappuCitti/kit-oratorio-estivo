@@ -7,7 +7,7 @@ import { sessionTable } from '../schema/session';
 
 export async function isValidToken(token: string) {
   try {
-    const exists = !!(await db.query.session.findFirst({
+    const exists = !!(await db.query.sessions.findFirst({
       where: and(
         eq(sessionTable.token, token),
         sql`${sessionTable.expires} > NOW()`
