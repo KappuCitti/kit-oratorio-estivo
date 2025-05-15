@@ -3,41 +3,50 @@ import { LOG_LEVELS } from './logger.model';
 
 export const configSchema = z
   .object({
-    server: z.object({
-      port: z.number().int().positive().default(3000),
-      host: z.string().default('0.0.0.0'),
-      routesPrefix: z.string().default('/'),
-      domain: z.string().default('localhost'),
-      frontendPort: z.number().int().positive().default(443),
-    }),
+    server: z
+      .object({
+        port: z.number().int().positive().default(3000),
+        host: z.string().default('0.0.0.0'),
+        routesPrefix: z.string().default('/'),
+        domain: z.string().default('localhost'),
+        frontendPort: z.number().int().positive().default(443),
+      })
+      .readonly(),
     musicFolder: z.string().default('../public/music'),
-    database: z.object({
-      host: z.string(),
-      port: z.number().int().positive().default(3306),
-      user: z.string().default('root'),
-      password: z.string().optional(),
-      database: z.string().default('oratorio'),
-      waitForConnections: z.boolean().default(true),
-      connectionLimit: z.number().int().positive().default(10),
-      queueLimit: z.number().int().positive().default(10),
-    }),
-    logs: z.object({
-      logLevel: z.enum(LOG_LEVELS).default('info'),
-      logFolder: z.string().default('logs'),
-    }),
+    database: z
+      .object({
+        host: z.string(),
+        port: z.number().int().positive().default(3306),
+        user: z.string().default('root'),
+        password: z.string().optional(),
+        database: z.string().default('oratorio'),
+        waitForConnections: z.boolean().default(true),
+        connectionLimit: z.number().int().positive().default(10),
+        queueLimit: z.number().int().positive().default(10),
+      })
+      .readonly(),
+    logs: z
+      .object({
+        logLevel: z.enum(LOG_LEVELS).default('info'),
+        logFolder: z.string().default('logs'),
+      })
+      .readonly(),
   })
   .and(
-    z.discriminatedUnion('useHttps', [
-      z.object({
-        useHttps: z.literal(true),
-        ssl: z.object({
-          cert: z.string().default('ssl/cert.pem'),
-          key: z.string().default('ssl/key.pem'),
+    z
+      .discriminatedUnion('useHttps', [
+        z.object({
+          useHttps: z.literal(true),
+          ssl: z.object({
+            cert: z.string().default('ssl/cert.pem'),
+            key: z.string().default('ssl/key.pem'),
+          }),
         }),
-      }),
-      z.object({ useHttps: z.literal(false) }),
-    ])
-  );
+        z.object({ useHttps: z.literal(false) }),
+      ])
+      .readonly()
+  )
+  .readonly();
 export type Config = z.infer<typeof configSchema>;
 
 export const envSchema = z.object({
