@@ -59,7 +59,6 @@ export async function getEnrollmentList(
         }).as('weeks'),
         user: {
           id: sql<string>`${usersTable.id}`.as('userId'),
-          email: usersTable.email,
           name: sql<string>`${personalInfoTable.name}`.as('userName'),
           surname: personalInfoTable.surname,
           sex: personalInfoTable.sex,

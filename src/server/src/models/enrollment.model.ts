@@ -46,6 +46,8 @@ export const bareEnrollmentSchema = createSelectSchema(enrollmentTable)
         password: true,
         theme: true,
         roleId: true,
+        email: true,
+        phone: true,
       })
       .and(
         createSelectSchema(personalInfoTable).omit({
