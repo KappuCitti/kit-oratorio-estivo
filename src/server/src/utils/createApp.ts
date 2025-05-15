@@ -64,7 +64,7 @@ export default function createApp() {
     config.server.domain
   }:${config.server.frontendPort}`;
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (config.development.isDev) {
     configureOpenApi(app);
   }
 

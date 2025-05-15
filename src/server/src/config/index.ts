@@ -59,6 +59,10 @@ const config = configSchema.safeParse({
     idleTimeout: 60 * 60 * 24 * 365,
   },
   musicFolder: env.MUSIC_FOLDER ?? tomlFile.server?.music_folder,
+  development: {
+    isDev: process.env.NODE_ENV !== 'production',
+    ignorePermissions: env.DEVELOPMENT_IGNORE_PERMISSIONS ?? false,
+  },
 });
 if (!config.success) {
   console.error('Error while parsing config');

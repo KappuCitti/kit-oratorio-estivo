@@ -31,6 +31,12 @@ export const configSchema = z
         logFolder: z.string().default('logs'),
       })
       .readonly(),
+    development: z
+      .object({
+        isDev: z.boolean(),
+        ignorePermissions: z.boolean().default(false),
+      })
+      .readonly(),
   })
   .and(
     z
@@ -73,6 +79,8 @@ export const envSchema = z.object({
   DB_WAIT_FOR_CONNECTIONS: z.coerce.boolean().optional(),
   DB_CONNECTION_LIMIT: z.coerce.number().int().positive().optional(),
   DB_QUEUE_LIMIT: z.coerce.number().int().positive().optional(),
+
+  DEVELOPMENT_IGNORE_PERMISSIONS: z.coerce.boolean().optional(),
 });
 export type EnvConfig = z.infer<typeof envSchema>;
 
