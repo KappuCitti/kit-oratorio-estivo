@@ -1,13 +1,10 @@
+import type { ColumnType } from '@/models/common.model';
 import { SQL, sql } from 'drizzle-orm';
 import type { MySqlColumn } from 'drizzle-orm/mysql-core';
 
 export function jsonArray<T extends Record<string, MySqlColumn>>(schema: T) {
   type JsonArrayResult = {
-    [K in keyof typeof schema]: (typeof schema)[K]['_']['notNull'] extends true
-      ? (typeof schema)[K]['_']['data']
-      : (typeof schema)[K]['_']['hasDefault'] extends true
-      ? (typeof schema)[K]['_']['data']
-      : (typeof schema)[K]['_']['data'] | null | undefined;
+    [K in keyof typeof schema]: ColumnType<(typeof schema)[K]>;
   };
   const jsonObjectParts: SQL[] = [sql`JSON_OBJECT(`];
   for (const key in schema) {
