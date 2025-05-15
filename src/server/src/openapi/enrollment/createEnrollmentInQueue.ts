@@ -21,7 +21,6 @@ export const createQueueEnrollmentRouteDef = createRoute({
         weeks: z.array(idSchema),
         dataProcessingConsent: z.boolean(),
         imageProcessingConsent: z.boolean(),
-        exitAuthorization: z.boolean(),
         schoolId: idSchema,
         classId: idSchema,
         specialDiet: z.union([z.string().max(255), z.null()]).optional(),

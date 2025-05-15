@@ -1,5 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
-import { createEnrollment } from '@/database/enrollment/createEnrollment';
+import { createEnrollment } from '@/database/enrollment/createQueueEnrollment';
 import type { RouteController } from '@/models/app.model';
 import type { CreateQueueEnrollmentRoute } from '@/openapi/enrollment/createEnrollmentInQueue';
 import { httpErrorResponse, httpSuccessResponse } from '@/utils/responses';
@@ -12,7 +12,6 @@ const createQueueEnrollmentController: RouteController<
     schoolId,
     classId,
     dataProcessingConsent,
-    exitAuthorization,
     imageProcessingConsent,
     user,
     weeks,
@@ -26,7 +25,6 @@ const createQueueEnrollmentController: RouteController<
     user,
     dataProcessingConsent,
     imageProcessingConsent,
-    exitAuthorization,
     schoolId,
     classId,
     weeks,
