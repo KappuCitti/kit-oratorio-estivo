@@ -1,6 +1,7 @@
 import { HttpStatusCodes } from '@/codes';
 import { can } from '@/middlewares/hasPermission';
 import { idSchema } from '@/models/common.model';
+import { weekEnrollmentSchema } from '@/models/week.model';
 import {
   createJsonResBody,
   createRequiredJsonBody,
@@ -8,29 +9,22 @@ import {
 import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
 
-export const createEnrollmentRouteDef = createRoute({
+export const approveEnrollmentRouteDef = createRoute({
   tags: ['Enrollment'],
   method: 'post',
   path: '/enrollments',
-  middleware: can('manage_self_child_users'),
+  middleware: can('manage_enrollments'),
   request: {
     body: createRequiredJsonBody(
       z.object({
-        user: z.string(),
-        shirt: z.union([idSchema, z.null()]).optional(),
-        weeks: z.array(idSchema),
-        dataProcessingConsent: z.boolean(),
-        imageProcessingConsent: z.boolean(),
-        exitAuthorization: z.boolean(),
-        schoolId: idSchema,
-        classId: idSchema,
-        specialDiet: z.union([z.string().max(255), z.null()]).optional(),
-        parentNotes: z
-          .union([
-            z.string().max(255, 'Max parent notes size reached'),
-            z.null(),
-          ])
-          .optional(),
+        queueId: idSchema,
+        teamId: z.union([idSchema, z.null()]).optional(),
+        section: z.string().length(1, 'Section must be 1 character long'),
+        weeks: z.array(weekEnrollmentSchema),
+        managerNotes: z.union([
+          z.string().max(255, 'Max manager notes size reached'),
+          z.null(),
+        ]),
       }),
       'Enrollment to add'
     ),
@@ -46,15 +40,10 @@ export const createEnrollmentRouteDef = createRoute({
       z.string(),
       'One or more ids are invalid'
     ),
-    [HttpStatusCodes.FORBIDDEN]: createJsonResBody(
+    [HttpStatusCodes.NOT_FOUND]: createJsonResBody(
       false,
       z.string(),
-      'Invalid user'
-    ),
-    [HttpStatusCodes.CONFLICT]: createJsonResBody(
-      false,
-      z.string(),
-      'Child is already enrolled for the year or year is invalid'
+      'Enrollment queue not found'
     ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: createJsonResBody(
       false,
@@ -64,4 +53,4 @@ export const createEnrollmentRouteDef = createRoute({
   },
 });
 
-export type CreateEnrollmentRoute = typeof createEnrollmentRouteDef;
+export type ApproveEnrollmentRoute = typeof approveEnrollmentRouteDef;

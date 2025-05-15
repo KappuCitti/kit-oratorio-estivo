@@ -35,7 +35,7 @@ export const enrollmentTable = mysqlTable('enrollments', {
     .references(() => classTable.id, {
       onDelete: 'cascade',
     }),
-  section: char(),
+  section: char().notNull(),
   year: int().notNull(),
   dateOfEnrollment: datetime().notNull(),
   parentNotes: text(),

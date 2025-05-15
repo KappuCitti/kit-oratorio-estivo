@@ -1,11 +1,16 @@
+import approveEnrollmentController from '@/controllers/enrollment/approveEnrollment';
+import createQueueEnrollmentController from '@/controllers/enrollment/createEnrollmentInQueue';
 import getEnrollmentsController from '@/controllers/enrollment/getEnrollmentList';
 import type { HonoApp } from '@/models/app.model';
+import { approveEnrollmentRouteDef } from '@/openapi/enrollment/approveEnrollment';
+import { createQueueEnrollmentRouteDef } from '@/openapi/enrollment/createEnrollmentInQueue';
 import { getEnrollmentListRouteDef } from '@/openapi/enrollment/getEnrollments';
 
 export default (router: HonoApp) => {
   router.openapi(getEnrollmentListRouteDef, getEnrollmentsController);
-  // router.openapi(getEnrollmentInfoRouteDef, getEnrollmentController);
-  // router.openapi(deleteEnrollmentRouteDef, deleteEnrollmentController);
-  // router.openapi(createEnrollmentRouteDef, createEnrollmentController);
-  // router.openapi(editEnrollmentRouteDef, editEnrollmentController);
+  router.openapi(approveEnrollmentRouteDef, approveEnrollmentController);
+  router.openapi(
+    createQueueEnrollmentRouteDef,
+    createQueueEnrollmentController
+  );
 };

@@ -19,6 +19,8 @@ import { weekTable } from './schema/week';
 import { eventClassesTable } from './schema/eventClasses';
 import { schoolTable } from './schema/school';
 import { classTable } from './schema/class';
+import { enrollmentQueueTable } from './schema/enrollmentQueue';
+import { enrollmentQueueWeeksTable } from './schema/enrollmentQueueWeek';
 
 const client = createPool(config.database);
 
@@ -27,6 +29,8 @@ const schema = {
   attendances: attendanceTable,
   classes: classTable,
   enrollments: enrollmentTable,
+  enrollmentQueue: enrollmentQueueTable,
+  enrollmentQueueWeeks: enrollmentQueueWeeksTable,
   enrollmentWeeks: enrollmentWeeksTable,
   events: eventsTable,
   eventClasses: eventClassesTable,

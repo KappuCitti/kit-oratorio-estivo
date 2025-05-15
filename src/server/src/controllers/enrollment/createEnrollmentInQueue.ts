@@ -1,12 +1,12 @@
 import { HttpStatusCodes } from '@/codes';
 import { createEnrollment } from '@/database/enrollment/createEnrollment';
 import type { RouteController } from '@/models/app.model';
-import type { CreateEnrollmentRoute } from '@/openapi/enrollment/createEnrollment';
+import type { CreateQueueEnrollmentRoute } from '@/openapi/enrollment/createEnrollmentInQueue';
 import { httpErrorResponse, httpSuccessResponse } from '@/utils/responses';
 import { getCookie } from 'hono/cookie';
 
-const createEnrollmentController: RouteController<
-  CreateEnrollmentRoute
+const createQueueEnrollmentController: RouteController<
+  CreateQueueEnrollmentRoute
 > = async (c) => {
   const {
     schoolId,
@@ -57,4 +57,4 @@ const createEnrollmentController: RouteController<
   return httpSuccessResponse(c, enrollment.data);
 };
 
-export default createEnrollmentController;
+export default createQueueEnrollmentController;
