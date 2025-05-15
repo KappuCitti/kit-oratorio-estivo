@@ -5,4 +5,7 @@ export const weekTable = mysqlTable('weeks', {
   startDate: date().notNull(),
   endDate: date().notNull(),
   price: decimal({ precision: 10, scale: 2 }).notNull(),
+  maxEnrollments: int({ unsigned: true }).notNull(),
+  registrationOpenDate: date().notNull(),
+  registrationCloseDate: date().notNull(),
 });
