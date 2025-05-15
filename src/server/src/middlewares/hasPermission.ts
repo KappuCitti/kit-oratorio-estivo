@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import config from '@/config';
 import { db } from '@/database';
 import { dbLogger } from '@/database/logger';
 import { roleTable } from '@/database/schema/role';
@@ -15,6 +16,9 @@ import { getCookie } from 'hono/cookie';
 export function can(permission: Permission) {
   return async (c: Context<Bindings, any, {}>, next: Next) => {
     try {
+      if (config.development.isDev && config.development.ignorePermissions) {
+        return next();
+      }
       const token = getCookie(c, 'user_token');
       if (!token)
         return httpErrorResponse(
