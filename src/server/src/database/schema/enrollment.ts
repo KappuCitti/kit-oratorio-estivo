@@ -3,16 +3,15 @@ import {
   char,
   datetime,
   int,
-  mysqlEnum,
   mysqlTable,
   text,
   varchar,
 } from 'drizzle-orm/mysql-core';
 import { teamTable } from './team';
 import { shirtSizeTable } from './shirt';
-import { SCHOOL_TYPES } from '@/models/schoolTypes.model';
-import { CLASSES } from '@/models/class.model';
 import { usersTable } from './user';
+import { schoolTable } from './school';
+import { classTable } from './class';
 
 export const enrollmentTable = mysqlTable('enrollments', {
   id: int().primaryKey().autoincrement().notNull(),
@@ -28,8 +27,14 @@ export const enrollmentTable = mysqlTable('enrollments', {
   dataProcessingConsent: boolean().notNull().default(true),
   imageProcessingConsent: boolean().notNull().default(false),
   exitAuthorization: boolean().notNull().default(true),
-  schoolType: mysqlEnum(SCHOOL_TYPES).notNull(),
-  className: mysqlEnum(CLASSES).notNull(),
+  schoolId: int()
+    .notNull()
+    .references(() => schoolTable.id, { onDelete: 'cascade' }),
+  classId: int()
+    .notNull()
+    .references(() => classTable.id, {
+      onDelete: 'cascade',
+    }),
   section: char(),
   year: int().notNull(),
   dateOfEnrollment: datetime().notNull(),

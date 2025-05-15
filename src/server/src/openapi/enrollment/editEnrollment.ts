@@ -1,7 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
-import { CLASSES } from '@/models/class.model';
-import { paramIdSchema } from '@/models/common.model';
-import { SCHOOL_TYPES } from '@/models/schoolTypes.model';
+import { idSchema, paramIdSchema } from '@/models/common.model';
 import { weekEnrollmentSchema } from '@/models/week.model';
 import {
   createJsonResBody,
@@ -23,8 +21,8 @@ export const editEnrollmentRouteDef = createRoute({
         weeks: z.array(weekEnrollmentSchema),
         dataProcessingConsent: z.boolean(),
         exitAuthorization: z.boolean(),
-        schoolType: z.enum(SCHOOL_TYPES),
-        className: z.enum(CLASSES),
+        schoolId: idSchema,
+        classId: idSchema,
         section: z.string().max(1, 'Section must be 1 character long'),
         year: z.number().int().positive(),
         parentNotes: z

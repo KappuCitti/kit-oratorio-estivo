@@ -1,7 +1,6 @@
 import { HttpStatusCodes } from '@/codes';
 import { can } from '@/middlewares/hasPermission';
-import { CLASSES } from '@/models/class.model';
-import { SCHOOL_TYPES } from '@/models/schoolTypes.model';
+import { idSchema } from '@/models/common.model';
 import { weekEnrollmentSchema } from '@/models/week.model';
 import {
   createJsonResBody,
@@ -24,8 +23,8 @@ export const createEnrollmentRouteDef = createRoute({
         dataProcessingConsent: z.boolean(),
         imageProcessingConsent: z.boolean(),
         exitAuthorization: z.boolean(),
-        schoolType: z.enum(SCHOOL_TYPES),
-        className: z.enum(CLASSES),
+        schoolId: idSchema,
+        classId: idSchema,
         specialDiet: z.union([z.string().max(255), z.null()]).optional(),
         parentNotes: z
           .union([

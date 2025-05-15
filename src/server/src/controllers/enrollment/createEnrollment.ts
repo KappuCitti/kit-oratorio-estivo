@@ -9,8 +9,8 @@ const createEnrollmentController: RouteController<
   CreateEnrollmentRoute
 > = async (c) => {
   const {
-    schoolType,
-    className,
+    schoolId,
+    classId,
     dataProcessingConsent,
     exitAuthorization,
     imageProcessingConsent,
@@ -28,8 +28,8 @@ const createEnrollmentController: RouteController<
     dataProcessingConsent,
     imageProcessingConsent,
     exitAuthorization,
-    schoolType,
-    className,
+    schoolId,
+    classId,
     weeks,
     specialDiet,
     managerNotes,

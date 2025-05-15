@@ -1,13 +1,11 @@
 import { HttpStatusCodes } from '@/codes';
 import { can } from '@/middlewares/hasPermission';
-import { CLASSES } from '@/models/class.model';
 import {
   coercedIdSchema,
   queryPageSchema,
   querySizeSchema,
 } from '@/models/common.model';
 import { bareEnrollmentSchema } from '@/models/enrollment.model';
-import { SCHOOL_TYPES } from '@/models/schoolTypes.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
@@ -25,8 +23,8 @@ export const getEnrollmentListRouteDef = createRoute({
       weekId: coercedIdSchema.optional(),
       teamId: coercedIdSchema.optional(),
       query: z.string().max(100, 'Max query size reached').optional(),
-      schoolType: z.enum(SCHOOL_TYPES).optional(),
-      className: z.enum(CLASSES).optional(),
+      schoolType: z.number().int().positive().optional(),
+      className: z.number().int().positive().optional(),
     }),
   },
   responses: {

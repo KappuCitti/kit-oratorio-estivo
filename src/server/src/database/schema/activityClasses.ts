@@ -1,12 +1,20 @@
-import { int, mysqlEnum, mysqlTable } from 'drizzle-orm/mysql-core';
-import { CLASSES } from '@/models/class.model';
-import { SCHOOL_TYPES } from '@/models/schoolTypes.model';
+import { int, mysqlTable } from 'drizzle-orm/mysql-core';
 import { activityTable } from './activities';
+import { classTable } from './class';
+import { schoolTable } from './school';
 
 export const activityClassesTable = mysqlTable('activity_classes', {
   activityId: int()
     .references(() => activityTable.id, { onDelete: 'cascade' })
     .notNull(),
-  class: mysqlEnum(CLASSES),
-  schoolType: mysqlEnum(SCHOOL_TYPES),
+  classId: int()
+    .notNull()
+    .references(() => classTable.id, {
+      onDelete: 'cascade',
+    }),
+  schoolId: int()
+    .notNull()
+    .references(() => schoolTable.id, {
+      onDelete: 'cascade',
+    }),
 });

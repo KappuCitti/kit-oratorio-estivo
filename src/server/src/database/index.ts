@@ -17,12 +17,15 @@ import { usersTable } from './schema/user';
 import { userEventTable } from './schema/userEvents';
 import { weekTable } from './schema/week';
 import { eventClassesTable } from './schema/eventClasses';
+import { schoolTable } from './schema/school';
+import { classTable } from './schema/class';
 
 const client = createPool(config.database);
 
 const schema = {
   addresses: addressTable,
   attendances: attendanceTable,
+  classes: classTable,
   enrollments: enrollmentTable,
   enrollmentWeeks: enrollmentWeeksTable,
   events: eventsTable,
@@ -31,6 +34,7 @@ const schema = {
   manages: managesTable,
   roles: roleTable,
   rolePermissions: rolePermissionTable,
+  schools: schoolTable,
   sessions: sessionTable,
   shirts: shirtSizeTable,
   teams: teamTable,

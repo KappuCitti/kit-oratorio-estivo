@@ -1,16 +1,17 @@
-import type { Class } from '@/models/class.model';
-import type { SchoolType } from '@/models/schoolTypes.model';
 import { dbLogger } from '../logger';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { HttpStatusCodes } from '@/codes';
 import { db } from '..';
 import { enrollmentTable } from '../schema/enrollment';
 import { teamTable } from '../schema/team';
-import { and, count, eq, like, or, SQL, sql } from 'drizzle-orm';
+import { and, count, eq, inArray, like, or, SQL } from 'drizzle-orm';
 import { enrollmentWeeksTable } from '../schema/enrollmentWeek';
 import { usersTable } from '../schema/user';
 import { personalInfoTable } from '../schema/personalInfo';
 import { jsonArray } from '../utils/jsonArray';
+import { classTable } from '../schema/class';
+import { schoolTable } from '../schema/school';
+import { aliased } from '../utils/alias';
 
 export async function getEnrollmentList(
   page: number,
@@ -19,15 +20,14 @@ export async function getEnrollmentList(
   weekId?: number,
   teamId?: number,
   query: string = '',
-  schoolType?: SchoolType,
-  className?: Class
+  schoolId?: number,
+  classId?: number
 ) {
   try {
     const filters = [eq(enrollmentTable.year, year)];
-    if (schoolType) filters.push(eq(enrollmentTable.schoolType, schoolType));
-    if (className) filters.push(eq(enrollmentTable.className, className));
-    if (weekId)
-      filters.push(sql`${enrollmentWeeksTable.weekId} IN (${weekId})`);
+    if (schoolId) filters.push(eq(enrollmentTable.schoolId, schoolId));
+    if (classId) filters.push(eq(enrollmentTable.classId, classId));
+    if (weekId) filters.push(eq(enrollmentWeeksTable.weekId, weekId));
     if (teamId) filters.push(eq(enrollmentTable.teamId, teamId));
     if (query)
       filters.push(
@@ -40,16 +40,22 @@ export async function getEnrollmentList(
     const enrollmentQuery = db
       .select({
         id: enrollmentTable.id,
-        className: enrollmentTable.className,
-        schoolType: enrollmentTable.schoolType,
+        class: {
+          id: aliased(classTable.id, 'classId'),
+          name: aliased(classTable.name, 'className'),
+        },
+        school: {
+          id: aliased(schoolTable.id, 'schoolId'),
+          name: aliased(schoolTable.name, 'schoolName'),
+        },
         year: enrollmentTable.year,
         dataProcessingConsent: enrollmentTable.dataProcessingConsent,
         exitAuthorization: enrollmentTable.exitAuthorization,
         imageProcessingConsent: enrollmentTable.imageProcessingConsent,
         specialDiet: enrollmentTable.specialDiet,
         team: {
-          id: sql<number>`${teamTable.id}`.as('teamId'),
-          name: sql<string>`${teamTable.name}`.as('teamName'),
+          id: aliased(teamTable.id, 'teamId'),
+          name: aliased(teamTable.name, 'teamName'),
           color: teamTable.color,
         },
         section: enrollmentTable.section,
@@ -58,8 +64,8 @@ export async function getEnrollmentList(
           weekId: enrollmentWeeksTable.weekId,
         }).as('weeks'),
         user: {
-          id: sql<string>`${usersTable.id}`.as('userId'),
-          name: sql<string>`${personalInfoTable.name}`.as('userName'),
+          id: aliased(usersTable.id, 'userId'),
+          name: aliased(personalInfoTable.name, 'userName'),
           surname: personalInfoTable.surname,
           sex: personalInfoTable.sex,
         },
@@ -70,13 +76,17 @@ export async function getEnrollmentList(
         eq(enrollmentTable.id, enrollmentWeeksTable.enrollmentId)
       )
       .innerJoin(usersTable, eq(enrollmentTable.userId, usersTable.id))
+      .innerJoin(schoolTable, eq(enrollmentTable.schoolId, schoolTable.id))
+      .innerJoin(classTable, eq(enrollmentTable.classId, classTable.id))
       .innerJoin(personalInfoTable, eq(usersTable.id, personalInfoTable.id))
       .leftJoin(teamTable, eq(enrollmentTable.teamId, teamTable.id))
       .where(and(...filters))
       .groupBy(
         enrollmentTable.id,
-        enrollmentTable.className,
-        enrollmentTable.schoolType,
+        schoolTable.id,
+        classTable.id,
+        schoolTable.name,
+        classTable.name,
         enrollmentTable.year,
         enrollmentTable.dataProcessingConsent,
         enrollmentTable.exitAuthorization,

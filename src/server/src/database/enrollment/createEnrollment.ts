@@ -4,15 +4,15 @@ import { HttpStatusCodes } from '@/codes';
 import { canUserManageFromToken } from '../user/managed/canUserManage';
 import { db } from '..';
 import { enrollmentTable } from '../schema/enrollment';
-import { weekEnrollmentSchema, type WeekEnrollment } from '@/models/week.model';
-import type { SchoolType } from '@/models/schoolTypes.model';
-import type { Class } from '@/models/class.model';
+import { type WeekEnrollment } from '@/models/week.model';
 import { enrollmentWeeksTable } from '../schema/enrollmentWeek';
-import { and, eq, inArray, sql } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import { weekTable } from '../schema/week';
 import { checkValidWeeks } from '../week/checkValidWeeks';
 import { getWeeksYear } from '../week/getWeeksYear';
 import { dateYear } from '../utils/year';
+import { isValidSchool } from '../school/isValid';
+import { isValidClass } from '../class/isValid';
 
 export async function createEnrollment(
   token: string,
@@ -20,8 +20,8 @@ export async function createEnrollment(
   dataProcessingConsent: boolean,
   imageProcessingConsent: boolean,
   exitAuthorization: boolean,
-  schoolType: SchoolType,
-  className: Class,
+  schoolId: number,
+  classId: number,
   weeks: WeekEnrollment[],
   specialDiet: string | null = null,
   parentNotes: string | null = null,
@@ -61,6 +61,15 @@ export async function createEnrollment(
     if (alreadyExists.length > 0)
       return createErrorResult(HttpStatusCodes.CONFLICT);
 
+    const validSchool = await isValidSchool(schoolId);
+    if (!validSchool.success) return validSchool;
+    if (!validSchool.data)
+      return createErrorResult(HttpStatusCodes.BAD_REQUEST);
+
+    const validClass = await isValidClass(classId);
+    if (!validClass.success) return validClass;
+    if (!validClass.data) return createErrorResult(HttpStatusCodes.BAD_REQUEST);
+
     const year = await getWeeksYear(weeks.map((w) => w.id));
     if (!year.success) return year;
     let enrollmentId!: number;
@@ -73,8 +82,8 @@ export async function createEnrollment(
           dataProcessingConsent,
           imageProcessingConsent,
           exitAuthorization,
-          schoolType,
-          className,
+          schoolId,
+          classId,
           section: null,
           dateOfEnrollment: new Date(),
           specialDiet,

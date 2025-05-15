@@ -1,7 +1,9 @@
 import { addressTable } from '@/database/schema/address';
+import { classTable } from '@/database/schema/class';
 import { enrollmentTable } from '@/database/schema/enrollment';
 import { enrollmentWeeksTable } from '@/database/schema/enrollmentWeek';
 import { personalInfoTable } from '@/database/schema/personalInfo';
+import { schoolTable } from '@/database/schema/school';
 import { shirtSizeTable } from '@/database/schema/shirt';
 import { teamTable } from '@/database/schema/team';
 import { usersTable } from '@/database/schema/user';
@@ -39,6 +41,8 @@ export const bareEnrollmentSchema = createSelectSchema(enrollmentTable)
     year: true,
     managerNotes: true,
     parentNotes: true,
+    schoolId: true,
+    classId: true,
   })
   .extend({
     user: createSelectSchema(usersTable)
@@ -63,6 +67,8 @@ export const bareEnrollmentSchema = createSelectSchema(enrollmentTable)
       })
     ),
     team: z.union([createSelectSchema(teamTable), z.null()]),
+    class: createSelectSchema(classTable).omit({ schoolId: true }),
+    school: createSelectSchema(schoolTable).omit({ canChooseActivities: true }),
   });
 
 export type BareEnrollment = z.infer<typeof bareEnrollmentSchema>;
