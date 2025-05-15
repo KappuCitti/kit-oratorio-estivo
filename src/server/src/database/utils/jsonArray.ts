@@ -10,21 +10,14 @@ export function jsonArray<T extends Record<string, MySqlColumn>>(schema: T) {
       : (typeof schema)[K]['_']['data'] | null | undefined;
   };
   const jsonObjectParts: SQL[] = [sql`JSON_OBJECT(`];
-  for (const key in Object.keys(schema)) {
-    jsonObjectParts.push(sql`'${key}'`);
+  for (const key in schema) {
+    jsonObjectParts.push(sql`${key}`);
     jsonObjectParts.push(sql.raw(','));
     jsonObjectParts.push(sql`${schema[key]}`);
     jsonObjectParts.push(sql.raw(','));
   }
   jsonObjectParts.pop();
   jsonObjectParts.push(sql`)`);
-  console.log(
-    sql.join([
-      sql`JSON_EXTRACT(COALESCE(JSON_ARRAYAGG(`,
-      sql.join(jsonObjectParts),
-      sql`), '[]'), '$')`,
-    ])
-  );
   return sql.join([
     sql`JSON_EXTRACT(COALESCE(JSON_ARRAYAGG(`,
     sql.join(jsonObjectParts),

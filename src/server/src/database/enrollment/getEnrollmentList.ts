@@ -53,15 +53,10 @@ export async function getEnrollmentList(
           color: teamTable.color,
         },
         section: enrollmentTable.section,
-        weeks: sql<
-          { isPaid: boolean; weekId: number }[]
-        >`JSON_EXTRACT(COALESCE(JSON_ARRAYAGG(JSON_OBJECT('isPaid', ${enrollmentWeeksTable.isPaid}, 'weekId', ${enrollmentWeeksTable.weekId})), '[]'), '$')`.as(
-          'weeks'
-        ),
-        // weeks: jsonArray({
-        //   isPaid: enrollmentWeeksTable.isPaid,
-        //   weekId: enrollmentWeeksTable.weekId,
-        // }).as('weeks'),
+        weeks: jsonArray({
+          isPaid: enrollmentWeeksTable.isPaid,
+          weekId: enrollmentWeeksTable.weekId,
+        }).as('weeks'),
         user: {
           id: sql<string>`${usersTable.id}`.as('userId'),
           email: usersTable.email,
