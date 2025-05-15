@@ -4,8 +4,6 @@ import { HttpStatusCodes } from '@/codes';
 import { canUserManageFromToken } from '../user/managed/canUserManage';
 import { db } from '..';
 import { enrollmentTable } from '../schema/enrollment';
-import { type WeekEnrollment } from '@/models/week.model';
-import { enrollmentWeeksTable } from '../schema/enrollmentWeek';
 import { and, eq, inArray } from 'drizzle-orm';
 import { weekTable } from '../schema/week';
 import { checkValidWeeks } from '../week/checkValidWeeks';
@@ -13,6 +11,8 @@ import { getWeeksYear } from '../week/getWeeksYear';
 import { dateYear } from '../utils/year';
 import { isValidSchool } from '../school/isValid';
 import { isValidClass } from '../class/isValid';
+import { enrollmentQueueTable } from '../schema/enrollmentQueue';
+import { enrollmentQueueWeeksTable } from '../schema/enrollmentQueueWeek';
 
 export async function createEnrollment(
   token: string,
@@ -22,10 +22,9 @@ export async function createEnrollment(
   exitAuthorization: boolean,
   schoolId: number,
   classId: number,
-  weeks: WeekEnrollment[],
+  weeks: number[],
   specialDiet: string | null = null,
   parentNotes: string | null = null,
-  managerNotes: string | null = null,
   shirtId: number | null = null
 ) {
   try {
@@ -33,7 +32,7 @@ export async function createEnrollment(
     if (!canManage.success) return canManage;
     if (!canManage.data) return createErrorResult(HttpStatusCodes.FORBIDDEN);
 
-    const validWeeks = await checkValidWeeks(weeks.map((w) => w.id));
+    const validWeeks = await checkValidWeeks(weeks);
     if (!validWeeks.success) return validWeeks;
     if (!validWeeks.data) return createErrorResult(HttpStatusCodes.BAD_REQUEST);
 
@@ -48,12 +47,7 @@ export async function createEnrollment(
             db
               .select({ year: dateYear(weekTable.startDate) })
               .from(weekTable)
-              .where(
-                inArray(
-                  weekTable.id,
-                  weeks.map((w) => w.id)
-                )
-              )
+              .where(inArray(weekTable.id, weeks))
               .as('weeks')
           )
         )
@@ -70,12 +64,12 @@ export async function createEnrollment(
     if (!validClass.success) return validClass;
     if (!validClass.data) return createErrorResult(HttpStatusCodes.BAD_REQUEST);
 
-    const year = await getWeeksYear(weeks.map((w) => w.id));
+    const year = await getWeeksYear(weeks);
     if (!year.success) return year;
     let enrollmentId!: number;
     await db.transaction(async (tx) => {
       const [enrollment] = await tx
-        .insert(enrollmentTable)
+        .insert(enrollmentQueueTable)
         .values({
           userId,
           year: year.data,
@@ -84,21 +78,17 @@ export async function createEnrollment(
           exitAuthorization,
           schoolId,
           classId,
-          section: null,
           dateOfEnrollment: new Date(),
           specialDiet,
           shirtSizeId: shirtId,
-          teamId: null,
           parentNotes,
-          managerNotes,
         })
         .$returningId();
       const weeksToInsert = weeks.map((week) => ({
         enrollmentId: enrollment.id,
-        weekId: week.id,
-        isPaid: week.isPaid,
+        weekId: week,
       }));
-      await tx.insert(enrollmentWeeksTable).values(weeksToInsert);
+      await tx.insert(enrollmentQueueWeeksTable).values(weeksToInsert);
       enrollmentId = enrollment.id;
     });
     return createSuccessResult(enrollmentId);

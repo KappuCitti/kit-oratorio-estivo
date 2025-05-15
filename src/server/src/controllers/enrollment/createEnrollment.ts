@@ -16,7 +16,6 @@ const createEnrollmentController: RouteController<
     imageProcessingConsent,
     user,
     weeks,
-    managerNotes,
     parentNotes,
     shirt,
     specialDiet,
@@ -32,7 +31,6 @@ const createEnrollmentController: RouteController<
     classId,
     weeks,
     specialDiet,
-    managerNotes,
     parentNotes,
     shirt
   );

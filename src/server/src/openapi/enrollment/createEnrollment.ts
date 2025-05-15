@@ -1,7 +1,6 @@
 import { HttpStatusCodes } from '@/codes';
 import { can } from '@/middlewares/hasPermission';
 import { idSchema } from '@/models/common.model';
-import { weekEnrollmentSchema } from '@/models/week.model';
 import {
   createJsonResBody,
   createRequiredJsonBody,
@@ -18,8 +17,8 @@ export const createEnrollmentRouteDef = createRoute({
     body: createRequiredJsonBody(
       z.object({
         user: z.string(),
-        shirt: z.union([z.number().int().positive(), z.null()]).optional(),
-        weeks: z.array(weekEnrollmentSchema),
+        shirt: z.union([idSchema, z.null()]).optional(),
+        weeks: z.array(idSchema),
         dataProcessingConsent: z.boolean(),
         imageProcessingConsent: z.boolean(),
         exitAuthorization: z.boolean(),
@@ -29,12 +28,6 @@ export const createEnrollmentRouteDef = createRoute({
         parentNotes: z
           .union([
             z.string().max(255, 'Max parent notes size reached'),
-            z.null(),
-          ])
-          .optional(),
-        managerNotes: z
-          .union([
-            z.string().max(255, 'Max manager notes size reached'),
             z.null(),
           ])
           .optional(),
