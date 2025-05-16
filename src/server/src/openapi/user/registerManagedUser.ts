@@ -14,21 +14,21 @@ export const registerManagedUserRouteDef = createRoute({
   request: {
     body: createRequiredJsonBody(
       z.object({
-        cf: z.string(),
-        password: z.string(),
-        name: z.string(),
-        surname: z.string(),
+        cf: z.string().length(16),
+        password: z.string().min(8),
+        name: z.string().min(2).max(255),
+        surname: z.string().min(2).max(255),
         email: z.string().email().optional(),
         birthDate: z.string().date(),
-        birthPlace: z.string(),
+        birthPlace: z.string().min(2).max(255),
         sex: z.enum(['M', 'F']),
         address: z.object({
-          street: z.string(),
-          city: z.string(),
-          postalCode: z.string(),
-          country: z.string(),
+          street: z.string().min(2).max(255),
+          city: z.string().min(2).max(255),
+          postalCode: z.string().min(2).max(255),
+          country: z.string().min(2).max(255),
         }),
-        role: z.string(),
+        role: z.string().min(2).max(255),
       }),
       'Info of the user to register'
     ),
