@@ -9,6 +9,7 @@ import { eq } from 'drizzle-orm';
 import { txCreateAddressIfNotExists } from '@/database/address/createAddress';
 import { personalInfoTable } from '@/database/schema/personalInfo';
 import { getRoleIdIfCanRegister } from '@/database/role/canRoleRegister';
+import { managesTable } from '@/database/schema/manages';
 
 export async function addManagedUser(
   token: string,
@@ -69,6 +70,10 @@ export async function addManagedUser(
         birthPlace,
         sex,
         addressId: addressId.data,
+      });
+      await tx.insert(managesTable).values({
+        mainId: user.data.id,
+        targetId: cf,
       });
     });
     return createSuccessResult(null);
