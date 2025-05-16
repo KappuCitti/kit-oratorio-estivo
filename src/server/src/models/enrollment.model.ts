@@ -72,3 +72,19 @@ export const bareEnrollmentSchema = createSelectSchema(enrollmentTable)
   });
 
 export type BareEnrollment = z.infer<typeof bareEnrollmentSchema>;
+
+export const bareQueueEnrollmentSchema = bareEnrollmentSchema
+  .omit({
+    team: true,
+    section: true,
+    exitAuthorization: true,
+  })
+  .extend({
+    weeks: z.array(
+      createSelectSchema(enrollmentWeeksTable).omit({
+        enrollmentId: true,
+        isPaid: true,
+      })
+    ),
+  });
+export type BareQueueEnrollment = z.infer<typeof bareQueueEnrollmentSchema>;
