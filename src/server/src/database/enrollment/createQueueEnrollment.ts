@@ -65,8 +65,8 @@ export async function createEnrollment(
 
     const year = await getWeeksYear(weeks);
     if (!year.success) return year;
-    let enrollmentId!: number;
-    await db.transaction(async (tx) => {
+
+    const enrollmentId = await db.transaction(async (tx) => {
       const [enrollment] = await tx
         .insert(enrollmentQueueTable)
         .values({
@@ -88,7 +88,7 @@ export async function createEnrollment(
         weekId: week,
       }));
       await tx.insert(enrollmentQueueWeeksTable).values(weeksToInsert);
-      enrollmentId = enrollment.id;
+      return enrollment.id;
     });
     return createSuccessResult(enrollmentId);
   } catch (e) {
