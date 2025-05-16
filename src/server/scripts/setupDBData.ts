@@ -17,6 +17,7 @@ const parentPermissions: Permission[] = [
   'see_personal_info',
   'manage_personal_info',
   'register_child_users',
+  'see_activities',
 ];
 
 const childPermissions: Permission[] = [
@@ -24,6 +25,7 @@ const childPermissions: Permission[] = [
   'see_personal_info',
   'be_managed',
   'be_enrolled',
+  'be_selected',
 ];
 
 async function main() {
