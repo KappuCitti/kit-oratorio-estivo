@@ -63,7 +63,7 @@ export function can(permission: Permission) {
           HttpStatusCodes.FORBIDDEN,
           'Missing permission'
         );
-      next();
+      return next();
     } catch (e) {
       dbLogger.error(e);
       return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
