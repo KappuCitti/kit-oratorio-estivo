@@ -41,6 +41,7 @@ export async function getActivities(
       .limit(1);
 
     const activities = await activitiesQuery
+      .orderBy(activityTable.name)
       .limit(size)
       .offset((page - 1) * size);
 
