@@ -87,8 +87,7 @@ export async function getEnrollmentQueueList(
         personalInfoTable.name,
         personalInfoTable.surname,
         personalInfoTable.sex
-      )
-      .orderBy(desc(enrollmentQueueTable.dateOfEnrollment));
+      );
 
     const [enrollmentCount] = await db
       .select({ count: count() })
@@ -96,6 +95,7 @@ export async function getEnrollmentQueueList(
       .limit(1);
 
     const enrollments = await enrollmentsQuery
+      .orderBy(desc(enrollmentQueueTable.dateOfEnrollment))
       .limit(size)
       .offset((page - 1) * size);
 

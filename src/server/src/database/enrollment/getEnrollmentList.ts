@@ -4,7 +4,7 @@ import { HttpStatusCodes } from '@/codes';
 import { db } from '..';
 import { enrollmentTable } from '../schema/enrollment';
 import { teamTable } from '../schema/team';
-import { and, count, eq, inArray, like, or, SQL } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, like, or, SQL } from 'drizzle-orm';
 import { enrollmentWeeksTable } from '../schema/enrollmentWeek';
 import { usersTable } from '../schema/user';
 import { personalInfoTable } from '../schema/personalInfo';
@@ -109,6 +109,7 @@ export async function getEnrollmentList(
       .limit(1);
 
     const enrollments = await enrollmentQuery
+      .orderBy(desc(enrollmentTable.dateOfEnrollment))
       .limit(size)
       .offset((page - 1) * size);
     return createSuccessResult({
