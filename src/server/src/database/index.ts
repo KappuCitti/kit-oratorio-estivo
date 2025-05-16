@@ -21,10 +21,16 @@ import { schoolTable } from './schema/school';
 import { classTable } from './schema/class';
 import { enrollmentQueueTable } from './schema/enrollmentQueue';
 import { enrollmentQueueWeeksTable } from './schema/enrollmentQueueWeek';
+import { activityTable } from './schema/activities';
+import { activityAppointmentTable } from './schema/activityAppointments';
+import { activitySubscriptionTable } from './schema/activitySubscriptions';
 
 const client = createPool(config.database);
 
 const schema = {
+  activities: activityTable,
+  activityAppointments: activityAppointmentTable,
+  activitySubscriptions: activitySubscriptionTable,
   addresses: addressTable,
   attendances: attendanceTable,
   classes: classTable,
