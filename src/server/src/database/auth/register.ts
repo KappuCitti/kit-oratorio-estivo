@@ -22,11 +22,6 @@ export async function register(
       where: eq(usersTable.id, cf),
     }));
     if (exists) return createErrorResult(HttpStatusCodes.CONFLICT);
-    await db.insert(personalInfoTable).values({
-      id: cf,
-      name,
-      surname,
-    });
     const roleId = await getRoleIdIfCanRegister(role);
     if (!roleId.success) {
       return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
@@ -41,6 +36,11 @@ export async function register(
       password: await hashPassword(password),
       theme: 'System',
       phone,
+    });
+    await db.insert(personalInfoTable).values({
+      id: cf,
+      name,
+      surname,
     });
     return createSuccessResult(HttpStatusCodes.OK);
   } catch (e) {
