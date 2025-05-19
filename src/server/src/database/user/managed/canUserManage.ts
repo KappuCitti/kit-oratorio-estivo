@@ -21,7 +21,6 @@ export async function canUserManageFromToken(token: string, targetId: string) {
       .where(
         and(
           eq(sessionTable.token, token),
-          eq(usersTable.id, targetId),
           gt(sessionTable.expires, new Date()),
           eq(rolePermissionTable.permission, 'manage_self_child_users')
         )
