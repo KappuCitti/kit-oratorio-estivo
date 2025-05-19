@@ -10,6 +10,7 @@ import { txCreateAddressIfNotExists } from '@/database/address/createAddress';
 import { personalInfoTable } from '@/database/schema/personalInfo';
 import { managesTable } from '@/database/schema/manages';
 import { getRoleIdIfCan } from '@/database/role/roleHasPermission';
+import { hashPassword } from '@/utils/password';
 
 export async function addManagedUser(
   token: string,
@@ -57,7 +58,7 @@ export async function addManagedUser(
         return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
       await tx.insert(usersTable).values({
         id: cf,
-        password,
+        password: await hashPassword(password),
         theme: 'System',
         roleId: roleId.data as number,
         email,
