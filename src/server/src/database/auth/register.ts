@@ -6,7 +6,7 @@ import { HttpStatusCodes } from '@/codes';
 import { dbLogger } from '../logger';
 import { usersTable } from '../schema/user';
 import { personalInfoTable } from '../schema/personalInfo';
-import { getRoleIdIfCanRegister } from '../role/canRoleRegister';
+import { getRoleIdIfCan } from '../role/roleHasPermission';
 
 export async function register(
   cf: string,
@@ -22,7 +22,7 @@ export async function register(
       where: eq(usersTable.id, cf),
     }));
     if (exists) return createErrorResult(HttpStatusCodes.CONFLICT);
-    const roleId = await getRoleIdIfCanRegister(role);
+    const roleId = await getRoleIdIfCan(role, 'register');
     if (!roleId.success) {
       return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }

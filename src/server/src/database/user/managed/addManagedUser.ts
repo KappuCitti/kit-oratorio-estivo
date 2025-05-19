@@ -8,8 +8,8 @@ import { usersTable } from '@/database/schema/user';
 import { eq } from 'drizzle-orm';
 import { txCreateAddressIfNotExists } from '@/database/address/createAddress';
 import { personalInfoTable } from '@/database/schema/personalInfo';
-import { getRoleIdIfCanRegister } from '@/database/role/canRoleRegister';
 import { managesTable } from '@/database/schema/manages';
+import { getRoleIdIfCan } from '@/database/role/roleHasPermission';
 
 export async function addManagedUser(
   token: string,
@@ -31,7 +31,7 @@ export async function addManagedUser(
     const user = await getUserFromToken(token);
     if (!user.success)
       return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
-    const roleId = await getRoleIdIfCanRegister(role);
+    const roleId = await getRoleIdIfCan(role, 'be_enrolled');
     if (!roleId.success)
       return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
     if (!roleId.data) return createErrorResult(HttpStatusCodes.FORBIDDEN);

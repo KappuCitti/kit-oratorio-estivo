@@ -5,8 +5,9 @@ import { db } from '..';
 import { rolePermissionTable } from '../schema/rolePermission';
 import { roleTable } from '../schema/role';
 import { eq } from 'drizzle-orm';
+import type { Permission } from '@/models/permissions.model';
 
-export async function getRoleIdIfCanRegister(role: string) {
+export async function getRoleIdIfCan(role: string, permission: Permission) {
   try {
     const rolePermissions = await db
       .select({
@@ -19,7 +20,7 @@ export async function getRoleIdIfCanRegister(role: string) {
     const permissions = rolePermissions.map((r) => r.permissions);
 
     return createSuccessResult(
-      permissions.includes('register') ? rolePermissions[0].roleId : null
+      permissions.includes(permission) ? rolePermissions[0].roleId : null
     );
   } catch (e) {
     dbLogger.error(e);
