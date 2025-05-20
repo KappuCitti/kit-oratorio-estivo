@@ -1,6 +1,4 @@
 import { sql } from 'drizzle-orm';
 import type { MySqlColumn } from 'drizzle-orm/mysql-core';
 
-export function dateYear<TCol extends MySqlColumn>(column: TCol) {
-  return sql<number>`YEAR(${column})`;
-}
+export const dateYear = (column: MySqlColumn) => sql<number>`YEAR(${column})`;
