@@ -25,13 +25,6 @@ export type Transaction = Parameters<
   Parameters<(typeof db)['transaction']>[0]
 >[0];
 
-export type ColumnType<TCol extends MySqlColumn> =
-  TCol['_']['notNull'] extends true
-    ? TCol['_']['data']
-    : TCol['_']['hasDefault'] extends true
-    ? TCol['_']['data']
-    : TCol['_']['data'] | null | undefined;
-
 export const phoneSchema = z
   .string()
   .regex(/^(\+?\d{1,3})?\s?\d{3}\s?\d{3}\s?\d{4}$/);

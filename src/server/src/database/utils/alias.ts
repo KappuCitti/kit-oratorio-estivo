@@ -1,7 +1,9 @@
-import type { ColumnType } from '@/models/common.model';
-import { sql } from 'drizzle-orm';
+import { SQL, type GetColumnData } from 'drizzle-orm';
 import type { MySqlColumn } from 'drizzle-orm/mysql-core';
 
-export function aliased<TCol extends MySqlColumn>(column: TCol, alias: string) {
-  return sql<ColumnType<TCol>>`${column}`.as(alias);
+export function aliased<TCol extends MySqlColumn>(
+  column: TCol,
+  alias: string
+): SQL.Aliased<GetColumnData<TCol>> {
+  return column.getSQL().mapWith(column.mapFromDriverValue).as(alias);
 }
