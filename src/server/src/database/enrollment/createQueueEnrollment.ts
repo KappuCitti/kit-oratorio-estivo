@@ -19,7 +19,6 @@ export async function createEnrollment(
   userId: string,
   dataProcessingConsent: boolean,
   imageProcessingConsent: boolean,
-  schoolId: number,
   classId: number,
   weeks: number[],
   specialDiet: string | null = null,
@@ -54,11 +53,6 @@ export async function createEnrollment(
     if (alreadyExists.length > 0)
       return createErrorResult(HttpStatusCodes.CONFLICT);
 
-    const validSchool = await isValidSchool(schoolId);
-    if (!validSchool.success) return validSchool;
-    if (!validSchool.data)
-      return createErrorResult(HttpStatusCodes.BAD_REQUEST);
-
     const validClass = await isValidClass(classId);
     if (!validClass.success) return validClass;
     if (!validClass.data) return createErrorResult(HttpStatusCodes.BAD_REQUEST);
@@ -75,7 +69,6 @@ export async function createEnrollment(
           dataProcessingConsent,
           imageProcessingConsent,
           exitAuthorization: false,
-          schoolId,
           classId,
           dateOfEnrollment: new Date(),
           specialDiet,

@@ -12,9 +12,4 @@ export const eventClassesTable = mysqlTable('event_classes', {
     .references(() => classTable.id, {
       onDelete: 'cascade',
     }),
-  schoolId: int()
-    .notNull()
-    .references(() => schoolTable.id, {
-      onDelete: 'cascade',
-    }),
 });

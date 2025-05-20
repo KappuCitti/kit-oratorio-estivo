@@ -9,7 +9,6 @@ const createQueueEnrollmentController: RouteController<
   CreateQueueEnrollmentRoute
 > = async (c) => {
   const {
-    schoolId,
     classId,
     dataProcessingConsent,
     imageProcessingConsent,
@@ -25,7 +24,6 @@ const createQueueEnrollmentController: RouteController<
     user,
     dataProcessingConsent,
     imageProcessingConsent,
-    schoolId,
     classId,
     weeks,
     specialDiet,

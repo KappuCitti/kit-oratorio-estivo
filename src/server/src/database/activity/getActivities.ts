@@ -5,6 +5,7 @@ import { db } from '..';
 import { activityTable } from '../schema/activities';
 import { and, count, eq, like, or, SQL } from 'drizzle-orm';
 import { activityClassesTable } from '../schema/activityClasses';
+import { classTable } from '../schema/class';
 
 export async function getActivities(
   page: number,
@@ -19,7 +20,7 @@ export async function getActivities(
       like(activityTable.place, `%${query}%`)
     ) as SQL,
   ];
-  if (schoolId) filters.push(eq(activityClassesTable.schoolId, schoolId));
+  if (schoolId) filters.push(eq(classTable.schoolId, schoolId));
   if (classId) filters.push(eq(activityClassesTable.classId, classId));
   try {
     const activitiesQuery = db
@@ -33,6 +34,7 @@ export async function getActivities(
         activityClassesTable,
         eq(activityTable.id, activityClassesTable.activityId)
       )
+      .innerJoin(classTable, eq(activityClassesTable.classId, classTable.id))
       .where(and(...filters));
 
     const [activitiesCount] = await db

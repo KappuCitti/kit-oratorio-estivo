@@ -27,9 +27,6 @@ export const enrollmentTable = mysqlTable('enrollments', {
   dataProcessingConsent: boolean().notNull().default(true),
   imageProcessingConsent: boolean().notNull().default(false),
   exitAuthorization: boolean().notNull().default(true),
-  schoolId: int()
-    .notNull()
-    .references(() => schoolTable.id, { onDelete: 'cascade' }),
   classId: int()
     .notNull()
     .references(() => classTable.id, {

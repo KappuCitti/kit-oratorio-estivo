@@ -41,7 +41,6 @@ export const bareEnrollmentSchema = createSelectSchema(enrollmentTable)
     year: true,
     managerNotes: true,
     parentNotes: true,
-    schoolId: true,
     classId: true,
   })
   .extend({

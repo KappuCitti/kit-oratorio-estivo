@@ -25,7 +25,7 @@ export async function getEnrollmentList(
 ) {
   try {
     const filters = [eq(enrollmentTable.year, year)];
-    if (schoolId) filters.push(eq(enrollmentTable.schoolId, schoolId));
+    if (schoolId) filters.push(eq(classTable.schoolId, schoolId));
     if (classId) filters.push(eq(enrollmentTable.classId, classId));
     if (weekId) filters.push(eq(enrollmentWeeksTable.weekId, weekId));
     if (teamId) filters.push(eq(enrollmentTable.teamId, teamId));
@@ -76,8 +76,8 @@ export async function getEnrollmentList(
         eq(enrollmentTable.id, enrollmentWeeksTable.enrollmentId)
       )
       .innerJoin(usersTable, eq(enrollmentTable.userId, usersTable.id))
-      .innerJoin(schoolTable, eq(enrollmentTable.schoolId, schoolTable.id))
       .innerJoin(classTable, eq(enrollmentTable.classId, classTable.id))
+      .innerJoin(schoolTable, eq(classTable.schoolId, schoolTable.id))
       .innerJoin(personalInfoTable, eq(usersTable.id, personalInfoTable.id))
       .leftJoin(teamTable, eq(enrollmentTable.teamId, teamTable.id))
       .where(and(...filters))
