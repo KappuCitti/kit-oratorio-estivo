@@ -5,6 +5,7 @@ import { managesTable } from '@/database/schema/manages';
 import { rolePermissionTable } from '@/database/schema/rolePermission';
 import { sessionTable } from '@/database/schema/session';
 import { usersTable } from '@/database/schema/user';
+import { now } from '@/database/utils/now';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { and, eq, gt } from 'drizzle-orm';
 
@@ -21,7 +22,7 @@ export async function canUserManageFromToken(token: string, targetId: string) {
       .where(
         and(
           eq(sessionTable.token, token),
-          gt(sessionTable.expires, new Date()),
+          gt(sessionTable.expires, now()),
           eq(rolePermissionTable.permission, 'manage_self_child_users')
         )
       )
@@ -35,7 +36,8 @@ export async function canUserManageFromToken(token: string, targetId: string) {
           eq(managesTable.mainId, result.userId),
           eq(managesTable.targetId, targetId)
         )
-      );
+      )
+      .limit(1);
     return createSuccessResult(targets.length > 0);
   } catch (e) {
     dbLogger.error(e);
