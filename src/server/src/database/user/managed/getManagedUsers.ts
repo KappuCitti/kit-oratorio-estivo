@@ -36,7 +36,6 @@ export async function getManagedUsers(userId: string) {
             .select({ targetId: managesTable.targetId })
             .from(managesTable)
             .where(eq(managesTable.mainId, userId))
-            .as('manages')
         )
       );
 
