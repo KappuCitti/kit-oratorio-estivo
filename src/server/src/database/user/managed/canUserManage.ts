@@ -30,6 +30,7 @@ export async function canUserManageFromToken(token: string, targetId: string) {
       .limit(1);
     dbLogger.debug('User can manage: %s', result?.userId ?? 'NOT FOUND');
     if (!result) return createSuccessResult(false);
+    dbLogger.debug('Checking if user can manage target');
     const targets = await db
       .select()
       .from(managesTable)
@@ -40,6 +41,10 @@ export async function canUserManageFromToken(token: string, targetId: string) {
         )
       )
       .limit(1);
+    dbLogger.debug(
+      'User can manage target: %s',
+      targets.length > 0 ? 'YES' : 'NO'
+    );
     return createSuccessResult(targets.length > 0);
   } catch (e) {
     dbLogger.error(e);
