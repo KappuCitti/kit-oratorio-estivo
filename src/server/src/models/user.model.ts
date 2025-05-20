@@ -52,7 +52,7 @@ export const adminCreateUserSchema = z.object({
         password: z.string().min(8),
         name: z.string().min(2).max(255),
         surname: z.string().min(2).max(255),
-        email: z.string().email().optional(),
+        email: z.string().email(),
         phoneNumber: phoneSchema,
         birthDate: z.string().date(),
         birthPlace: z.string().min(2).max(255),
