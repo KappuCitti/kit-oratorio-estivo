@@ -10,7 +10,7 @@ import { createRoute, z } from '@hono/zod-openapi';
 export const createUsersRouteDef = createRoute({
   tags: ['User'],
   method: 'post',
-  path: '/admin/users',
+  path: '/admin/users/bulk',
   middleware: can('manage_users'),
   request: {
     body: createRequiredJsonBody(
