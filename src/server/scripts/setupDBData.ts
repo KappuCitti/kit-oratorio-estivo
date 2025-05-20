@@ -5,6 +5,10 @@ import { usersTable } from '../src/database/schema/user';
 import { hashPassword } from '../src/utils/password';
 
 import { PERMISSIONS, type Permission } from '../src/models/permissions.model';
+import { teamTable } from '../src/database/schema/team';
+import { shirtSizeTable } from '../src/database/schema/shirt';
+import { schoolTable } from '../src/database/schema/school';
+import { classTable } from '../src/database/schema/class';
 
 const adminPermissions: Permission[] = PERMISSIONS.filter(
   (p) => p !== 'be_managed' && p !== 'register'
@@ -41,6 +45,7 @@ async function main() {
   }
 
   await db.transaction(async (tx) => {
+    console.log('Adding roles...');
     const [adminId, parentId, childId] = await tx
       .insert(roleTable)
       .values([
@@ -58,6 +63,8 @@ async function main() {
         },
       ])
       .$returningId();
+
+    console.log('Setting up permissions...');
     const rolePermissions: { roleId: number; permission: Permission }[] = [];
     adminPermissions.forEach((p) => {
       rolePermissions.push({
@@ -79,6 +86,7 @@ async function main() {
     });
     await tx.insert(rolePermissionTable).values(rolePermissions);
 
+    console.log('Creating admin user...');
     await tx.insert(usersTable).values({
       id: adminCF,
       roleId: adminId.id,
@@ -86,6 +94,105 @@ async function main() {
       password: await hashPassword(adminPassword),
       theme: 'System',
     });
+
+    console.log('Creating teams...');
+    await tx.insert(teamTable).values([
+      {
+        name: 'Rosso',
+        color: '#dc3545',
+      },
+      {
+        name: 'Giallo',
+        color: '#ffc107',
+      },
+      {
+        name: 'Blu',
+        color: '#0d6efd',
+      },
+      {
+        name: 'Verde',
+        color: '#198754',
+      },
+    ]);
+
+    console.log('Creating shirt sizes...');
+    await tx.insert(shirtSizeTable).values([
+      {
+        sizeName: 'Small',
+        width: '45.0',
+        height: '65.0',
+        isAvailable: true,
+      },
+      {
+        sizeName: 'Medium',
+        width: '50.0',
+        height: '70.0',
+        isAvailable: true,
+      },
+      {
+        sizeName: 'Large',
+        width: '55.0',
+        height: '75.0',
+        isAvailable: true,
+      },
+      {
+        sizeName: 'Extra Large',
+        width: '60.0',
+        height: '80.0',
+        isAvailable: false,
+      },
+    ]);
+
+    console.log('Creating schools...');
+    const [primaryId, secondaryId] = await tx
+      .insert(schoolTable)
+      .values([
+        {
+          name: 'Elementari',
+          canChooseActivities: false,
+        },
+        {
+          name: 'Medie',
+          canChooseActivities: true,
+        },
+      ])
+      .$returningId();
+
+    console.log('Creating classes...');
+    await tx.insert(classTable).values([
+      {
+        name: 'I',
+        schoolId: primaryId.id,
+      },
+      {
+        name: 'II',
+        schoolId: primaryId.id,
+      },
+      {
+        name: 'III',
+        schoolId: primaryId.id,
+      },
+      {
+        name: 'IV',
+        schoolId: primaryId.id,
+      },
+      {
+        name: 'V',
+        schoolId: primaryId.id,
+      },
+      {
+        name: 'I',
+        schoolId: secondaryId.id,
+      },
+      {
+        name: 'II',
+        schoolId: secondaryId.id,
+      },
+      {
+        name: 'III',
+        schoolId: secondaryId.id,
+      },
+    ]);
   });
 }
 
