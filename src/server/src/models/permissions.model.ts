@@ -5,6 +5,7 @@ export const PERMISSIONS = [
   'login',
   'manage_activities',
   'manage_attendances',
+  'manage_classes',
   'manage_enrollments',
   'manage_events',
   'manage_personal_info',
@@ -15,6 +16,7 @@ export const PERMISSIONS = [
   'register_child_users',
   'see_activities',
   'see_personal_info',
+  'see_classes',
   'see_users',
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];

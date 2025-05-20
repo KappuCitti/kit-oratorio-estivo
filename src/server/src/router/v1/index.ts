@@ -7,12 +7,14 @@ import team from './team';
 import shirt from './shirt';
 import user from './user';
 import activity from './activity';
+import school from './school';
 
 export default (router: HonoApp) => {
   activity(router);
   auth(router);
   enrollment(router);
   main(router);
+  school(router);
   shirt(router);
   team(router);
   user(router);
