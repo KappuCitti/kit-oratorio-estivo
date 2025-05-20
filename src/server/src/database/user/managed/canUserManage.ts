@@ -28,7 +28,7 @@ export async function canUserManageFromToken(token: string, targetId: string) {
       .limit(1);
     if (!result) return createSuccessResult(false);
     const targets = await db
-      .select({})
+      .select()
       .from(managesTable)
       .where(
         and(
