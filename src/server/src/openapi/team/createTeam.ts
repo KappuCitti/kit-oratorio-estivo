@@ -1,4 +1,6 @@
 import { HttpStatusCodes } from '@/codes';
+import { can } from '@/middlewares/hasPermission';
+import { colorSchema } from '@/models/common.model';
 import {
   createJsonResBody,
   createRequiredJsonBody,
@@ -10,11 +12,12 @@ export const createTeamRouteDef = createRoute({
   tags: ['Team'],
   method: 'post',
   path: '/teams',
+  middleware: can('manage_teams'),
   request: {
     body: createRequiredJsonBody(
       z.object({
         name: z.string().min(1),
-        color: z.string().regex(/(#[\da-f]{3})|(#[\da-f]{6})/i),
+        color: colorSchema,
       }),
       'Data of the team'
     ),

@@ -11,6 +11,7 @@ export const PERMISSIONS = [
   'manage_personal_info',
   'manage_roles',
   'manage_self_child_users',
+  'manage_teams',
   'manage_users',
   'register',
   'register_child_users',

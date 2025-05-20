@@ -9,6 +9,8 @@ export const paramIdSchema = z.object({
   id: coercedIdSchema,
 });
 
+export const colorSchema = z.string().regex(/(#[\da-f]{3})|(#[\da-f]{6})/i);
+
 export const queryPageSchema = z.coerce.number().int().positive().default(1);
 export const querySizeSchema = z.coerce
   .number()
