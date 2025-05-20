@@ -11,6 +11,7 @@ import { and, eq, gt } from 'drizzle-orm';
 
 export async function canUserManageFromToken(token: string, targetId: string) {
   try {
+    dbLogger.debug('Checking if user can manage with %s, %s', token, targetId);
     const [result] = await db
       .select({ userId: usersTable.id })
       .from(usersTable)
@@ -27,6 +28,7 @@ export async function canUserManageFromToken(token: string, targetId: string) {
         )
       )
       .limit(1);
+    dbLogger.debug('User can manage: %s', result?.userId ?? 'NOT FOUND');
     if (!result) return createSuccessResult(false);
     const targets = await db
       .select()
