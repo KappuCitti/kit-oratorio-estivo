@@ -20,7 +20,7 @@ export async function addManagedUser(
   surname: string,
   birthDate: string,
   birthPlace: string,
-  sex: 'M' | 'F',
+  gender: 'M' | 'F',
   street: string,
   city: string,
   postalCode: string,
@@ -69,7 +69,7 @@ export async function addManagedUser(
         surname,
         birthDate,
         birthPlace,
-        sex,
+        gender,
         addressId: addressId.data,
       });
       await tx.insert(managesTable).values({

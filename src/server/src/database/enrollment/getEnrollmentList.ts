@@ -67,7 +67,7 @@ export async function getEnrollmentList(
           id: aliased(usersTable.id, 'userId'),
           name: aliased(personalInfoTable.name, 'userName'),
           surname: personalInfoTable.surname,
-          sex: personalInfoTable.sex,
+          gender: personalInfoTable.gender,
         },
       })
       .from(enrollmentTable)
@@ -100,7 +100,7 @@ export async function getEnrollmentList(
         usersTable.email,
         personalInfoTable.name,
         personalInfoTable.surname,
-        personalInfoTable.sex
+        personalInfoTable.gender
       );
 
     const [enrollmentCount] = await db

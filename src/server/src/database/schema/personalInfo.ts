@@ -9,7 +9,7 @@ export const personalInfoTable = mysqlTable('personal_info', {
     .references(() => usersTable.id, { onDelete: 'cascade' }),
   name: varchar({ length: 100 }).notNull(),
   surname: varchar({ length: 100 }).notNull(),
-  sex: mysqlEnum(['M', 'F']),
+  gender: mysqlEnum(['M', 'F']),
   birthDate: varchar({ length: 100 }),
   birthPlace: varchar({ length: 255 }),
   addressId: int().references(() => addressTable.id),

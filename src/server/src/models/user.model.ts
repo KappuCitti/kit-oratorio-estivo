@@ -45,7 +45,7 @@ export const adminCreateUserSchema = z.object({
   phoneNumber: phoneSchema.optional(),
   birthDate: z.string().date(),
   birthPlace: z.string().min(2).max(255),
-  sex: z.enum(['M', 'F']),
+  gender: z.enum(['M', 'F']),
   address: z.object({
     street: z.string().min(2).max(255),
     city: z.string().min(2).max(255),
@@ -65,7 +65,7 @@ export const adminCreateUserSchema = z.object({
         phoneNumber: phoneSchema,
         birthDate: z.string().date(),
         birthPlace: z.string().min(2).max(255),
-        sex: z.enum(['M', 'F']),
+        gender: z.enum(['M', 'F']),
         address: z.object({
           street: z.string().min(2).max(255),
           city: z.string().min(2).max(255),

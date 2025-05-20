@@ -17,7 +17,7 @@ export async function getUserFromNameSurname(name: string, surname: string) {
         name: personalInfoTable.name,
         surname: personalInfoTable.surname,
         birthDate: personalInfoTable.birthDate,
-        sex: personalInfoTable.sex,
+        gender: personalInfoTable.gender,
         birthPlace: personalInfoTable.birthPlace,
         address: {
           street: addressTable.street,
@@ -58,7 +58,7 @@ export async function getUserFromEmail(email: string) {
         name: personalInfoTable.name,
         surname: personalInfoTable.surname,
         birthDate: personalInfoTable.birthDate,
-        sex: personalInfoTable.sex,
+        gender: personalInfoTable.gender,
         birthPlace: personalInfoTable.birthPlace,
         address: {
           street: addressTable.street,

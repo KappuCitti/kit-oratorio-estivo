@@ -109,7 +109,7 @@ export async function createUsers(users: AdminCreateUser[]) {
           surname: u.surname,
           birthDate: u.birthDate,
           birthPlace: u.birthPlace,
-          sex: u.sex,
+          gender: u.gender,
           addressId: addresses.find(
             (a) =>
               a.street === u.address.street &&

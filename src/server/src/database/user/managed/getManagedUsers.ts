@@ -20,7 +20,7 @@ export async function getManagedUsers(userId: string) {
         phone: usersTable.phone,
         birthDate: personalInfoTable.birthDate,
         birthPlace: personalInfoTable.birthPlace,
-        sex: personalInfoTable.sex,
+        gender: personalInfoTable.gender,
         role: {
           id: aliased(roleTable.id, 'roleId'),
           name: aliased(roleTable.name, 'roleName'),
