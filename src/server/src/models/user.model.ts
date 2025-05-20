@@ -5,26 +5,35 @@ import { z } from 'zod';
 import { PERMISSIONS } from './permissions.model';
 import { personalInfoTable } from '@/database/schema/personalInfo';
 import { phoneSchema, idSchema } from './common.model';
+import { addressTable } from '@/database/schema/address';
 
 export const fullUserSchema = createSelectSchema(usersTable)
-  .omit({ password: true })
+  .omit({ password: true, roleId: true, theme: true })
   .extend({
     role: createSelectSchema(roleTable).omit({ description: true }),
     permissions: z.array(z.enum(PERMISSIONS)),
   })
-  .and(createSelectSchema(personalInfoTable).omit({ id: true }));
-
+  .and(
+    createSelectSchema(personalInfoTable)
+      .omit({ id: true, addressId: true })
+      .extend({
+        address: createSelectSchema(addressTable).omit({ id: true }),
+      })
+  );
 export type FullUser = z.infer<typeof fullUserSchema>;
 
 export const bareUserSchema = createSelectSchema(usersTable)
   .omit({
     password: true,
     theme: true,
+    roleId: true,
   })
   .extend({
     role: createSelectSchema(roleTable).omit({ description: true }),
-  });
-
+  })
+  .and(
+    createSelectSchema(personalInfoTable).omit({ id: true, addressId: true })
+  );
 export type BareUser = z.infer<typeof bareUserSchema>;
 
 export const adminCreateUserSchema = z.object({
