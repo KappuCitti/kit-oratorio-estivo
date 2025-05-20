@@ -13,6 +13,7 @@ export const PERMISSIONS = [
   'manage_self_child_users',
   'manage_teams',
   'manage_users',
+  'manage_weeks',
   'register',
   'register_child_users',
   'see_activities',
