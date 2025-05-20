@@ -9,7 +9,7 @@ import { createRoute, z } from '@hono/zod-openapi';
 export const registerManagedUserRouteDef = createRoute({
   tags: ['User'],
   method: 'post',
-  path: '/user',
+  path: '/users',
   middleware: can('register_child_users'),
   request: {
     body: createRequiredJsonBody(
