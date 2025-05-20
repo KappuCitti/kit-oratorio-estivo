@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { phoneSchema } from '@/models/common.model';
 import {
   createJsonResBody,
   createRequiredJsonBody,
@@ -13,7 +14,7 @@ export const registerRouteDef = createRoute({
     body: createRequiredJsonBody(
       z.object({
         cf: z.string().length(16),
-        phoneNumber: z.string().regex(/^(\+?\d\d\d)?\s?\d{3}\s?\d{3}\s?\d{4}$/),
+        phoneNumber: phoneSchema,
         name: z
           .string()
           .min(2, 'Name must be at least 2 characters long')

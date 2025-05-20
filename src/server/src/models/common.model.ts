@@ -29,3 +29,7 @@ export type ColumnType<TCol extends MySqlColumn> =
     : TCol['_']['hasDefault'] extends true
     ? TCol['_']['data']
     : TCol['_']['data'] | null | undefined;
+
+export const phoneSchema = z
+  .string()
+  .regex(/^(\+?\d\d\d)?\s?\d{3}\s?\d{3}\s?\d{4}$/);
