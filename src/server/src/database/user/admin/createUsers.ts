@@ -9,6 +9,7 @@ import { personalInfoTable } from '@/database/schema/personalInfo';
 import { usersTable } from '@/database/schema/user';
 import type { AdminCreateUser } from '@/models/user.model';
 import { createErrorResult, createSuccessResult } from '@/utils/createResult';
+import { hashPassword } from '@/utils/password';
 import { eq, inArray, or } from 'drizzle-orm';
 
 export async function createUsers(users: AdminCreateUser[]) {
@@ -89,17 +90,19 @@ export async function createUsers(users: AdminCreateUser[]) {
         address.id = addressId.data;
       }
 
-      const usersBody = users
-        .flatMap((u) => [u, ...u.managers])
-        .filter((u) => typeof u !== 'string')
-        .map((u) => ({
-          id: u.cf,
-          email: u.email,
-          phone: u.phoneNumber,
-          password: u.password,
-          roleId: u.role,
-          theme: 'System' as const,
-        }));
+      const usersBody = await Promise.all(
+        users
+          .flatMap((u) => [u, ...u.managers])
+          .filter((u) => typeof u !== 'string')
+          .map(async (u) => ({
+            id: u.cf,
+            email: u.email,
+            phone: u.phoneNumber,
+            password: await hashPassword(u.password),
+            roleId: u.role,
+            theme: 'System' as const,
+          }))
+      );
       const userPersonalInfos = users
         .flatMap((u) => [u, ...u.managers])
         .filter((u) => typeof u !== 'string')
