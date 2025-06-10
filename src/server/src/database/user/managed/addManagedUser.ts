@@ -11,6 +11,7 @@ import { personalInfoTable } from '@/database/schema/personalInfo';
 import { managesTable } from '@/database/schema/manages';
 import { getRoleIdIfCan } from '@/database/role/roleHasPermission';
 import { hashPassword } from '@/utils/password';
+import { DatabaseError } from '@/errors/database';
 
 export async function addManagedUser(
   token: string,
@@ -28,58 +29,48 @@ export async function addManagedUser(
   role: string,
   email?: string
 ) {
-  try {
-    const user = await getUserFromToken(token);
-    if (!user.success)
-      return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
-    const roleId = await getRoleIdIfCan(role, 'be_enrolled');
-    if (!roleId.success)
-      return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
-    if (!roleId.data) return createErrorResult(HttpStatusCodes.FORBIDDEN);
-    if (email) {
-      const exists = await getUserFromEmail(email);
-      if (!exists.success) return exists;
-      if (exists.data) return createErrorResult(HttpStatusCodes.CONFLICT);
-    }
-    const cfExists = await db.query.users.findFirst({
-      where: eq(usersTable.id, cf),
-    });
-    if (cfExists) return createErrorResult(HttpStatusCodes.CONFLICT);
-    if (isNaN(new Date(birthDate).getTime()))
-      return createErrorResult(HttpStatusCodes.BAD_REQUEST);
-    await db.transaction(async (tx) => {
-      const addressId = await txCreateAddressIfNotExists(tx, {
-        street,
-        city,
-        postalCode,
-        country,
-      });
-      if (!addressId.success)
-        return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
-      await tx.insert(usersTable).values({
-        id: cf,
-        password: await hashPassword(password),
-        theme: 'System',
-        roleId: roleId.data as number,
-        email,
-      });
-      await tx.insert(personalInfoTable).values({
-        id: cf,
-        name,
-        surname,
-        birthDate,
-        birthPlace,
-        gender,
-        addressId: addressId.data,
-      });
-      await tx.insert(managesTable).values({
-        mainId: user.data.id,
-        targetId: cf,
-      });
-    });
-    return createSuccessResult(null);
-  } catch (error) {
-    dbLogger.error(error);
-    return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
+  const user = await getUserFromToken(token);
+  const roleId = await getRoleIdIfCan(role, 'be_enrolled');
+  if (!roleId)
+    throw new DatabaseError(HttpStatusCodes.FORBIDDEN, 'role_cant_be_enrolled');
+  if (email) {
+    const exists = await getUserFromEmail(email);
+    if (exists)
+      throw new DatabaseError(HttpStatusCodes.CONFLICT, 'user_email_exists');
   }
+  const cfExists = await db.query.users.findFirst({
+    where: eq(usersTable.id, cf),
+  });
+  if (cfExists)
+    throw new DatabaseError(HttpStatusCodes.CONFLICT, 'user_cf_exists');
+  if (isNaN(new Date(birthDate).getTime()))
+    throw new DatabaseError(HttpStatusCodes.BAD_REQUEST, 'invalid_date');
+  await db.transaction(async (tx) => {
+    const addressId = await txCreateAddressIfNotExists(tx, {
+      street,
+      city,
+      postalCode,
+      country,
+    });
+    await tx.insert(usersTable).values({
+      id: cf,
+      password: await hashPassword(password),
+      theme: 'System',
+      roleId: roleId,
+      email,
+    });
+    await tx.insert(personalInfoTable).values({
+      id: cf,
+      name,
+      surname,
+      birthDate,
+      birthPlace,
+      gender,
+      addressId,
+    });
+    await tx.insert(managesTable).values({
+      mainId: user.id,
+      targetId: cf,
+    });
+  });
 }

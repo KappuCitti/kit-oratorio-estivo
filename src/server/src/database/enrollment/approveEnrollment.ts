@@ -10,6 +10,7 @@ import type { WeekEnrollment } from '@/models/week.model';
 import { checkValidWeeks } from '../week/checkValidWeeks';
 import { enrollmentQueueWeeksTable } from '../schema/enrollmentQueueWeek';
 import { enrollmentWeeksTable } from '../schema/enrollmentWeek';
+import { DatabaseError } from '@/errors/database';
 
 export async function approveEnrollment(
   queueId: number,
@@ -18,58 +19,60 @@ export async function approveEnrollment(
   teamId: number | null = null,
   managerNotes: string | null = null
 ) {
-  try {
-    const exists = !!(await db.query.enrollmentQueue.findFirst({
-      where: eq(enrollmentQueueTable.id, queueId),
+  const exists = !!(await db.query.enrollmentQueue.findFirst({
+    where: eq(enrollmentQueueTable.id, queueId),
+  }));
+  if (!exists)
+    throw new DatabaseError(
+      HttpStatusCodes.NOT_FOUND,
+      'enrollment_queue_not_found'
+    );
+  if (teamId) {
+    const exists = !!(await db.query.teams.findFirst({
+      where: eq(teamTable.id, teamId),
     }));
-    if (!exists) return createErrorResult(HttpStatusCodes.NOT_FOUND);
-    if (teamId) {
-      const exists = !!(await db.query.teams.findFirst({
-        where: eq(teamTable.id, teamId),
-      }));
-      if (!exists) return createErrorResult(HttpStatusCodes.BAD_REQUEST);
-    }
-    const weeksValid = await checkValidWeeks(weeks.map((w) => w.id));
-    if (!weeksValid.success) return weeksValid;
-    if (!weeksValid.data) return createErrorResult(HttpStatusCodes.BAD_REQUEST);
-    return await db.transaction(async (tx) => {
-      const queue = await tx.query.enrollmentQueue.findFirst({
-        where: eq(enrollmentTable.id, queueId),
-        columns: { id: false },
-      });
-      if (!queue) {
-        tx.rollback();
-        return createErrorResult(HttpStatusCodes.NOT_FOUND);
-      }
-      const queueWeeks = await tx.query.enrollmentQueueWeeks.findMany({
-        where: eq(enrollmentQueueWeeksTable.enrollmentId, queueId),
-      });
-      const [enrollment] = await tx
-        .insert(enrollmentTable)
-        .values({
-          ...queue,
-          section,
-          teamId,
-          managerNotes,
-        })
-        .$returningId();
-      await tx.insert(enrollmentWeeksTable).values(
-        queueWeeks.map((w) => ({
-          enrollmentId: enrollment.id,
-          weekId: w.weekId,
-          isPaid: weeks.find((ww) => ww.id === w.weekId)?.isPaid ?? false,
-        }))
-      );
-      await tx
-        .delete(enrollmentQueueWeeksTable)
-        .where(eq(enrollmentQueueWeeksTable.enrollmentId, queueId));
-      await tx
-        .delete(enrollmentQueueTable)
-        .where(eq(enrollmentQueueTable.id, queueId));
-      return createSuccessResult(enrollment.id);
-    });
-  } catch (e) {
-    dbLogger.error(e);
-    return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
+    if (!exists)
+      throw new DatabaseError(HttpStatusCodes.NOT_FOUND, 'team_not_found');
   }
+  const weeksValid = await checkValidWeeks(weeks.map((w) => w.id));
+  if (!weeksValid)
+    throw new DatabaseError(HttpStatusCodes.BAD_REQUEST, 'invalid_weeks');
+  return await db.transaction(async (tx) => {
+    const queue = await tx.query.enrollmentQueue.findFirst({
+      where: eq(enrollmentTable.id, queueId),
+      columns: { id: false },
+    });
+    if (!queue) {
+      throw new DatabaseError(
+        HttpStatusCodes.NOT_FOUND,
+        'enrollment_queue_not_found'
+      );
+    }
+    const queueWeeks = await tx.query.enrollmentQueueWeeks.findMany({
+      where: eq(enrollmentQueueWeeksTable.enrollmentId, queueId),
+    });
+    const [enrollment] = await tx
+      .insert(enrollmentTable)
+      .values({
+        ...queue,
+        section,
+        teamId,
+        managerNotes,
+      })
+      .$returningId();
+    await tx.insert(enrollmentWeeksTable).values(
+      queueWeeks.map((w) => ({
+        enrollmentId: enrollment.id,
+        weekId: w.weekId,
+        isPaid: weeks.find((ww) => ww.id === w.weekId)?.isPaid ?? false,
+      }))
+    );
+    await tx
+      .delete(enrollmentQueueWeeksTable)
+      .where(eq(enrollmentQueueWeeksTable.enrollmentId, queueId));
+    await tx
+      .delete(enrollmentQueueTable)
+      .where(eq(enrollmentQueueTable.id, queueId));
+    return enrollment.id;
+  });
 }

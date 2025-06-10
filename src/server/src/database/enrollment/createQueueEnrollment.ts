@@ -13,6 +13,7 @@ import { isValidSchool } from '../school/isValid';
 import { isValidClass } from '../class/isValid';
 import { enrollmentQueueTable } from '../schema/enrollmentQueue';
 import { enrollmentQueueWeeksTable } from '../schema/enrollmentQueueWeek';
+import { DatabaseError } from '@/errors/database';
 
 export async function createEnrollment(
   token: string,
@@ -25,67 +26,61 @@ export async function createEnrollment(
   parentNotes: string | null = null,
   shirtId: number | null = null
 ) {
-  try {
-    const canManage = await canUserManageFromToken(token, userId);
-    if (!canManage.success) return canManage;
-    if (!canManage.data) return createErrorResult(HttpStatusCodes.FORBIDDEN);
+  const canManage = await canUserManageFromToken(token, userId);
+  if (!canManage)
+    throw new DatabaseError(HttpStatusCodes.FORBIDDEN, 'cant_manage');
 
-    const validWeeks = await checkValidWeeks(weeks);
-    if (!validWeeks.success) return validWeeks;
-    if (!validWeeks.data) return createErrorResult(HttpStatusCodes.BAD_REQUEST);
+  const validWeeks = await checkValidWeeks(weeks);
+  if (!validWeeks)
+    throw new DatabaseError(HttpStatusCodes.BAD_REQUEST, 'invalid_weeks');
 
-    const alreadyExists = await db
-      .select()
-      .from(enrollmentTable)
-      .where(
-        and(
-          eq(enrollmentTable.userId, userId),
-          inArray(
-            enrollmentTable.year,
-            db
-              .select({ year: dateYear(weekTable.startDate) })
-              .from(weekTable)
-              .where(inArray(weekTable.id, weeks))
-              .as('weeks')
-          )
+  const alreadyExists = await db
+    .select()
+    .from(enrollmentTable)
+    .where(
+      and(
+        eq(enrollmentTable.userId, userId),
+        inArray(
+          enrollmentTable.year,
+          db
+            .select({ year: dateYear(weekTable.startDate) })
+            .from(weekTable)
+            .where(inArray(weekTable.id, weeks))
+            .as('weeks')
         )
-      );
-    if (alreadyExists.length > 0)
-      return createErrorResult(HttpStatusCodes.CONFLICT);
+      )
+    );
+  if (alreadyExists.length > 0)
+    throw new DatabaseError(HttpStatusCodes.CONFLICT, 'user_already_enrolled');
 
-    const validClass = await isValidClass(classId);
-    if (!validClass.success) return validClass;
-    if (!validClass.data) return createErrorResult(HttpStatusCodes.BAD_REQUEST);
+  const validClass = await isValidClass(classId);
+  if (!validClass)
+    throw new DatabaseError(HttpStatusCodes.BAD_REQUEST, 'class_not_found');
 
-    const year = await getWeeksYear(weeks);
-    if (!year.success) return year;
+  const year = await getWeeksYear(weeks);
 
-    const enrollmentId = await db.transaction(async (tx) => {
-      const [enrollment] = await tx
-        .insert(enrollmentQueueTable)
-        .values({
-          userId,
-          year: year.data,
-          dataProcessingConsent,
-          imageProcessingConsent,
-          exitAuthorization: false,
-          classId,
-          dateOfEnrollment: new Date(),
-          specialDiet,
-          shirtSizeId: shirtId,
-          parentNotes,
-        })
-        .$returningId();
-      const weeksToInsert = weeks.map((week) => ({
-        enrollmentId: enrollment.id,
-        weekId: week,
-      }));
-      await tx.insert(enrollmentQueueWeeksTable).values(weeksToInsert);
-      return enrollment.id;
-    });
-    return createSuccessResult(enrollmentId);
-  } catch (e) {
-    dbLogger.error(e);
-    return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
-  }
+  const enrollmentId = await db.transaction(async (tx) => {
+    const [enrollment] = await tx
+      .insert(enrollmentQueueTable)
+      .values({
+        userId,
+        year,
+        dataProcessingConsent,
+        imageProcessingConsent,
+        exitAuthorization: false,
+        classId,
+        dateOfEnrollment: new Date(),
+        specialDiet,
+        shirtSizeId: shirtId,
+        parentNotes,
+      })
+      .$returningId();
+    const weeksToInsert = weeks.map((week) => ({
+      enrollmentId: enrollment.id,
+      weekId: week,
+    }));
+    await tx.insert(enrollmentQueueWeeksTable).values(weeksToInsert);
+    return enrollment.id;
+  });
+  return enrollmentId;
 }

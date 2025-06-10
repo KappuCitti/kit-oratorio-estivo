@@ -1,5 +1,6 @@
 import { HttpStatusCodes } from '@/codes';
 import { changePassword } from '@/database/user/changePassword';
+import { getUserMessage } from '@/localization';
 import type { RouteController } from '@/models/app.model';
 import type { ChangePasswordRoute } from '@/openapi/user/changePassword';
 import { httpErrorResponse, httpSuccessResponse } from '@/utils/responses';
@@ -16,25 +17,9 @@ const changePasswordController: RouteController<ChangePasswordRoute> = async (
     return httpErrorResponse(
       c,
       HttpStatusCodes.BAD_REQUEST,
-      'New password is the same as the old one'
+      getUserMessage(c, 'same_password')
     );
-  const res = await changePassword(token, oldPassword, newPassword);
-  if (!res.success) {
-    switch (res.error) {
-      case HttpStatusCodes.UNAUTHORIZED:
-        return httpErrorResponse(
-          c,
-          HttpStatusCodes.UNAUTHORIZED,
-          'Invalid or expired token'
-        );
-      case HttpStatusCodes.FORBIDDEN:
-        return httpErrorResponse(
-          c,
-          HttpStatusCodes.UNAUTHORIZED,
-          'Invalid password'
-        );
-    }
-  }
+  await changePassword(token, oldPassword, newPassword);
   return httpSuccessResponse(c, null);
 };
 

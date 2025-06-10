@@ -1,9 +1,9 @@
 import { HttpStatusCodes } from '@/codes';
-import { createErrorResult, createSuccessResult } from '@/utils/createResult';
-import { dbLogger } from '../logger';
+import { createErrorResult } from '@/utils/createResult';
 import { db } from '..';
 import { eq } from 'drizzle-orm';
 import { shirtSizeTable } from '../schema/shirt';
+import { DatabaseError } from '@/errors/database';
 
 export async function editShirt(
   id: number,
@@ -12,32 +12,27 @@ export async function editShirt(
   height?: string,
   isAvailable?: boolean
 ) {
-  try {
-    const validId = !!(await db.query.shirts.findFirst({
-      where: eq(shirtSizeTable.id, id),
+  const validId = !!(await db.query.shirts.findFirst({
+    where: eq(shirtSizeTable.id, id),
+  }));
+  if (!validId)
+    throw new DatabaseError(HttpStatusCodes.NOT_FOUND, 'shirt_not_found');
+
+  if (sizeName) {
+    const alreadyExists = !!(await db.query.shirts.findFirst({
+      where: eq(shirtSizeTable.sizeName, sizeName),
     }));
-    if (!validId) return createErrorResult(HttpStatusCodes.NOT_FOUND);
-
-    if (sizeName) {
-      const alreadyExists = !!(await db.query.shirts.findFirst({
-        where: eq(shirtSizeTable.sizeName, sizeName),
-      }));
-      if (alreadyExists) return createErrorResult(HttpStatusCodes.CONFLICT);
-    }
-
-    await db
-      .update(shirtSizeTable)
-      .set({
-        sizeName,
-        width,
-        height,
-        isAvailable,
-      })
-      .where(eq(shirtSizeTable.id, id));
-
-    return createSuccessResult(null);
-  } catch (e) {
-    dbLogger.error(e);
-    return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
+    if (alreadyExists)
+      throw new DatabaseError(HttpStatusCodes.CONFLICT, 'shirt_exists');
   }
+
+  await db
+    .update(shirtSizeTable)
+    .set({
+      sizeName,
+      width,
+      height,
+      isAvailable,
+    })
+    .where(eq(shirtSizeTable.id, id));
 }

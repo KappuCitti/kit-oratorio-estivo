@@ -11,19 +11,18 @@ import { parseZodError } from './parseZodError';
 import { httpErrorResponse } from './responses';
 import { HttpStatusCodes } from '@/codes';
 import { prefixJoin } from './joinPrefix';
-import { serveStatic } from 'hono/serve-static';
+import { serveStatic } from 'hono/bun';
+import { DatabaseError } from '@/errors/database';
 
 export function createRouter() {
   return new OpenAPIHono<Bindings>({
     strict: false,
     defaultHook: (result, c) => {
       if (!result.success) {
-        return c.json(
-          {
-            success: false,
-            error: parseZodError(result.error),
-          },
-          422
+        return httpErrorResponse(
+          c,
+          HttpStatusCodes.UNPROCESSABLE_ENTITY,
+          parseZodError(result.error) as unknown as string
         );
       }
     },
@@ -48,14 +47,14 @@ export default function createApp() {
     '/static/*',
     serveStatic({
       root: path.join(__dirname, '../../global/'),
-      getContent: async (path) => {
-        return await Bun.file(path).bytes();
-      },
       rewriteRequestPath: (path) => path.replace('/static/', '/'),
     })
   );
 
   app.onError((err, c) => {
+    if (DatabaseError.isDatabaseError(err)) {
+      return err.toResponse(c);
+    }
     c.var.logger.error(err.message, err);
     return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
   });

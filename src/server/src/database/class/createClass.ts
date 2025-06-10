@@ -1,29 +1,22 @@
 import { HttpStatusCodes } from '@/codes';
-import { createErrorResult, createSuccessResult } from '@/utils/createResult';
-import { dbLogger } from '../logger';
 import { db } from '..';
 import { and, eq } from 'drizzle-orm';
 import { classTable } from '../schema/class';
 import { isValidSchool } from '../school/isValid';
+import { DatabaseError } from '@/errors/database';
 
 export async function createClass(name: string, schoolId: number) {
-  try {
-    const schoolValid = await isValidSchool(schoolId);
-    if (!schoolValid.success) return schoolValid;
-    if (!schoolValid.data)
-      return createErrorResult(HttpStatusCodes.BAD_REQUEST);
+  const schoolValid = await isValidSchool(schoolId);
+  if (!schoolValid)
+    throw new DatabaseError(HttpStatusCodes.BAD_REQUEST, 'school_not_found');
 
-    const exists = await db.query.classes.findFirst({
-      where: and(eq(classTable.name, name), eq(classTable.schoolId, schoolId)),
-    });
-    if (exists) return createErrorResult(HttpStatusCodes.CONFLICT);
-    const [classRes] = await db
-      .insert(classTable)
-      .values({ name, schoolId })
-      .$returningId();
-    return createSuccessResult(classRes.id);
-  } catch (e) {
-    dbLogger.error(e);
-    return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
-  }
+  const exists = await db.query.classes.findFirst({
+    where: and(eq(classTable.name, name), eq(classTable.schoolId, schoolId)),
+  });
+  if (exists) throw new DatabaseError(HttpStatusCodes.CONFLICT, 'class_exists');
+  const [classRes] = await db
+    .insert(classTable)
+    .values({ name, schoolId })
+    .$returningId();
+  return classRes.id;
 }

@@ -1,9 +1,7 @@
-import { HttpStatusCodes } from '@/codes';
-import { getEnrollmentList } from '@/database/enrollment/getEnrollmentList';
 import { getEnrollmentQueueList } from '@/database/enrollment/getEnrollmentQueueList';
 import type { RouteController } from '@/models/app.model';
 import type { GetEnrollmentQueueListRoute } from '@/openapi/enrollment/getEnrollmentQueues';
-import { httpErrorResponse, httpSuccessResponse } from '@/utils/responses';
+import { httpSuccessResponse } from '@/utils/responses';
 
 const getEnrollmentQueuesController: RouteController<
   GetEnrollmentQueueListRoute
@@ -19,9 +17,7 @@ const getEnrollmentQueuesController: RouteController<
     schoolId,
     classId
   );
-  if (!enrollments.success)
-    return httpErrorResponse(c, HttpStatusCodes.INTERNAL_SERVER_ERROR);
-  return httpSuccessResponse(c, enrollments.data);
+  return httpSuccessResponse(c, enrollments);
 };
 
 export default getEnrollmentQueuesController;

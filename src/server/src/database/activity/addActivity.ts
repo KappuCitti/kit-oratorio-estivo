@@ -7,36 +7,32 @@ import { checkValidWeeks } from '../week/checkValidWeeks';
 import { db } from '..';
 import { activityTable } from '../schema/activities';
 import { activityAppointmentTable } from '../schema/activityAppointments';
+import { DatabaseError } from '@/errors/database';
 
 export async function addActivity(
   name: string,
   weeks: ActivityWeek[],
   place: string | null = null
 ) {
-  try {
-    const isInvalid = await activityExists(name);
-    if (!isInvalid.success) return isInvalid;
-    if (isInvalid.data) return createErrorResult(HttpStatusCodes.CONFLICT);
+  const isInvalid = await activityExists(name);
+  if (isInvalid)
+    throw new DatabaseError(HttpStatusCodes.CONFLICT, 'activity_exists');
 
-    const validWeeks = await checkValidWeeks(weeks.map((w) => w.weekId));
-    if (!validWeeks.success) return validWeeks;
-    if (!validWeeks.data) return createErrorResult(HttpStatusCodes.BAD_REQUEST);
+  const validWeeks = await checkValidWeeks(weeks.map((w) => w.weekId));
+  if (!validWeeks)
+    throw new DatabaseError(HttpStatusCodes.BAD_REQUEST, 'invalid_weeks');
 
-    return await db.transaction(async (tx) => {
-      const [activity] = await tx
-        .insert(activityTable)
-        .values({
-          name,
-          place,
-        })
-        .$returningId();
-      await tx
-        .insert(activityAppointmentTable)
-        .values(weeks.map((w) => ({ ...w, activityId: activity.id })));
-      return createSuccessResult(activity.id);
-    });
-  } catch (e) {
-    dbLogger.error(e);
-    return createErrorResult(HttpStatusCodes.INTERNAL_SERVER_ERROR);
-  }
+  return await db.transaction(async (tx) => {
+    const [activity] = await tx
+      .insert(activityTable)
+      .values({
+        name,
+        place,
+      })
+      .$returningId();
+    await tx
+      .insert(activityAppointmentTable)
+      .values(weeks.map((w) => ({ ...w, activityId: activity.id })));
+    return activity.id;
+  });
 }
