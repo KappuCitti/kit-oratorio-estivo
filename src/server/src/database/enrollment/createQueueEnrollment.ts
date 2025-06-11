@@ -1,4 +1,3 @@
-import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { dbLogger } from '../logger';
 import { HttpStatusCodes } from '@/codes';
 import { canUserManageFromToken } from '../user/managed/canUserManage';
@@ -26,14 +25,17 @@ export async function createEnrollment(
   parentNotes: string | null = null,
   shirtId: number | null = null
 ) {
+  dbLogger.debug('Can user manage from token: %s %s', token, userId);
   const canManage = await canUserManageFromToken(token, userId);
   if (!canManage)
     throw new DatabaseError(HttpStatusCodes.FORBIDDEN, 'cant_manage');
 
+  dbLogger.debug('Checking valid weeks');
   const validWeeks = await checkValidWeeks(weeks);
   if (!validWeeks)
     throw new DatabaseError(HttpStatusCodes.BAD_REQUEST, 'invalid_weeks');
 
+  dbLogger.debug('Checking if already enrolled');
   const alreadyExists = await db
     .select()
     .from(enrollmentTable)
@@ -53,13 +55,16 @@ export async function createEnrollment(
   if (alreadyExists.length > 0)
     throw new DatabaseError(HttpStatusCodes.CONFLICT, 'user_already_enrolled');
 
+  dbLogger.debug('Checking if class is valid');
   const validClass = await isValidClass(classId);
   if (!validClass)
     throw new DatabaseError(HttpStatusCodes.BAD_REQUEST, 'class_not_found');
 
+  dbLogger.debug('Getting year');
   const year = await getWeeksYear(weeks);
 
-  const enrollmentId = await db.transaction(async (tx) => {
+  dbLogger.debug('Creating enrollment');
+  await db.transaction(async (tx) => {
     const [enrollment] = await tx
       .insert(enrollmentQueueTable)
       .values({
@@ -79,8 +84,8 @@ export async function createEnrollment(
       enrollmentId: enrollment.id,
       weekId: week,
     }));
+    dbLogger.debug('Inserting weeks');
     await tx.insert(enrollmentQueueWeeksTable).values(weeksToInsert);
     return enrollment.id;
   });
-  return enrollmentId;
 }

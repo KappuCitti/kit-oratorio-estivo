@@ -1,4 +1,3 @@
-import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { getUserFromToken } from '../getFromToken';
 import { HttpStatusCodes } from '@/codes';
 import { dbLogger } from '@/database/logger';
