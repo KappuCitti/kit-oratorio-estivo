@@ -127,8 +127,8 @@ export async function createUsers(users: AdminCreateUser[]) {
     for (const user of users) {
       for (const manager of user.managers) {
         manages.push({
-          mainId: user.cf,
-          targetId: typeof manager === 'string' ? manager : manager.cf,
+          mainId: typeof manager === 'string' ? manager : manager.cf,
+          targetId: user.cf,
         });
       }
     }
