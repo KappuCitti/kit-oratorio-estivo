@@ -30,14 +30,18 @@ export async function addManagedUser(
   email?: string
 ) {
   const user = await getUserFromToken(token);
+  dbLogger.debug('Found user: %s', user.id);
+  dbLogger.debug('Getting user role');
   const roleId = await getRoleIdIfCan(role, 'be_enrolled');
   if (!roleId)
     throw new DatabaseError(HttpStatusCodes.FORBIDDEN, 'role_cant_be_enrolled');
   if (email) {
+    dbLogger.debug('Checking if email is already used');
     const exists = await getUserFromEmail(email);
     if (exists)
       throw new DatabaseError(HttpStatusCodes.CONFLICT, 'user_email_exists');
   }
+  dbLogger.debug('Checking if user CF is already used');
   const cfExists = await db.query.users.findFirst({
     where: eq(usersTable.id, cf),
   });
@@ -46,12 +50,14 @@ export async function addManagedUser(
   if (isNaN(new Date(birthDate).getTime()))
     throw new DatabaseError(HttpStatusCodes.BAD_REQUEST, 'invalid_date');
   await db.transaction(async (tx) => {
+    dbLogger.debug('Creating address');
     const addressId = await txCreateAddressIfNotExists(tx, {
       street,
       city,
       postalCode,
       country,
     });
+    dbLogger.debug('Creating user');
     await tx.insert(usersTable).values({
       id: cf,
       password: await hashPassword(password),
@@ -59,6 +65,7 @@ export async function addManagedUser(
       roleId: roleId,
       email,
     });
+    dbLogger.debug('Creating personal info');
     await tx.insert(personalInfoTable).values({
       id: cf,
       name,
@@ -68,6 +75,7 @@ export async function addManagedUser(
       gender,
       addressId,
     });
+    dbLogger.debug('Linking users');
     await tx.insert(managesTable).values({
       mainId: user.id,
       targetId: cf,
