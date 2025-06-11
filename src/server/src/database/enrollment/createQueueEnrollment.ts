@@ -48,7 +48,6 @@ export async function createEnrollment(
             .select({ year: dateYear(weekTable.startDate) })
             .from(weekTable)
             .where(inArray(weekTable.id, weeks))
-            .as('weeks')
         )
       )
     );
