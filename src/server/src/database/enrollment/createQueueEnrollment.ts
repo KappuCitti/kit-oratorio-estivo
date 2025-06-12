@@ -8,7 +8,6 @@ import { weekTable } from '../schema/week';
 import { checkValidWeeks } from '../week/checkValidWeeks';
 import { getWeeksYear } from '../week/getWeeksYear';
 import { dateYear } from '../utils/year';
-import { isValidSchool } from '../school/isValid';
 import { isValidClass } from '../class/isValid';
 import { enrollmentQueueTable } from '../schema/enrollmentQueue';
 import { enrollmentQueueWeeksTable } from '../schema/enrollmentQueueWeek';

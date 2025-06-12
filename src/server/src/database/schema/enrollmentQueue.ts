@@ -8,7 +8,6 @@ import {
 } from 'drizzle-orm/mysql-core';
 import { shirtSizeTable } from './shirt';
 import { usersTable } from './user';
-import { schoolTable } from './school';
 import { classTable } from './class';
 
 export const enrollmentQueueTable = mysqlTable('enrollment_queue', {
