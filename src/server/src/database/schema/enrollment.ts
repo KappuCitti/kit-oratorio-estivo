@@ -10,7 +10,6 @@ import {
 import { teamTable } from './team';
 import { shirtSizeTable } from './shirt';
 import { usersTable } from './user';
-import { schoolTable } from './school';
 import { classTable } from './class';
 
 export const enrollmentTable = mysqlTable('enrollments', {

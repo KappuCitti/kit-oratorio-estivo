@@ -18,9 +18,9 @@ for (const lang of allLangs) {
     ![...messages].every((x) => enMessages.has(x))
   ) {
     localizationLogger.error(
-      `Language '${lang}' has different message keys than 'en', keys: ${[...enMessages.difference(
-        messages
-      )].join(', ')}`
+      `Language '${lang}' has different message keys than 'en', keys: ${[
+        ...enMessages.difference(messages),
+      ].join(', ')}`
     );
     process.exit(1);
   }
@@ -31,10 +31,6 @@ export const isMessage = (message: unknown): message is Message => {
 };
 
 export const getMessage = (lang: Lang, message: Message) => {
-  if (!isMessage(message)) {
-    localizationLogger.warn(`Message ${message} not implemented`);
-    return 'MESSAGE NOT IMPLEMENTED';
-  }
   return langs[lang][message];
 };
 

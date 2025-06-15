@@ -1,5 +1,4 @@
 import type { db } from '@/database';
-import type { MySqlColumn } from 'drizzle-orm/mysql-core';
 import { z } from 'zod';
 
 export const idSchema = z.number().int().positive();
@@ -28,3 +27,7 @@ export type Transaction = Parameters<
 export const phoneSchema = z
   .string()
   .regex(/^(\+?\d{1,3})?\s?\d{3}\s?\d{3}\s?\d{4}$/);
+
+export type Prettify<T extends Object> = {
+  [K in keyof T]: T[K] extends Object ? Prettify<T[K]> : T[K];
+} & {};

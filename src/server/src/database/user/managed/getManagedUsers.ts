@@ -20,6 +20,7 @@ export async function getManagedUsers(userId: string) {
       role: {
         id: aliased(roleTable.id, 'roleId'),
         name: aliased(roleTable.name, 'roleName'),
+        displayName: roleTable.displayName,
       },
     })
     .from(usersTable)

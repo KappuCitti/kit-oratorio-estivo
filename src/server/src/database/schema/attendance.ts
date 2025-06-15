@@ -7,6 +7,5 @@ export const attendanceTable = mysqlTable('attendances', {
     .notNull()
     .references(() => enrollmentTable.id, { onDelete: 'cascade' }),
   date: date().notNull(),
-  present: boolean().notNull().default(false),
   eatsInOratory: boolean().notNull().default(false),
 });
