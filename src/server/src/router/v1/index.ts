@@ -9,8 +9,10 @@ import user from './user';
 import activity from './activity';
 import school from './school';
 import _class from './class';
+import attendance from './attendance';
 
 export default (router: HonoApp) => {
+  attendance(router);
   activity(router);
   auth(router);
   _class(router);
