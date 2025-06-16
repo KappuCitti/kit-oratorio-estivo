@@ -10,7 +10,7 @@ import { addressTable } from '@/database/schema/address';
 export const fullUserSchema = createSelectSchema(usersTable)
   .omit({ password: true, roleId: true, theme: true })
   .extend({
-    role: createSelectSchema(roleTable).omit({ description: true }),
+    role: createSelectSchema(roleTable),
     permissions: z.array(z.enum(PERMISSIONS)),
   })
   .and(
@@ -29,7 +29,7 @@ export const bareUserSchema = createSelectSchema(usersTable)
     roleId: true,
   })
   .extend({
-    role: createSelectSchema(roleTable).omit({ description: true }),
+    role: createSelectSchema(roleTable),
   })
   .and(
     createSelectSchema(personalInfoTable).omit({ id: true, addressId: true })

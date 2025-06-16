@@ -3,21 +3,12 @@ import { fullUserSchema } from '@/models/user.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute, z } from '@hono/zod-openapi';
 
-export const getUserInfoRouteDef = createRoute({
+export const getSelfInfoRouteDef = createRoute({
   tags: ['User'],
   method: 'get',
-  path: '/user',
+  path: '/users/self',
   responses: {
-    [HttpStatusCodes.OK]: createJsonResBody(
-      true,
-      fullUserSchema,
-      'User successfully registered'
-    ),
-    [HttpStatusCodes.UNAUTHORIZED]: createJsonResBody(
-      false,
-      z.string(),
-      'Token is invalid or has expired'
-    ),
+    [HttpStatusCodes.OK]: createJsonResBody(true, fullUserSchema, 'User data'),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: createJsonResBody(
       false,
       z.string(),
@@ -26,4 +17,4 @@ export const getUserInfoRouteDef = createRoute({
   },
 });
 
-export type GetUserInfoRoute = typeof getUserInfoRouteDef;
+export type GetSelfInfoRoute = typeof getSelfInfoRouteDef;
