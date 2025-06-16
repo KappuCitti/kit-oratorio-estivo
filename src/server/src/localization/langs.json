@@ -32,7 +32,8 @@
     "same_password": "La nuova password deve essere diversa da quella attuale",
     "week_exists": "Esiste già una settimana in questo periodo",
     "cant_give_exit_authorization": "L'amministratore ha impedito di dare l'autorizzazione via software. Utilizzare il modulo cartaceo",
-    "attendance_not_found": "Presenza con l'id fornito non trovata"
+    "attendance_not_found": "Presenza con l'id fornito non trovata",
+    "nothing_to_change": "Non e' stata richiesta nessuna modifica"
   },
   "en": {
     "invalid_username": "Invalid username or email",
@@ -67,6 +68,7 @@
     "same_password": "The new password must be different from the current one",
     "week_exists": "There is already a week in this period",
     "cant_give_exit_authorization": "The admin has forbidden giving exit authorization via software. Use the paper form",
-    "attendance_not_found": "Attendance with the given id not found"
+    "attendance_not_found": "Attendance with the given id not found",
+    "nothing_to_change": "No change requested"
   }
 }
