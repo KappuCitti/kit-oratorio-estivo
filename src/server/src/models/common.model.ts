@@ -31,3 +31,5 @@ export const phoneSchema = z
 export type Prettify<T extends Object> = {
   [K in keyof T]: T[K] extends Object ? Prettify<T[K]> : T[K];
 } & {};
+
+export const cfSchema = z.string().length(16);
