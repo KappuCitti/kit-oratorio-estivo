@@ -31,7 +31,8 @@
     "invalid_date": "La data non è valida",
     "same_password": "La nuova password deve essere diversa da quella attuale",
     "week_exists": "Esiste già una settimana in questo periodo",
-    "cant_give_exit_authorization": "L'amministratore ha impedito di dare l'autorizzazione via software. Utilizzare il modulo cartaceo"
+    "cant_give_exit_authorization": "L'amministratore ha impedito di dare l'autorizzazione via software. Utilizzare il modulo cartaceo",
+    "attendance_not_found": "Presenza con l'id fornito non trovata"
   },
   "en": {
     "invalid_username": "Invalid username or email",
@@ -65,6 +66,7 @@
     "invalid_date": "The date is invalid",
     "same_password": "The new password must be different from the current one",
     "week_exists": "There is already a week in this period",
-    "cant_give_exit_authorization": "The admin has forbidden giving exit authorization via software. Use the paper form"
+    "cant_give_exit_authorization": "The admin has forbidden giving exit authorization via software. Use the paper form",
+    "attendance_not_found": "Attendance with the given id not found"
   }
 }
