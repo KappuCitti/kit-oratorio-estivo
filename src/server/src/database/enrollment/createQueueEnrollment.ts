@@ -1,6 +1,6 @@
 import { dbLogger } from '../logger';
 import { HttpStatusCodes } from '@/codes';
-import { canUserManageFromToken } from '../user/managed/canUserManage';
+import { canUserManage } from '../user/managed/canUserManage';
 import { db } from '..';
 import { enrollmentTable } from '../schema/enrollment';
 import { and, eq, inArray } from 'drizzle-orm';
@@ -12,22 +12,38 @@ import { isValidClass } from '../class/isValid';
 import { enrollmentQueueTable } from '../schema/enrollmentQueue';
 import { enrollmentQueueWeeksTable } from '../schema/enrollmentQueueWeek';
 import { DatabaseError } from '@/errors/database';
+import { hasPermission } from '../permissions/hasPermission';
+import { getUserFromToken } from '../user/getFromToken';
 
 export async function createEnrollment(
   token: string,
-  userId: string,
+  targetId: string,
   dataProcessingConsent: boolean,
   imageProcessingConsent: boolean,
   classId: number,
   weeks: number[],
+  section: string,
   specialDiet: string | null = null,
   parentNotes: string | null = null,
-  shirtId: number | null = null
+  shirtId: number | null = null,
+  exitAuthorization: boolean | null = null
 ) {
-  dbLogger.debug('Can user manage from token: %s %s', token, userId);
-  const canManage = await canUserManageFromToken(token, userId);
+  dbLogger.debug('Getting user from token');
+  const user = await getUserFromToken(token);
+  dbLogger.debug('Can user manage from token: %s %s', token, targetId);
+  const canManage = await canUserManage(user.id, targetId);
   if (!canManage)
     throw new DatabaseError(HttpStatusCodes.FORBIDDEN, 'cant_manage');
+
+  if (exitAuthorization !== null) {
+    dbLogger.debug('Checking if exit authorization is valid');
+    if (!hasPermission(user.id, 'give_exit_authorization')) {
+      throw new DatabaseError(
+        HttpStatusCodes.FORBIDDEN,
+        'cant_give_exit_authorization'
+      );
+    }
+  }
 
   dbLogger.debug('Checking valid weeks');
   const validWeeks = await checkValidWeeks(weeks);
@@ -40,7 +56,7 @@ export async function createEnrollment(
     .from(enrollmentTable)
     .where(
       and(
-        eq(enrollmentTable.userId, userId),
+        eq(enrollmentTable.userId, targetId),
         inArray(
           enrollmentTable.year,
           db
@@ -66,11 +82,12 @@ export async function createEnrollment(
     const [enrollment] = await tx
       .insert(enrollmentQueueTable)
       .values({
-        userId,
+        userId: targetId,
         year,
         dataProcessingConsent,
         imageProcessingConsent,
-        exitAuthorization: false,
+        section,
+        exitAuthorization,
         classId,
         dateOfEnrollment: new Date(),
         specialDiet,

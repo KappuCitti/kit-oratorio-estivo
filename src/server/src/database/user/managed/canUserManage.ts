@@ -44,3 +44,39 @@ export async function canUserManageFromToken(token: string, targetId: string) {
   );
   return targets.length > 0;
 }
+
+export async function canUserManage(userId: string, targetId: string) {
+  dbLogger.debug('Checking if user can manage with %s, %s', userId, targetId);
+  const [result] = await db
+    .select({ userId: usersTable.id })
+    .from(usersTable)
+    .innerJoin(
+      rolePermissionTable,
+      eq(usersTable.roleId, rolePermissionTable.roleId)
+    )
+    .where(
+      and(
+        eq(usersTable.id, userId),
+        eq(rolePermissionTable.permission, 'manage_self_child_users')
+      )
+    )
+    .limit(1);
+  dbLogger.debug('User can manage: %s', result?.userId ?? 'NOT FOUND');
+  if (!result) return false;
+  dbLogger.debug('Checking if user can manage target');
+  const targets = await db
+    .select()
+    .from(managesTable)
+    .where(
+      and(
+        eq(managesTable.mainId, result.userId),
+        eq(managesTable.targetId, targetId)
+      )
+    )
+    .limit(1);
+  dbLogger.debug(
+    'User can manage target: %s',
+    targets.length > 0 ? 'YES' : 'NO'
+  );
+  return targets.length > 0;
+}

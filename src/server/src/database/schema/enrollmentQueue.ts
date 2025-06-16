@@ -1,5 +1,6 @@
 import {
   boolean,
+  char,
   datetime,
   int,
   mysqlTable,
@@ -20,12 +21,13 @@ export const enrollmentQueueTable = mysqlTable('enrollment_queue', {
   }),
   dataProcessingConsent: boolean().notNull().default(true),
   imageProcessingConsent: boolean().notNull().default(false),
-  exitAuthorization: boolean().notNull().default(true),
+  exitAuthorization: boolean(),
   classId: int()
     .notNull()
     .references(() => classTable.id, {
       onDelete: 'cascade',
     }),
+  section: char().notNull(),
   year: int().notNull(),
   dateOfEnrollment: datetime().notNull(),
   parentNotes: text(),

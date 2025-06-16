@@ -2,6 +2,7 @@ export const PERMISSIONS = [
   'be_enrolled',
   'be_managed',
   'be_selected',
+  'give_exit_authorization',
   'login',
   'manage_activities',
   'manage_attendances',

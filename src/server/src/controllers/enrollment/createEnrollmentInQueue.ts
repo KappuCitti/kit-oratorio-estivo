@@ -13,7 +13,9 @@ const createQueueEnrollmentController: RouteController<
     imageProcessingConsent,
     user,
     weeks,
+    section,
     parentNotes,
+    exitAuthorization,
     shirt,
     specialDiet,
   } = await c.req.valid('json');
@@ -25,9 +27,11 @@ const createQueueEnrollmentController: RouteController<
     imageProcessingConsent,
     classId,
     weeks,
+    section,
     specialDiet,
     parentNotes,
-    shirt
+    shirt,
+    exitAuthorization
   );
   return httpSuccessResponse(c, enrollment);
 };
