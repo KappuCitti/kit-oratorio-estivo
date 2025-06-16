@@ -6,15 +6,14 @@ import { httpSuccessResponse } from '@/utils/responses';
 const approveEnrollmentController: RouteController<
   ApproveEnrollmentRoute
 > = async (c) => {
-  const { queueId, managerNotes, section, weeks, teamId } = await c.req.valid(
-    'json'
-  );
+  const { queueId, managerNotes, weeks, teamId, exitAuthorization } =
+    await c.req.valid('json');
   const enrollment = await approveEnrollment(
     queueId,
-    section,
     weeks,
     teamId,
-    managerNotes
+    managerNotes,
+    exitAuthorization
   );
   return httpSuccessResponse(c, enrollment);
 };

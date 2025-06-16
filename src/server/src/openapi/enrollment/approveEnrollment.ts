@@ -19,12 +19,12 @@ export const approveEnrollmentRouteDef = createRoute({
       z.object({
         queueId: idSchema,
         teamId: z.union([idSchema, z.null()]).optional(),
-        section: z.string().length(1, 'Section must be 1 character long'),
         weeks: z.array(weekEnrollmentSchema),
         managerNotes: z.union([
           z.string().max(255, 'Max manager notes size reached'),
           z.null(),
         ]),
+        exitAuthorization: z.union([z.boolean(), z.null()]).optional(),
       }),
       'Enrollment to add'
     ),

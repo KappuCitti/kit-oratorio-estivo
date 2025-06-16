@@ -1,6 +1,4 @@
 import { HttpStatusCodes } from '@/codes';
-import { createErrorResult, createSuccessResult } from '@/utils/createResult';
-import { dbLogger } from '../logger';
 import { db } from '..';
 import { enrollmentQueueTable } from '../schema/enrollmentQueue';
 import { eq } from 'drizzle-orm';
@@ -14,10 +12,10 @@ import { DatabaseError } from '@/errors/database';
 
 export async function approveEnrollment(
   queueId: number,
-  section: string,
   weeks: WeekEnrollment[],
   teamId: number | null = null,
-  managerNotes: string | null = null
+  managerNotes: string | null = null,
+  exitAuthorization: boolean | null = null
 ) {
   const exists = !!(await db.query.enrollmentQueue.findFirst({
     where: eq(enrollmentQueueTable.id, queueId),
@@ -55,9 +53,10 @@ export async function approveEnrollment(
       .insert(enrollmentTable)
       .values({
         ...queue,
-        section,
         teamId,
         managerNotes,
+        exitAuthorization:
+          exitAuthorization ?? queue.exitAuthorization ?? false,
       })
       .$returningId();
     await tx.insert(enrollmentWeeksTable).values(
