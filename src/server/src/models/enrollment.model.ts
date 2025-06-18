@@ -21,8 +21,8 @@ export const fullEnrollmentSchema = enrollmentTableSchema
     shirtSizeId: true,
   })
   .extend({
-    shirt: z.union([createSelectSchema(shirtSizeTable), z.null()]),
-    team: z.union([createSelectSchema(teamTable), z.null()]),
+    shirt: createSelectSchema(shirtSizeTable).nullable(),
+    team: createSelectSchema(teamTable).nullable(),
     weeks: z.array(
       createSelectSchema(weekTable).extend({
         isPaid: z.boolean(),
@@ -65,7 +65,7 @@ export const bareEnrollmentSchema = createSelectSchema(enrollmentTable)
         enrollmentId: true,
       })
     ),
-    team: z.union([createSelectSchema(teamTable), z.null()]),
+    team: createSelectSchema(teamTable).nullable(),
     class: createSelectSchema(classTable).omit({ schoolId: true }),
     school: createSelectSchema(schoolTable).omit({ canChooseActivities: true }),
   });

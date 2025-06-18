@@ -17,14 +17,14 @@ export const createQueueEnrollmentRouteDef = createRoute({
     body: createRequiredJsonBody(
       z.object({
         user: z.string(),
-        shirt: z.union([idSchema, z.null()]).optional(),
+        shirt: idSchema.nullable().optional(),
         weeks: z.array(idSchema),
         section: z.string().length(1),
         dataProcessingConsent: z.boolean(),
         imageProcessingConsent: z.boolean(),
         exitAuthorization: z.boolean().optional(),
         classId: idSchema,
-        specialDiet: z.union([z.string().max(255), z.null()]).optional(),
+        specialDiet: z.string().max(255).nullable().optional(),
         parentNotes: z
           .union([
             z.string().max(255, 'Max parent notes size reached'),

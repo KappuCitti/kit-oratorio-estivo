@@ -4,23 +4,24 @@ import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { PERMISSIONS } from './permissions.model';
 import { personalInfoTable } from '@/database/schema/personalInfo';
-import { phoneSchema, idSchema } from './common.model';
+import { phoneSchema, idSchema, type Prettify } from './common.model';
 import { addressTable } from '@/database/schema/address';
 
 export const fullUserSchema = createSelectSchema(usersTable)
   .omit({ password: true, roleId: true, theme: true })
   .extend({
-    role: createSelectSchema(roleTable),
-    permissions: z.array(z.enum(PERMISSIONS)),
+    role: createSelectSchema(roleTable).extend({
+      permissions: z.array(z.enum(PERMISSIONS)),
+    }),
   })
   .and(
     createSelectSchema(personalInfoTable)
       .omit({ id: true, addressId: true })
       .extend({
-        address: createSelectSchema(addressTable).omit({ id: true }),
+        address: createSelectSchema(addressTable).omit({ id: true }).nullable(),
       })
   );
-export type FullUser = z.infer<typeof fullUserSchema>;
+export type FullUser = Prettify<z.infer<typeof fullUserSchema>>;
 
 export const bareUserSchema = createSelectSchema(usersTable)
   .omit({

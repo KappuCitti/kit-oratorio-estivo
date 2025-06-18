@@ -18,13 +18,13 @@ export const approveEnrollmentRouteDef = createRoute({
     body: createRequiredJsonBody(
       z.object({
         queueId: idSchema,
-        teamId: z.union([idSchema, z.null()]).optional(),
+        teamId: idSchema.nullable().optional(),
         weeks: z.array(weekEnrollmentSchema),
         managerNotes: z.union([
           z.string().max(255, 'Max manager notes size reached'),
           z.null(),
         ]),
-        exitAuthorization: z.union([z.boolean(), z.null()]).optional(),
+        exitAuthorization: z.boolean().nullable().optional(),
       }),
       'Enrollment to add'
     ),

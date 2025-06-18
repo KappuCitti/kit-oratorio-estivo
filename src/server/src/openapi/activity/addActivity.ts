@@ -18,7 +18,7 @@ export const addActivityRouteDef = createRoute({
     body: createRequiredJsonBody(
       z.object({
         name: z.string().min(2).max(255),
-        place: z.union([z.string().min(2).max(255), z.null()]).optional(),
+        place: z.string().min(2).max(255).nullable().optional(),
         weeks: z.array(activityWeekSchema),
       }),
       'Data of the activity to add'
