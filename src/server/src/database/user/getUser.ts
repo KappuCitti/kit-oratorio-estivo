@@ -41,7 +41,23 @@ function createGetUserQuery(filter: SQL | undefined) {
       rolePermissionTable,
       eq(rolePermissionTable.roleId, roleTable.id)
     )
-    .where(filter);
+    .where(filter)
+    .groupBy(
+      usersTable.id,
+      usersTable.email,
+      personalInfoTable.name,
+      personalInfoTable.surname,
+      personalInfoTable.gender,
+      personalInfoTable.birthDate,
+      personalInfoTable.birthPlace,
+      addressTable.street,
+      addressTable.city,
+      addressTable.postalCode,
+      addressTable.country,
+      roleTable.id,
+      roleTable.name,
+      roleTable.displayName
+    );
 }
 
 export async function getUserFromNameSurname(name: string, surname: string) {
