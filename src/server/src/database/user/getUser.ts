@@ -6,6 +6,8 @@ import { addressTable } from '../schema/address';
 import { roleTable } from '../schema/role';
 import { sessionTable } from '../schema/session';
 import { now } from '../utils/now';
+import { jsonArray } from '../utils/jsonArray';
+import { rolePermissionTable } from '../schema/rolePermission';
 
 function createGetUserQuery(filter: SQL | undefined) {
   return db
@@ -17,6 +19,7 @@ function createGetUserQuery(filter: SQL | undefined) {
       birthDate: personalInfoTable.birthDate,
       gender: personalInfoTable.gender,
       birthPlace: personalInfoTable.birthPlace,
+      phone: usersTable.phone,
       address: {
         street: addressTable.street,
         city: addressTable.city,
@@ -26,12 +29,18 @@ function createGetUserQuery(filter: SQL | undefined) {
       role: {
         id: roleTable.id,
         name: roleTable.name,
+        displayName: roleTable.displayName,
+        permissions: jsonArray(rolePermissionTable.permission),
       },
     })
     .from(usersTable)
     .innerJoin(personalInfoTable, eq(usersTable.id, personalInfoTable.id))
     .leftJoin(addressTable, eq(personalInfoTable.addressId, addressTable.id))
     .innerJoin(roleTable, eq(usersTable.roleId, roleTable.id))
+    .innerJoin(
+      rolePermissionTable,
+      eq(rolePermissionTable.roleId, roleTable.id)
+    )
     .where(filter);
 }
 
