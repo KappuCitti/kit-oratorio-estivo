@@ -1,7 +1,9 @@
 import { SQL, sql, type GetColumnData } from 'drizzle-orm';
 import type { MySqlColumn } from 'drizzle-orm/mysql-core';
 
-export function jsonArray<T extends Record<string, MySqlColumn>>(schema: T) {
+export function jsonObjectArray<T extends Record<string, MySqlColumn>>(
+  schema: T
+) {
   type JsonArrayResult = {
     [K in keyof typeof schema]: GetColumnData<(typeof schema)[K]>;
   };
@@ -17,6 +19,15 @@ export function jsonArray<T extends Record<string, MySqlColumn>>(schema: T) {
   return sql.join([
     sql`JSON_EXTRACT(COALESCE(JSON_ARRAYAGG(`,
     sql.join(jsonObjectParts),
+    sql`), '[]'), '$')`,
+  ]) as SQL<JsonArrayResult[]>;
+}
+
+export function jsonArray<T extends MySqlColumn>(schema: T) {
+  type JsonArrayResult = GetColumnData<T>;
+  return sql.join([
+    sql`JSON_EXTRACT(COALESCE(JSON_ARRAYAGG(`,
+    sql`${schema}`,
     sql`), '[]'), '$')`,
   ]) as SQL<JsonArrayResult[]>;
 }

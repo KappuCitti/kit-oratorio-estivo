@@ -3,7 +3,7 @@ import { enrollmentQueueTable } from '../schema/enrollmentQueue';
 import { schoolTable } from '../schema/school';
 import { aliased } from '../utils/alias';
 import { classTable } from '../schema/class';
-import { jsonArray } from '../utils/jsonArray';
+import { jsonObjectArray } from '../utils/jsonArray';
 import { enrollmentQueueWeeksTable } from '../schema/enrollmentQueueWeek';
 import { usersTable } from '../schema/user';
 import { personalInfoTable } from '../schema/personalInfo';
@@ -47,7 +47,7 @@ export async function getEnrollmentQueueList(
       exitAuthorization: enrollmentQueueTable.exitAuthorization,
       imageProcessingConsent: enrollmentQueueTable.imageProcessingConsent,
       specialDiet: enrollmentQueueTable.specialDiet,
-      weeks: jsonArray({
+      weeks: jsonObjectArray({
         weekId: enrollmentQueueWeeksTable.weekId,
       }).as('weeks'),
       user: {

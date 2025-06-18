@@ -5,7 +5,7 @@ import { and, count, desc, eq, like, or, SQL } from 'drizzle-orm';
 import { enrollmentWeeksTable } from '../schema/enrollmentWeek';
 import { usersTable } from '../schema/user';
 import { personalInfoTable } from '../schema/personalInfo';
-import { jsonArray } from '../utils/jsonArray';
+import { jsonObjectArray } from '../utils/jsonArray';
 import { classTable } from '../schema/class';
 import { schoolTable } from '../schema/school';
 import { aliased } from '../utils/alias';
@@ -55,7 +55,7 @@ export async function getEnrollmentList(
         color: teamTable.color,
       },
       section: enrollmentTable.section,
-      weeks: jsonArray({
+      weeks: jsonObjectArray({
         isPaid: enrollmentWeeksTable.isPaid,
         weekId: enrollmentWeeksTable.weekId,
       }).as('weeks'),
