@@ -7,7 +7,7 @@ import { getCookie } from 'hono/cookie';
 const getSelfInfoController: RouteController<GetSelfInfoRoute> = async (c) => {
   const token = getCookie(c, 'user_token') as string;
   const user = await getFullUserFromToken(token);
-  return httpSuccessResponse(c, user);
+  return httpSuccessResponse(c, user!);
 };
 
 export default getSelfInfoController;
