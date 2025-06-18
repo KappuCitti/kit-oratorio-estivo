@@ -81,5 +81,8 @@ export async function getFullUserFromToken(token: string) {
           and(eq(sessionTable.token, token), gt(sessionTable.expires, now()))
         )
     )
-  );
+  )
+    .limit(1)
+    .execute();
+  return users.at(0);
 }
