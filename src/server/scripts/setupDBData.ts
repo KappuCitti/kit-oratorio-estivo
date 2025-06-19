@@ -51,15 +51,15 @@ async function main() {
       .values([
         {
           name: 'admin',
-          description: 'Amministratore',
+          displayName: 'Amministratore',
         },
         {
           name: 'parent',
-          description: 'Genitore',
+          displayName: 'Genitore',
         },
         {
           name: 'child',
-          description: 'Figlio',
+          displayName: 'Figlio',
         },
       ])
       .$returningId();
