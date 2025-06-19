@@ -5,7 +5,8 @@
   "version": "0.0.1",
   "description": "Server API per la comunicazione tra l'interfaccia web ed il database: raccolta iscrizioni, gestione presenze, giochi interattivi e punteggi squadre.",
   "scripts": {
-    "start": "NODE_ENV=production bun .",
+    "start:ts": "NODE_ENV=production bun .",
+    "start": "bun run ./dist/index.js",
     "dev": "bun run --hot .",
     "check": "tsc --noEmit --pretty",
     "build": "tsc -b",
@@ -23,6 +24,7 @@
   ],
   "license": "MIT",
   "devDependencies": {
+    "@clack/prompts": "^0.11.0",
     "@types/bun": "latest",
     "@types/strftime": "^0.9.8",
     "drizzle-kit": "^0.30.6"

@@ -27,7 +27,7 @@ import { activitySubscriptionTable } from './schema/activitySubscriptions';
 
 const client = createPool(config.database);
 
-const schema = {
+export const schema = {
   activities: activityTable,
   activityAppointments: activityAppointmentTable,
   activitySubscriptions: activitySubscriptionTable,
