@@ -104,10 +104,14 @@ export async function getEnrollmentList(
     .from(enrollmentQuery.as('enrollments'))
     .limit(1);
 
-  const enrollments = await enrollmentQuery
-    .orderBy(desc(enrollmentTable.dateOfEnrollment))
-    .limit(size)
-    .offset((page - 1) * size);
+  const enrollments = (
+    await enrollmentQuery
+      .orderBy(desc(enrollmentTable.dateOfEnrollment))
+      .limit(size)
+      .offset((page - 1) * size)
+  ).forEach(
+    (e) => (e.weeks = e.weeks.map((w) => ({ ...w, isPaid: !!w.isPaid })))
+  );
   return {
     elements: enrollments,
     count: enrollmentCount.count,
