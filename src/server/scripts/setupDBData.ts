@@ -114,7 +114,7 @@ async function main() {
   for (const key in adminData) {
     if (!adminData[key]) {
       const value = await prompts.text({
-        message: `Enter the ${key} of the admin user:`,
+        message: `Enter the ${key} of the admin user (optional):`,
         validate: (value) => {
           if (value.length === 0) return;
           if (key === 'gender' && value !== 'M' && value !== 'F') {
