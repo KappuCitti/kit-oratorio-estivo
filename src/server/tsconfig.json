@@ -1,5 +1,5 @@
 {
-  "exclude": ["./scripts/*", "./drizzle.config.ts", "./src/globals.ts"],
+  "exclude": ["./scripts/*", "./drizzle.config.ts", "./src/globals.ts", "./dist/*"],
   "compilerOptions": {
     // Enable latest features
     "lib": ["ESNext", "DOM"],
