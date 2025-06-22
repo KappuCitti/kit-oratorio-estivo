@@ -78,7 +78,7 @@ export async function createEnrollment(
   const year = await getWeeksYear(weeks);
 
   dbLogger.debug('Creating enrollment');
-  await db.transaction(async (tx) => {
+  return await db.transaction(async (tx) => {
     const [enrollment] = await tx
       .insert(enrollmentQueueTable)
       .values({
