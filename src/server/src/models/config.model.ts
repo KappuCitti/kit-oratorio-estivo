@@ -43,7 +43,7 @@ export const configSchema = z
       .discriminatedUnion('useHttps', [
         z.object({
           useHttps: z.literal(true),
-          ssl: z.object({
+          https: z.object({
             cert: z.string().default('ssl/cert.pem'),
             key: z.string().default('ssl/key.pem'),
           }),

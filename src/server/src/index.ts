@@ -9,8 +9,8 @@ export default {
   fetch: app.fetch,
   tls: config.useHttps
     ? {
-        cert: Bun.file(config.ssl.cert),
-        key: Bun.file(config.ssl.key),
+        cert: Bun.file(config.https.cert),
+        key: Bun.file(config.https.key),
       }
     : undefined,
 };
