@@ -77,6 +77,7 @@ async function main() {
       await tx.execute(sql`SET FOREIGN_KEY_CHECKS = 0`);
       for (const table of Object.values(schema)) {
         await tx.execute(sql`TRUNCATE TABLE ${table}`);
+        await tx.execute(sql`ALTER TABLE ${table} AUTO_INCREMENT = 1`);
       }
       await tx.execute(sql`SET FOREIGN_KEY_CHECKS = 1`);
     });
