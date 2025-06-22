@@ -6,7 +6,7 @@
   "description": "Server API per la comunicazione tra l'interfaccia web ed il database: raccolta iscrizioni, gestione presenze, giochi interattivi e punteggi squadre.",
   "scripts": {
     "start:ts": "NODE_ENV=production bun .",
-    "start": "bun run ./dist/index.js",
+    "start": "NODE_ENV=production bun run ./dist/index.js",
     "dev": "bun run --hot .",
     "check": "tsc --noEmit --pretty",
     "build": "tsc -b",
