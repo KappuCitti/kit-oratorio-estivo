@@ -22,7 +22,8 @@ export function createRouter() {
         return httpErrorResponse(
           c,
           HttpStatusCodes.UNPROCESSABLE_ENTITY,
-          parseZodError(result.error) as unknown as string
+          // parseZodError(result.error) as unknown as string
+          result.error as unknown as string
         );
       }
     },
