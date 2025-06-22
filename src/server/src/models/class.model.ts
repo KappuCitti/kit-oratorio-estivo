@@ -8,6 +8,6 @@ export const classListSchema = createSelectSchema(classTable)
     schoolId: true,
   })
   .extend({
-    school: schoolListSchema,
+    school: schoolListSchema.omit({ classes: true }),
   });
 export type ClassList = z.infer<typeof classListSchema>;
