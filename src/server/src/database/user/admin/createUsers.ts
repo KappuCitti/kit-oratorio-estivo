@@ -21,7 +21,8 @@ export async function createUsers(users: AdminCreateUser[]) {
           usersTable.id,
           users
             .flatMap((user) => [user.cf, ...user.managers])
-            .map((u) => (typeof u === 'string' ? u : u.cf))
+            .filter((u) => typeof u !== 'string')
+            .map((u) => u.cf)
         ),
         inArray(
           usersTable.email,
