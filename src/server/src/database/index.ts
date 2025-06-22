@@ -24,6 +24,7 @@ import { enrollmentQueueWeeksTable } from './schema/enrollmentQueueWeek';
 import { activityTable } from './schema/activities';
 import { activityAppointmentTable } from './schema/activityAppointments';
 import { activitySubscriptionTable } from './schema/activitySubscriptions';
+import { personalInfoTable } from './schema/personalInfo';
 
 const client = createPool(config.database);
 
@@ -42,6 +43,7 @@ export const schema = {
   eventClasses: eventClassesTable,
   extraordinaryAttendances: extraordinaryAttendanceTable,
   manages: managesTable,
+  personalInfos: personalInfoTable,
   roles: roleTable,
   rolePermissions: rolePermissionTable,
   schools: schoolTable,
