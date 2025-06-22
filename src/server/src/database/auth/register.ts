@@ -30,7 +30,7 @@ export async function register(
     email: email,
     password: await hashPassword(password),
     theme: 'System',
-    phone,
+    phone: phone.replaceAll(' ', ''),
   });
   await db.insert(personalInfoTable).values({
     id: cf,

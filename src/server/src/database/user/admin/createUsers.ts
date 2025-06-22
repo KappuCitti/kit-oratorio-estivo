@@ -99,7 +99,7 @@ export async function createUsers(users: AdminCreateUser[]) {
         .map(async (u) => ({
           id: u.cf,
           email: u.email,
-          phone: u.phoneNumber,
+          phone: u.phoneNumber?.replaceAll(' ', ''),
           password: await hashPassword(u.password),
           roleId: u.role,
           theme: 'System' as const,
