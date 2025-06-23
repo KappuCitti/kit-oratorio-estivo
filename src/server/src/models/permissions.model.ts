@@ -18,8 +18,9 @@ export const PERMISSIONS = [
   'register',
   'register_child_users',
   'see_activities',
-  'see_personal_info',
   'see_classes',
+  'see_personal_info',
+  'see_stats',
   'see_users',
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];

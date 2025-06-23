@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { can } from '@/middlewares/hasPermission';
 import { idSchema } from '@/models/common.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute, z } from '@hono/zod-openapi';
@@ -7,6 +8,7 @@ export const usersStatsRouteDef = createRoute({
   tags: ['Stats'],
   method: 'get',
   path: '/stats/users/{year}',
+  middleware: can('see_stats'),
   request: {
     params: z.object({
       year: z.coerce.number().int().positive().optional(),
