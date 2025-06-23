@@ -7,10 +7,11 @@ const app = createApp();
 export default {
   port: config.server.port,
   fetch: app.fetch,
+  hostname: config.server.host,
   tls: config.useHttps
     ? {
         cert: Bun.file(config.https.cert),
         key: Bun.file(config.https.key),
       }
     : undefined,
-};
+} satisfies Bun.ServeFunctionOptions<any, any>;
