@@ -64,6 +64,7 @@ const config = configSchema.safeParse({
     ignorePermissions: env.DEVELOPMENT_IGNORE_PERMISSIONS ?? false,
   },
 });
+
 if (!config.success) {
   console.error('Error while parsing config');
   console.error(config.error.issues);

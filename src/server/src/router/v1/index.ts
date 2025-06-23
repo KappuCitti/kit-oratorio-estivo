@@ -10,6 +10,7 @@ import activity from './activity';
 import school from './school';
 import _class from './class';
 import attendance from './attendance';
+import stats from './stats';
 
 export default (router: HonoApp) => {
   attendance(router);
@@ -20,6 +21,7 @@ export default (router: HonoApp) => {
   main(router);
   school(router);
   shirt(router);
+  stats(router);
   team(router);
   user(router);
   week(router);
