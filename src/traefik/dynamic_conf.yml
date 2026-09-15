@@ -1,0 +1,41 @@
+# Configurazione dinamica di Traefik: middleware e impostazioni TLS.
+# Traefik ricarica questo file da solo quando cambia (watch: true).
+
+http:
+  middlewares:
+    # Intestazioni di sicurezza applicate a tutto il traffico in ingresso.
+    # Il server Hono ne imposta gia' alcune per conto suo: averle anche qui
+    # copre anche le risposte che non passano dall'applicazione (errori di
+    # Traefik, file statici serviti da nginx).
+    security-headers:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        forceSTSHeader: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        frameDeny: true
+        referrerPolicy: no-referrer
+
+    # Limita le richieste per IP. E' una rete di sicurezza davanti a tutto:
+    # il rate limit applicativo copre solo /user/login.
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50
+
+    # Autenticazione della dashboard di Traefik.
+    # Genera la coppia utente:hash con:  htpasswd -nbB admin 'tuapassword'
+    # e sostituisci la riga sotto. Le $ vanno raddoppiate ($$) nei file YAML
+    # letti da docker compose.
+    dashboard-auth:
+      basicAuth:
+        users:
+          - 'admin:$$2y$$05$$SOSTITUISCI.QUESTO.HASH.CON.UNO.GENERATO.DA.HTPASSWD'
+
+tls:
+  options:
+    default:
+      # TLS 1.2 e' il minimo: sotto ci sono solo protocolli deprecati.
+      minVersion: VersionTLS12
+      sniStrict: true

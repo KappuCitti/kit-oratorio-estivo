@@ -1,34 +1,58 @@
-version: '3.8'
+# Stack completo: reverse proxy, database, API, frontend.
+#
+# Avvio:  ./build.sh   (oppure: docker compose up -d --build)
+#
+# Dopo il primo avvio il database e' vuoto: lo schema va applicato con le
+# migrazioni, non esiste piu' uno script che crei le tabelle.
+#
+#   docker compose run --rm server bun run db:migrate
+#   docker compose run --rm server bun run db:setup:data
+#
+# La chiave `version:` non si usa piu' in Compose v2: era presente e ignorata.
 
 services:
   traefik:
-    image: traefik:latest
-    command:
-      - "--api.insecure=true"          # Traefik Dashboard per debugging
-      - "--providers.docker=true"      # Usa Docker come provider
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      # - "--certificatesresolvers.myresolver.acme.httpChallenge.entryPoint=web" # Certificato SSL opzionale
-      # - "--certificatesresolvers.myresolver.acme.email=you@example.com"       # Certificato SSL opzionale
-      # - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    # Era `traefik:latest`: la versione cambiava sotto i piedi a ogni pull, e un
+    # major di Traefik avrebbe rotto il deploy senza preavviso.
+    image: traefik:v3.5
+    # Nessun blocco `command:`: la configurazione sta tutta in src/traefik/traefik.yml.
+    # Prima erano presenti entrambi, con i flag che sovrascrivevano il file.
     ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080" # Dashboard di Traefik
+      - '80:80'
+      - '443:443'
+      # La porta 8080 non e' piu' esposta: pubblicava la dashboard di Traefik
+      # senza autenticazione a chiunque raggiungesse l'host.
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      # - "./traefik/letsencrypt:/letsencrypt"  # Certificato SSL opzionale
-      - "./src/traefik/traefik.yml:/etc/traefik/traefik.yml"
-      - "./src/traefik/dynamic_conf.yml:/etc/traefik/dynamic_conf.yml"
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
+      - './src/traefik/traefik.yml:/etc/traefik/traefik.yml:ro'
+      - './src/traefik/dynamic_conf.yml:/etc/traefik/dynamic_conf.yml:ro'
+      # Certificati Let's Encrypt: senza volume verrebbero riemessi a ogni
+      # riavvio, fino a sbattere contro i rate limit di Let's Encrypt.
+      - 'letsencrypt:/letsencrypt'
+    restart: unless-stopped
     networks:
       - internal
 
-  # Delete if you want to use your own MySQL database, remember to change the .env file in server/config folder
+  # Rimuovi questo servizio se usi un MySQL tuo, e aggiorna DB_HOST nel .env del server.
   db:
     build: ./src/database
     env_file: ./src/database/.env
     volumes:
-      - ./src/database/tables.sql:/docker-entrypoint-initdb.d/tables.sql
+      # Il volume era dichiarato in fondo al file ma non montato da nessuno:
+      # ogni `docker compose down` cancellava l'intero database.
+      - mysql-data:/var/lib/mysql
+      # Nessun bind mount dello schema: il Dockerfile copia gia' init.sql in
+      # /docker-entrypoint-initdb.d, e init.sql crea solo il database vuoto.
+      # Le tabelle le creano le migrazioni Drizzle (bun run db:migrate).
+      # Il mount precedente puntava a ./src/database/tables.sql, un file che non
+      # e' mai esistito: Docker ci montava sopra una directory vuota.
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -39,38 +63,57 @@ services:
 
   server:
     build: ./src/server
-    env_file: ./src/server/config/.env
+    # Il percorso era ./src/server/config/.env, cancellato nel passaggio a v2.
+    env_file: ./src/server/src/config/.env
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.server.rule=PathPrefix(`/api`)"
-      - "traefik.http.services.server.loadbalancer.server.port=3000"
-      - "traefik.http.routers.server.entrypoints=web"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.server.rule=PathPrefix(`/api`)'
+      - 'traefik.http.services.server.loadbalancer.server.port=3000'
+      - 'traefik.http.routers.server.entrypoints=websecure'
+      - 'traefik.http.routers.server.tls.certresolver=letsencrypt'
+      - 'traefik.http.routers.server.middlewares=security-headers@file,rate-limit@file'
     environment:
-      MYSQL_HOST: ${MYSQL_HOST}
-      MYSQL_PORT: ${MYSQL_PORT}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-
-      MUSIC_FOLDER: ${MUSIC_FOLDER}
+      # Il server legge DB_* e SERVER_*, non MYSQL_*: prima compose passava
+      # variabili con nomi che nessuno leggeva, e la configurazione veniva presa
+      # silenziosamente dai default di config.toml.
+      DB_HOST: ${MYSQL_HOST:-db}
+      DB_PORT: ${MYSQL_PORT:-3306}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_DATABASE: ${MYSQL_DATABASE}
+      MUSIC_FOLDER: /app/global/music
     volumes:
-      - "${MUSIC_FOLDER}:/server/static/music"
+      # Il server serve /static/* da /app/global: il mount precedente puntava a
+      # /server/static/music, un percorso che il codice non guarda mai.
+      - '${MUSIC_FOLDER}:/app/global/music'
     depends_on:
-      - db
-      - traefik
+      db:
+        # Aspetta che MySQL accetti connessioni, non solo che il container esista.
+        condition: service_healthy
+      traefik:
+        condition: service_started
+    restart: unless-stopped
     networks:
       - internal
 
   client:
     build: ./src/client
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.client.rule=PathPrefix(`/`)"
-      - "traefik.http.services.client.loadbalancer.server.port=80"
-      - "traefik.http.routers.client.entrypoints=web"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.client.rule=PathPrefix(`/`)'
+      - 'traefik.http.services.client.loadbalancer.server.port=80'
+      - 'traefik.http.routers.client.entrypoints=websecure'
+      - 'traefik.http.routers.client.tls.certresolver=letsencrypt'
+      - 'traefik.http.routers.client.middlewares=security-headers@file'
+      # Priorita' piu' bassa del router del server: `/` altrimenti catturerebbe
+      # anche `/api`, che deve andare al backend.
+      - 'traefik.http.routers.client.priority=1'
     depends_on:
-      - server
-      - traefik
+      server:
+        condition: service_started
+      traefik:
+        condition: service_started
+    restart: unless-stopped
     networks:
       - internal
 
@@ -80,4 +123,6 @@ networks:
 
 volumes:
   mysql-data:
+    driver: local
+  letsencrypt:
     driver: local

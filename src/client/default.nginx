@@ -1,0 +1,35 @@
+server {
+    listen 80;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Non rivelare la versione di nginx nelle intestazioni e nelle pagine d'errore.
+    server_tokens off;
+
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css application/javascript application/json
+               image/svg+xml application/xml;
+
+    # I file con hash nel nome sono immutabili: si possono cachare a lungo.
+    location ~* \.(?:js|css|woff2?|ttf|eot|svg|png|jpg|jpeg|gif|ico)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    # index.html invece non va mai cachato, altrimenti dopo un deploy i browser
+    # continuano a chiedere bundle con hash che non esistono piu'.
+    location = /index.html {
+        add_header Cache-Control "no-store, no-cache, must-revalidate";
+    }
+
+    # Angular e' una single page application: ogni percorso sconosciuto deve
+    # restituire index.html e lasciare che sia il router del client a decidere.
+    # Senza questo, un refresh su /admin/enrollments darebbe 404.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

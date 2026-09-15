@@ -1,0 +1,29 @@
+# ATTENZIONE: senza questo file il contesto di build includerebbe logs/, che
+# contiene hash delle password, token di sessione validi e dati personali di
+# minori. Finirebbero dentro l'immagine, e nelle immagini non si cancella niente:
+# restano nei layer anche se un RUN successivo li rimuove.
+logs/
+*.log
+
+# Segreti: la configurazione va passata a runtime (env_file / environment),
+# mai cotta dentro l'immagine.
+.env
+.env.*
+!.env.example
+ssl/
+*.pem
+*.key
+
+# Ricostruiti dentro l'immagine
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Non servono al runtime.
+# NB: scripts/ NON va escluso — contiene setupDBData.ts, usato da db:setup:data
+# per creare ruoli e utente amministratore dentro il container.
+.git/
+.gitignore
+.vscode/
+global/
+README.md

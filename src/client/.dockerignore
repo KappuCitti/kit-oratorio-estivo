@@ -1,0 +1,15 @@
+# La cache di .angular da sola vale ~15 MB di contesto di build inutile,
+# e rallenta ogni `docker build` senza aggiungere niente.
+.angular/
+node_modules/
+dist/
+
+# Ambienti di sviluppo
+.vs/
+.vscode/
+.git/
+.gitignore
+
+# Il Dockerfile del client non deve portarsi dietro segreti
+.env
+.env.*

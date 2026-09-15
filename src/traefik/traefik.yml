@@ -1,0 +1,61 @@
+# Configurazione statica di Traefik.
+#
+# Il compose precedente passava questi stessi parametri come flag `command:` E
+# montava questo file: due fonti di verita' sovrapposte. Ora vale solo il file.
+
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+entryPoints:
+  web:
+    address: ':80'
+    http:
+      # Tutto il traffico in chiaro viene rimandato su HTTPS. Questa applicazione
+      # tratta dati personali di minori: non deve viaggiare su HTTP.
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+
+  websecure:
+    address: ':443'
+    http:
+      tls:
+        certResolver: letsencrypt
+
+api:
+  # `insecure: true` esponeva la dashboard su :8080 senza alcuna autenticazione,
+  # a chiunque potesse raggiungere l'host. La dashboard resta disponibile ma solo
+  # tramite un router con autenticazione (vedi dynamic_conf.yml).
+  dashboard: true
+  insecure: false
+
+providers:
+  docker:
+    # I container non vengono esposti se non lo chiedono esplicitamente con
+    # `traefik.enable=true`: un container nuovo non finisce online per sbaglio.
+    exposedByDefault: false
+    network: internal
+  file:
+    filename: /etc/traefik/dynamic_conf.yml
+    watch: true
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      # Sostituisci con un indirizzo reale: Let's Encrypt lo usa per gli avvisi
+      # di scadenza dei certificati.
+      email: cambiami@example.com
+      storage: /letsencrypt/acme.json
+      httpChallenge:
+        entryPoint: web
+
+log:
+  level: INFO
+
+accessLog:
+  filters:
+    statusCodes:
+      - '400-599'
