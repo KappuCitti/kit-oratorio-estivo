@@ -24,7 +24,9 @@ import { enrollmentQueueWeeksTable } from './schema/enrollmentQueueWeek';
 import { activityTable } from './schema/activities';
 import { activityAppointmentTable } from './schema/activityAppointments';
 import { activitySubscriptionTable } from './schema/activitySubscriptions';
+import { activityClassesTable } from './schema/activityClasses';
 import { personalInfoTable } from './schema/personalInfo';
+import { pointTable } from './schema/points';
 
 const client = createPool(config.database);
 
@@ -32,6 +34,10 @@ export const schema = {
   activities: activityTable,
   activityAppointments: activityAppointmentTable,
   activitySubscriptions: activitySubscriptionTable,
+  // Era definita ma non registrata qui: restava fuori dalla mappa dello schema
+  // e quindi anche dal TRUNCATE di db:setup:data, lasciando righe orfane che
+  // puntavano a id gia' riassegnati dal reset degli auto-increment.
+  activityClasses: activityClassesTable,
   addresses: addressTable,
   attendances: attendanceTable,
   classes: classTable,
@@ -44,6 +50,7 @@ export const schema = {
   extraordinaryAttendances: extraordinaryAttendanceTable,
   manages: managesTable,
   personalInfos: personalInfoTable,
+  points: pointTable,
   roles: roleTable,
   rolePermissions: rolePermissionTable,
   schools: schoolTable,
