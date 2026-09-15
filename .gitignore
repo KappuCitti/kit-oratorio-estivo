@@ -1,0 +1,41 @@
+# .gitignore di root.
+# I singoli pacchetti hanno il proprio .gitignore piu' specifico:
+#   src/client/.gitignore, src/server/.gitignore, src/database/.gitignore
+
+# Dipendenze
+node_modules/
+
+# Build
+dist/
+build/
+out-tsc/
+*.tsbuildinfo
+
+# Cache
+.angular/
+.cache/
+*.log
+
+# Segreti — MAI committare un .env (i .env.example vanno invece tracciati)
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Certificati e chiavi
+ssl/
+*.pem
+*.key
+*.crt
+
+# Log applicativi: contengono token di sessione e dati personali di minori
+logs/
+
+# Editor e sistema operativo
+.vs/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+AGENTS.md

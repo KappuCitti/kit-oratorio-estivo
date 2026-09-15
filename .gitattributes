@@ -1,0 +1,32 @@
+# Normalizza i fine riga: in repo sempre LF, in working tree quelli nativi.
+# Senza questa regola un file riscritto su Windows produce diff da centinaia di
+# righe per modifiche di poche righe (e' successo con src/database/init.sql).
+* text=auto
+
+# File che devono restare LF anche su Windows (script eseguiti in container Linux)
+*.sh        text eol=lf
+Dockerfile  text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+
+# File che devono restare CRLF (script batch di Windows)
+*.cmd       text eol=crlf
+*.bat       text eol=crlf
+
+# Binari: niente conversione, niente diff testuale
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.woff      binary
+*.woff2     binary
+*.ttf       binary
+*.eot       binary
+*.pdf       binary
+*.mp3       binary
+*.mp4       binary
+
+# Lockfile: generati, non vanno revisionati riga per riga
+bun.lock        -diff
+package-lock.json -diff
