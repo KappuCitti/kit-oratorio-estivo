@@ -1,5 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
-import { phoneSchema } from '@/models/common.model';
+import { MIN_PASSWORD_LENGTH, phoneSchema } from '@/models/common.model';
 import {
   createJsonResBody,
   createRequiredJsonBody,
@@ -25,9 +25,15 @@ export const registerRouteDef = createRoute({
           .max(255, 'Surname must be at most 255 characters long'),
         password: z
           .string()
-          .min(5, 'Password must be at least 5 characters long')
+          .min(
+            MIN_PASSWORD_LENGTH,
+            `Password must be at least ${MIN_PASSWORD_LENGTH} characters long`
+          )
           .max(255, 'Password must be at most 255 characters long'),
-        role: z.string(),
+        // `role` NON si accetta dal body: la rotta e' pubblica e senza
+        // middleware, quindi lasciarlo scegliere al chiamante significava far
+        // dipendere l'escalation di privilegi solo da quali ruoli seedati
+        // hanno il permesso 'register'. Il ruolo lo decide il server.
         email: z.string().email().optional(),
       }),
       'User info and password'

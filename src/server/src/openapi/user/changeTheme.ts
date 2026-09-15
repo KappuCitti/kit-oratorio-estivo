@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { isLogged } from '@/middlewares/isLogged';
 import { THEMES } from '@/models/theme.model';
 import {
   createJsonResBody,
@@ -10,6 +11,7 @@ export const changeUserThemeRouteDef = createRoute({
   tags: ['User'],
   method: 'put',
   path: '/user/theme',
+  middleware: isLogged,
   request: {
     body: createRequiredJsonBody(
       z.object({ theme: z.enum(THEMES) }),

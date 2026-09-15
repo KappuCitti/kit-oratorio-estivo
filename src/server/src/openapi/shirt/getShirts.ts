@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { isLogged } from '@/middlewares/isLogged';
 import { shirtSchema } from '@/models/shirt.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
@@ -8,6 +9,9 @@ export const getShirtListRouteDef = createRoute({
   tags: ['Shirt'],
   method: 'get',
   path: '/shirts',
+  // Serve al form di iscrizione, che sta comunque dietro login: basta la
+  // sessione, non un permesso specifico.
+  middleware: isLogged,
   responses: {
     [HttpStatusCodes.OK]: createJsonResBody(
       true,

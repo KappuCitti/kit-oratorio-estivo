@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { can } from '@/middlewares/hasPermission';
 import { paramIdSchema } from '@/models/common.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
@@ -8,6 +9,7 @@ export const deleteShirtRouteDef = createRoute({
   tags: ['Shirt'],
   method: 'delete',
   path: '/shirts/{id}',
+  middleware: can('manage_enrollments'),
   request: {
     params: paramIdSchema,
   },

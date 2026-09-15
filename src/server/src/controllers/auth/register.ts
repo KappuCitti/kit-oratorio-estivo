@@ -4,9 +4,9 @@ import type { RegisterRoute } from '@/openapi/auth/register';
 import { httpSuccessResponse } from '@/utils/responses';
 
 const registerController: RouteController<RegisterRoute> = async (c) => {
-  const { cf, name, surname, password, role, email, phoneNumber } =
+  const { cf, name, surname, password, email, phoneNumber } =
     await c.req.valid('json');
-  await register(cf, name, surname, password, role, phoneNumber, email);
+  await register(cf, name, surname, password, phoneNumber, email);
   return httpSuccessResponse(c, null);
 };
 

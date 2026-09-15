@@ -7,12 +7,19 @@ import { personalInfoTable } from '../schema/personalInfo';
 import { getRoleIdIfCan } from '../role/roleHasPermission';
 import { DatabaseError } from '@/errors/database';
 
+/**
+ * Ruolo assegnato a chi si registra da solo. Non e' scelto dal chiamante: la
+ * rotta di registrazione e' pubblica e senza middleware, quindi accettare il
+ * ruolo dal body rendeva l'escalation di privilegi una questione di come sono
+ * seedati i dati invece che di codice.
+ */
+export const SELF_REGISTRATION_ROLE = 'parent';
+
 export async function register(
   cf: string,
   name: string,
   surname: string,
   password: string,
-  role: string,
   phone: string,
   email: string | null = null
 ) {
@@ -20,7 +27,9 @@ export async function register(
     where: eq(usersTable.id, cf),
   }));
   if (exists) throw new DatabaseError(HttpStatusCodes.CONFLICT, 'user_exists');
-  const roleId = await getRoleIdIfCan(role, 'register');
+  // Il ruolo deve comunque avere il permesso 'register': se qualcuno lo toglie
+  // a 'parent', l'auto-registrazione si chiude invece di aprirsi.
+  const roleId = await getRoleIdIfCan(SELF_REGISTRATION_ROLE, 'register');
 
   if (!roleId)
     throw new DatabaseError(HttpStatusCodes.FORBIDDEN, 'role_invalid');

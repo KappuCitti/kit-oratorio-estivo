@@ -8,7 +8,15 @@ export const paramIdSchema = z.object({
   id: coercedIdSchema,
 });
 
-export const colorSchema = z.string().regex(/(#[\da-f]{3})|(#[\da-f]{6})/i);
+/**
+ * Lunghezza minima delle password. Prima era 5 sulle rotte pubbliche e 8 su
+ * quelle admin: la costante esiste perche' resti un valore solo.
+ */
+export const MIN_PASSWORD_LENGTH = 8;
+
+// La regex era senza ancore, quindi 'testo#fff altro testo' passava e finiva
+// troncato in una colonna varchar(7).
+export const colorSchema = z.string().regex(/^#(?:[\da-f]{3}|[\da-f]{6})$/i);
 
 export const queryPageSchema = z.coerce.number().int().positive().default(1);
 export const querySizeSchema = z.coerce

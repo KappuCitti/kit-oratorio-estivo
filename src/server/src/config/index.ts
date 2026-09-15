@@ -60,7 +60,9 @@ const config = configSchema.safeParse({
   },
   musicFolder: env.MUSIC_FOLDER ?? tomlFile.server?.music_folder,
   development: {
-    isDev: process.env.NODE_ENV !== 'production',
+    // Opt-in: prima era `!== 'production'`, quindi dimenticare NODE_ENV in
+    // produzione attivava la modalita' dev e pubblicava le doc OpenAPI complete.
+    isDev: process.env.NODE_ENV === 'development',
     ignorePermissions: env.DEVELOPMENT_IGNORE_PERMISSIONS ?? false,
   },
 });

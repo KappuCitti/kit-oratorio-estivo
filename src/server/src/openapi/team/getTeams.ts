@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { isLogged } from '@/middlewares/isLogged';
 import { teamSchema } from '@/models/team.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
@@ -8,6 +9,7 @@ export const getTeamListRouteDef = createRoute({
   tags: ['Team'],
   method: 'get',
   path: '/teams',
+  middleware: isLogged,
   responses: {
     [HttpStatusCodes.OK]: createJsonResBody(
       true,

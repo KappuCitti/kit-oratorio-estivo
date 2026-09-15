@@ -8,7 +8,9 @@ import { now } from '@/database/utils/now';
 import { and, eq, gt } from 'drizzle-orm';
 
 export async function canUserManageFromToken(token: string, targetId: string) {
-  dbLogger.debug('Checking if user can manage with %s, %s', token, targetId);
+  // Il token non va loggato: i file di log non sono cifrati e chiunque li legga
+  // otterrebbe una sessione valida.
+  dbLogger.debug('Checking if session can manage target %s', targetId);
   const [result] = await db
     .select({ userId: usersTable.id })
     .from(usersTable)

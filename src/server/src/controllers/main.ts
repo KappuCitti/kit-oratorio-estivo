@@ -5,10 +5,13 @@ import type { MainRoute } from '@/openapi/main';
 import packageJSON from '../../package.json';
 
 const mainController: RouteController<MainRoute> = (c) => {
+  // Le doc sono montate su `${routesPrefix}/docs` (vedi utils/openApi.ts), non
+  // sotto /v1: il valore pubblicizzato qui puntava a un path che si limita a
+  // reindirizzare.
   const docs = config.development.isDev
     ? `${config.useHttps ? 'https' : 'http'}://${config.server.domain}:${
         config.server.port
-      }/api/v1/docs`
+      }${config.server.routesPrefix}/docs`
     : undefined;
 
   const authors = [...(packageJSON.contributors ?? [])];

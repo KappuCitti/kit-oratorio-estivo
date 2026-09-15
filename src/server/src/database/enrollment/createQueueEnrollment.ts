@@ -30,14 +30,14 @@ export async function createEnrollment(
 ) {
   dbLogger.debug('Getting user from token');
   const user = await getUserFromToken(token);
-  dbLogger.debug('Can user manage from token: %s %s', token, targetId);
+  dbLogger.debug('Can user manage target user: %s', targetId);
   const canManage = await canUserManage(user.id, targetId);
   if (!canManage)
     throw new DatabaseError(HttpStatusCodes.FORBIDDEN, 'cant_manage');
 
   if (exitAuthorization !== null) {
     dbLogger.debug('Checking if exit authorization is valid');
-    if (!hasPermission(user.id, 'give_exit_authorization')) {
+    if (!(await hasPermission(user.id, 'give_exit_authorization'))) {
       throw new DatabaseError(
         HttpStatusCodes.FORBIDDEN,
         'cant_give_exit_authorization'

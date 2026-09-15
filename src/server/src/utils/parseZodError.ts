@@ -1,8 +1,14 @@
 import type { ZodError, ZodIssue } from 'zod';
 
-export function parseZodError(error: ZodError) {
-  const issues = error.issues.map(parseIssue);
-  return issues;
+/**
+ * Riduce un ZodError a una singola stringa leggibile.
+ *
+ * Il contratto OpenAPI dichiara `error: z.string()`: serializzare l'oggetto
+ * ZodError intero violava il contratto e mostrava al client la struttura
+ * interna degli schemi.
+ */
+export function parseZodError(error: ZodError): string {
+  return error.issues.map(parseIssue).join('; ');
 }
 
 export function parseIssue(issue: ZodIssue) {

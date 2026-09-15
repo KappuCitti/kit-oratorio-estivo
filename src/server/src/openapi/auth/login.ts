@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { rateLimit } from '@/middlewares/rateLimit';
 import {
   createJsonResBody,
   createRequiredJsonBody,
@@ -9,6 +10,9 @@ export const loginRouteDef = createRoute({
   tags: ['Auth'],
   method: 'post',
   path: '/user/login',
+  // 10 tentativi ogni 15 minuti per IP: abbondante per chi sbaglia a digitare,
+  // proibitivo per il credential stuffing.
+  middleware: rateLimit({ windowMs: 15 * 60 * 1000, max: 10 }),
   request: {
     body: createRequiredJsonBody(
       z.object({
@@ -33,6 +37,11 @@ export const loginRouteDef = createRoute({
       false,
       z.string(),
       'Invalid username or password'
+    ),
+    [HttpStatusCodes.TOO_MANY_REQUESTS]: createJsonResBody(
+      false,
+      z.string(),
+      'Too many login attempts'
     ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: createJsonResBody(
       false,

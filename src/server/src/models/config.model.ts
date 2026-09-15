@@ -55,13 +55,23 @@ export const configSchema = z
   .readonly();
 export type Config = z.infer<typeof configSchema>;
 
+/**
+ * Le variabili d'ambiente sono sempre stringhe. `z.coerce.boolean()` applica
+ * `Boolean(value)`, quindi la stringa 'false' diventa `true`: scrivere
+ * `DEVELOPMENT_IGNORE_PERMISSIONS=false` nel .env avrebbe disattivato ogni
+ * controllo di permessi. Qui il confronto e' esplicito.
+ */
+const envBoolean = z
+  .enum(['true', 'false', '1', '0'])
+  .transform((value) => value === 'true' || value === '1');
+
 export const envSchema = z.object({
   MUSIC_FOLDER: z.string().optional(),
 
   SERVER_PORT: z.coerce.number().int().positive().optional(),
   SERVER_HOST: z.string().optional(),
   SERVER_ROUTES_PREFIX: z.string().optional(),
-  SERVER_USE_HTTPS: z.coerce.boolean().optional(),
+  SERVER_USE_HTTPS: envBoolean.optional(),
   SERVER_FRONTEND_PORT: z.coerce.number().int().positive().optional(),
   SERVER_DOMAIN: z.string().optional(),
 
@@ -76,11 +86,11 @@ export const envSchema = z.object({
   DB_USER: z.string().optional(),
   DB_PASSWORD: z.string().optional(),
   DB_DATABASE: z.string().optional(),
-  DB_WAIT_FOR_CONNECTIONS: z.coerce.boolean().optional(),
+  DB_WAIT_FOR_CONNECTIONS: envBoolean.optional(),
   DB_CONNECTION_LIMIT: z.coerce.number().int().positive().optional(),
   DB_QUEUE_LIMIT: z.coerce.number().int().positive().optional(),
 
-  DEVELOPMENT_IGNORE_PERMISSIONS: z.coerce.boolean().optional(),
+  DEVELOPMENT_IGNORE_PERMISSIONS: envBoolean.optional(),
 });
 export type EnvConfig = z.infer<typeof envSchema>;
 

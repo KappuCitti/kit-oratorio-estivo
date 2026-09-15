@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { can } from '@/middlewares/hasPermission';
 import { paramIdSchema } from '@/models/common.model';
 import { bodyShirtSchema } from '@/models/shirt.model';
 import {
@@ -12,6 +13,7 @@ export const editShirtRouteDef = createRoute({
   tags: ['Shirt'],
   method: 'put',
   path: '/shirts/{id}',
+  middleware: can('manage_enrollments'),
   request: {
     params: paramIdSchema,
     body: createRequiredJsonBody(

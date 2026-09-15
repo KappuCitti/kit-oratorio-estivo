@@ -14,7 +14,9 @@ cert = 'ssl/cert.pem'
 key = 'ssl/key.pem'
 
 [logs]
-log_level = 'debug'
+# 'debug' scrive su disco righe che contengono dati personali dei ragazzi.
+# Alzalo a debug solo in locale e solo per il tempo necessario.
+log_level = 'info'
 log_folder = 'logs'
 
 [database]

@@ -2,6 +2,7 @@
   "it": {
     "invalid_username": "Codice fiscale o email non validi",
     "invalid_password": "Password non valida",
+    "invalid_credentials": "Credenziali non valide",
     "invalid_token": "Token non valido o scaduto",
     "user_exists": "Email o codice fiscale già utilizzati",
     "user_cf_exists": "Codice fiscale già utilizzato",
@@ -39,6 +40,7 @@
   "en": {
     "invalid_username": "Invalid username or email",
     "invalid_password": "Invalid password",
+    "invalid_credentials": "Invalid credentials",
     "invalid_token": "Invalid or expired token",
     "user_exists": "Email or code already used",
     "user_cf_exists": "Code already used",
