@@ -8,7 +8,6 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
   selector: 'app-styleguide',
   imports: [FooterComponent, FaIconComponent],
   templateUrl: './styleguide.component.html',
-  styleUrl: './styleguide.component.css',
 })
 export class StyleguideComponent implements OnInit {
   faChevronDown = faChevronDown;

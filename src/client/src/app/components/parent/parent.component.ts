@@ -20,7 +20,6 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
   selector: 'app-parent',
   imports: [FaIconComponent, ReactiveFormsModule],
   templateUrl: './parent.component.html',
-  styleUrl: './parent.component.css',
 })
 export class ParentComponent implements OnChanges {
   @Input() parent: Parent | null = null;

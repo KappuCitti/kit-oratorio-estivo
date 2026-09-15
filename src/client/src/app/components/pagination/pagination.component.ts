@@ -11,7 +11,6 @@ import {
   selector: 'app-pagination',
   imports: [],
   templateUrl: './pagination.component.html',
-  styleUrl: './pagination.component.css',
 })
 export class PaginationComponent implements OnInit, OnChanges {
   @Input() totalItems: number = 10; // Numero totale di elementi

@@ -20,7 +20,6 @@ import { Child } from '../../../models/Family.model';
   selector: 'app-child',
   imports: [FaIconComponent, ReactiveFormsModule],
   templateUrl: './child.component.html',
-  styleUrl: './child.component.css',
 })
 export class ChildComponent implements OnChanges {
   @Input() child: Child | null = null;

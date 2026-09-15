@@ -12,6 +12,7 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import {
   faArrowRotateLeft,
+  faCamera,
   faDoorClosed,
   faDoorOpen,
   faDroplet,
@@ -32,6 +33,7 @@ import Week from '../../../../models/Week.model';
 import { EnrollmentGetRequest } from '../../../../models/Request.model';
 import { UtilsService } from '../../../../services/utils.service';
 import Team from '../../../../models/Team.model';
+import { Class, School } from '../../../../models/School.model';
 
 interface EnrollmentWeekEnrolled extends Week {
   index?: number;
@@ -52,11 +54,11 @@ interface EnrollmentWeekEnrolled extends Week {
     RouterLink,
   ],
   templateUrl: './enrollments-search.component.html',
-  styleUrl: './enrollments-search.component.css',
 })
 export class EnrollmentsSearchComponent implements OnInit {
   faThumbTackSlash = faThumbTackSlash;
   faThumbTack = faThumbTack;
+  faCamera = faCamera;
   faDoorClosed = faDoorClosed;
   faDoorOpen = faDoorOpen;
   faPen = faPen;
@@ -68,6 +70,9 @@ export class EnrollmentsSearchComponent implements OnInit {
   enrollments: EnrollmentSearch[] = [];
   weeks: Week[] = [];
   teams: Team[] = [];
+
+  schools: School[] = [];
+  classes: Class[] = [];
 
   elements: number = 0;
   page: number = 1;
@@ -87,18 +92,35 @@ export class EnrollmentsSearchComponent implements OnInit {
   ) {
     this.searchForm = this.fb.group({
       year: [this.year, [Validators.required, Validators.min(1980)]],
-      week: [''],
+      week: [null],
       query: ['', [Validators.minLength(2), Validators.maxLength(100)]],
-      schoolType: [''],
-      className: [''],
-      team: [''],
+      schoolId: [null],
+      classId: [null],
+      teamId: [null],
     });
 
     this.searchForm.valueChanges.subscribe((value) => {
+      if (
+        this.searchForm.get('schoolId')?.value != value.schoolId ||
+        this.searchForm.get('schoolId')?.value == null
+      ) {
+        this.searchForm.patchValue({ classId: null }, { emitEvent: false });
+      }
+      // If no one is selected get all, else filter by school
+      const selectedSchool = this.schools.find(
+        (school) => school.id == value.schoolId
+      );
+      this.classes = selectedSchool
+        ? selectedSchool.classes.map((cls) => ({
+            ...cls,
+            school: { ...selectedSchool, classes: undefined },
+          }))
+        : [];
+
       if (this.searchForm.valid) {
         if (value.year != this.year) {
           this.year = value.year;
-          this.searchForm.patchValue({ week: '' });
+          this.searchForm.patchValue({ week: null });
           this.loadWeeks();
         } else {
           this.loadEnrollments();
@@ -108,9 +130,16 @@ export class EnrollmentsSearchComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.api.getSchools().subscribe({
+      next: (response) => {
+        if (response.status == 200 && response.body?.success) {
+          this.schools = response.body.data;
+        }
+      },
+    });
     this.api.getTeams().subscribe((response) => {
-      if (response.status == 200 && response.body?.data) {
-        this.teams = response.body?.data;
+      if (response.status == 200 && response.body?.success) {
+        this.teams = response.body.data;
       }
     });
 
@@ -119,8 +148,8 @@ export class EnrollmentsSearchComponent implements OnInit {
 
   loadWeeks() {
     this.api.getWeeks(this.year).subscribe((response) => {
-      if (response.status == 200 && response.body?.data) {
-        this.weeks = response.body?.data;
+      if (response.status == 200 && response.body?.success) {
+        this.weeks = response.body.data;
         this.loadEnrollments();
       }
     });
@@ -128,37 +157,38 @@ export class EnrollmentsSearchComponent implements OnInit {
 
   loadEnrollments() {
     this.api.getWeeks(this.year).subscribe((response) => {
-      if (response.status == 200 && response.body?.data) {
-        this.weeks = response.body?.data;
+      if (response.status == 200 && response.body?.success) {
+        this.weeks = response.body.data;
       }
     });
 
-    const q: EnrollmentGetRequest = {
+    const params: EnrollmentGetRequest = {
       year: this.year,
       page: this.page,
       size: this.size,
     };
 
-    if (this.searchForm.value.week) {
-      q.weekId = this.searchForm.value.week;
+    if (this.searchForm.get('week')?.value) {
+      params.weekId = this.searchForm.get('week')?.value;
     }
-    if (this.searchForm.value.query) {
-      q.query = this.searchForm.value.query;
+    if (this.searchForm.get('query')?.value) {
+      params.query = this.searchForm.get('query')?.value;
     }
-    if (this.searchForm.value.schoolType) {
-      q.schoolType = this.searchForm.value.schoolType;
+    if (this.searchForm.get('schoolId')?.value) {
+      params.schoolId = this.searchForm.get('schoolId')?.value;
     }
-    if (this.searchForm.value.className) {
-      q.className = this.searchForm.value.className;
+    if (this.searchForm.get('classId')?.value) {
+      params.classId = this.searchForm.get('classId')?.value;
     }
-    if (this.searchForm.value.team) {
-      q.teamId = this.searchForm.value.team;
+    if (this.searchForm.get('teamId')?.value) {
+      params.teamId = this.searchForm.get('teamId')?.value;
     }
 
-    this.api.getEnrollments(q).subscribe((response) => {
-      if (response.status == 200 && response.body?.data) {
-        this.enrollments = response.body?.data.enrollments;
-        this.elements = response.body?.data.count;
+    this.api.getEnrollments(params).subscribe((response) => {
+      if (response.status == 200 && response.body?.success) {
+        this.enrollments = response.body.data.elements;
+        console.log(this.enrollments);
+        this.elements = response.body.data.count;
       }
     });
   }
@@ -172,16 +202,39 @@ export class EnrollmentsSearchComponent implements OnInit {
           id: week.id,
           index: index + 1,
           enrolled: enrolled != undefined,
-          isPaid: enrolled?.isPaid || false,
+          isPaid: !!enrolled?.isPaid,
           startDate: week.startDate,
           endDate: week.endDate,
           price: week.price,
+          maxEnrollments: week.maxEnrollments,
+          registrationOpenDate: week.registrationOpenDate,
+          registrationCloseDate: week.registrationCloseDate,
         };
       });
   }
 
+  isEnrollmentWeekEnrolled(
+    weeks: EnrollmentWeekSearch[] | null | undefined,
+    id: number
+  ): boolean | null {
+    if (!weeks || weeks.length === 0) return null;
+
+    const match = weeks.find((w) => w.weekId == id);
+    return match ? true : null;
+  }
+
+  isEnrollmentWeekPaid(
+    weeks: EnrollmentWeekSearch[] | null | undefined,
+    id: number
+  ): boolean | null {
+    if (!weeks || weeks.length === 0) return null;
+
+    const match = weeks.find((w) => w.weekId == id && w.isPaid);
+    return match ? true : null;
+  }
+
   getTotalWeeksPayed(weeks: EnrollmentWeekSearch[]): number {
-    const res = weeks.length - weeks.filter((week) => !week.isPaid).length;
+    const res = weeks.filter((w) => w.isPaid).length;
     return res;
   }
 
@@ -202,11 +255,11 @@ export class EnrollmentsSearchComponent implements OnInit {
     const now = new Date();
     this.searchForm.reset({
       year: now.getFullYear(),
-      week: '',
+      week: null,
       query: '',
-      schoolType: '',
-      className: '',
-      team: '',
+      schoolId: null,
+      classId: null,
+      teamId: null,
     });
   }
 

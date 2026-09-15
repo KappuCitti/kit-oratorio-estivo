@@ -37,7 +37,6 @@ interface Page {
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss'],
   imports: [RouterLink, CommonModule, FontAwesomeModule],
 })
 export class NavbarComponent implements OnInit {

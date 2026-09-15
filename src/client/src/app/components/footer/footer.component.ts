@@ -8,7 +8,6 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons';
   selector: 'app-footer',
   imports: [RouterLink, FontAwesomeModule],
   templateUrl: './footer.component.html',
-  styleUrl: './footer.component.scss',
 })
 export class FooterComponent {
   faHeart = faHeart;

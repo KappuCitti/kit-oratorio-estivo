@@ -24,7 +24,6 @@ import { UtilsService } from '../../../../services/utils.service';
     ReactiveFormsModule,
   ],
   templateUrl: './teams-search.component.html',
-  styleUrl: './teams-search.component.css',
 })
 export class TeamsSearchComponent implements OnInit {
   teams: Team[] = [];
@@ -51,7 +50,7 @@ export class TeamsSearchComponent implements OnInit {
   ngOnInit() {
     this.loading = true;
     this.api.getTeams().subscribe((response) => {
-      this.teams = response.body?.data || [];
+      if (response.body?.success) this.teams = response.body.data;
       this.loading = false;
     });
   }
@@ -78,8 +77,11 @@ export class TeamsSearchComponent implements OnInit {
 
     this.api.createTeam(this.teamForm.value).subscribe({
       next: (response) => {
-        if (response.body?.data) {
-          this.teams.push({ id: response.body?.data, ...this.teamForm.value });
+        if (response.body?.success) {
+          this.teams.push({
+            id: response.body?.success,
+            ...this.teamForm.value,
+          });
         }
 
         this.closeEditModal();

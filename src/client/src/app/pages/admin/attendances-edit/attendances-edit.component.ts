@@ -17,7 +17,6 @@ import { addMonths, subMonths } from 'date-fns';
     CalendarModule, DatePipe,
   ],
   templateUrl: './attendances-edit.component.html',
-  styleUrl: './attendances-edit.component.css'
 })
 export class AttendancesEditComponent implements OnInit {
   faArrowRotateLeft = faArrowRotateLeft;

@@ -24,7 +24,6 @@ import { UtilsService } from '../../../../services/utils.service';
     LoadingComponent,
   ],
   templateUrl: './my.component.html',
-  styleUrl: './my.component.css',
 })
 export class MyComponent implements OnInit {
   user!: User;
@@ -72,8 +71,8 @@ export class MyComponent implements OnInit {
 
   ngOnInit(): void {
     this.api.getUser().subscribe((response) => {
-      if (response.status === 200 && response.body?.data) {
-        this.user = response.body?.data;
+      if (response.status === 200 && response.body?.success) {
+        this.user = response.body.data;
 
         this.dataForm.patchValue(this.user);
       }

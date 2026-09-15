@@ -6,6 +6,5 @@ import { FooterComponent } from '../../components/footer/footer.component';
   selector: 'app-home',
   imports: [RouterLink, FooterComponent],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.scss',
 })
 export class HomeComponent {}

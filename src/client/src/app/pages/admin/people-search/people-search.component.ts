@@ -41,7 +41,6 @@ import { UtilsService } from '../../../../services/utils.service';
     CommonModule,
   ],
   templateUrl: './people-search.component.html',
-  styleUrl: './people-search.component.css',
 })
 export class PeopleSearchComponent implements OnInit {
   searchForm: FormGroup;
@@ -108,24 +107,24 @@ export class PeopleSearchComponent implements OnInit {
     switch (this.searchForm.get('type')?.value) {
       case 'Child':
         this.api.getChilds(params).subscribe((response) => {
-          if (response.status == 200 && response.body?.data) {
-            this.people = response.body.data.childs as PeopleSearch[];
+          if (response.status == 200 && response.body?.success) {
+            this.people = response.body.data.elements as PeopleSearch[];
             this.elements = response.body.data.count;
           }
         });
         break;
       case 'Parent':
         this.api.getParents(params).subscribe((response) => {
-          if (response.status == 200 && response.body?.data) {
-            this.people = response.body.data.parents as PeopleSearch[];
+          if (response.status == 200 && response.body?.success) {
+            this.people = response.body.data.elements as PeopleSearch[];
             this.elements = response.body.data.count;
           }
         });
         break;
       default:
         this.api.getPeople(params).subscribe((response) => {
-          if (response.status == 200 && response.body?.data) {
-            this.people = response.body.data.people as PeopleSearch[];
+          if (response.status == 200 && response.body?.success) {
+            this.people = response.body.data.elements as PeopleSearch[];
             this.elements = response.body.data.count;
             console.log(response.body.data.count);
           }

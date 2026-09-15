@@ -1,9 +1,21 @@
 import { Component } from '@angular/core';
-import { NavbarComponent } from "../../../components/navbar/navbar.component";
-import { FooterComponent } from "../../../components/footer/footer.component";
-import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NavbarComponent } from '../../../components/navbar/navbar.component';
+import { FooterComponent } from '../../../components/footer/footer.component';
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { faInfo, faUsers, faCalendar, faIdCardClip, faClipboardCheck } from '@fortawesome/free-solid-svg-icons';
+import {
+  faInfo,
+  faUsers,
+  faCalendar,
+  faIdCardClip,
+  faClipboardCheck,
+} from '@fortawesome/free-solid-svg-icons';
 import Enrollment from '../../../../models/Enrollment.model';
 import { ChildSearch, Child, Parent } from '../../../../models/Family.model';
 import { EnrollmentCreateRequest } from '../../../../models/Request.model';
@@ -24,16 +36,17 @@ import { PaginationComponent } from '../../../components/pagination/pagination.c
 
 @Component({
   selector: 'app-enrollments-create',
-  imports: [NavbarComponent,
+  imports: [
+    NavbarComponent,
     FooterComponent,
     FormsModule,
     FontAwesomeModule,
     CommonModule,
     EnrollmentComponent,
     ReactiveFormsModule,
-    PaginationComponent,],
+    PaginationComponent,
+  ],
   templateUrl: './enrollments-create.component.html',
-  styleUrl: './enrollments-create.component.css',
 })
 export class EnrollmentsCreateComponent {
   // TODO - Create enrollment form
@@ -118,8 +131,8 @@ export class EnrollmentsCreateComponent {
     this.loading = true;
     this.api.getChilds({ query: this.searchForm.value.query }).subscribe({
       next: (response) => {
-        if (response.status === 200 && response.body?.data) {
-          this.childs = response.body.data.childs;
+        if (response.status === 200 && response.body?.success) {
+          this.childs = response.body.data.elements;
           this.elements = response.body.data.count;
 
           this.step = 2;
@@ -148,8 +161,6 @@ export class EnrollmentsCreateComponent {
     }
     return child ? `${child.name} ${child.surname}` : '';
   }
-
-
 
   checkIfYearIsValid(year: number) {
     return year && year > 1980;
@@ -246,7 +257,7 @@ export class EnrollmentsCreateComponent {
   createEnrollment() {
     this.api.createEnrollment(this.enrollment).subscribe({
       next: (response) => {
-        if (response.status === 200 && response.body?.data) {
+        if (response.status === 200 && response.body?.success) {
           window.location.href = '/admin/enrollments';
         }
       },
@@ -255,6 +266,5 @@ export class EnrollmentsCreateComponent {
         this.error = this.utils.handleResponse(error, null);
       },
     });
-
   }
 }

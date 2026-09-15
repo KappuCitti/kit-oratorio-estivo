@@ -16,7 +16,6 @@ import { RouterLink } from '@angular/router';
     RouterLink,
   ],
   templateUrl: './enrollments-search.component.html',
-  styleUrl: './enrollments-search.component.css',
 })
 export class EnrollmentsSearchComponent {
   faPlus = faPlus;

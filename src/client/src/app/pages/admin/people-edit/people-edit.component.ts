@@ -18,7 +18,6 @@ import Enrollment from '../../../../models/Enrollment.model';
   selector: 'app-people-edit',
   imports: [FooterComponent, NavbarComponent, ParentComponent, ChildComponent],
   templateUrl: './people-edit.component.html',
-  styleUrl: './people-edit.component.css',
 })
 export class PeopleEditComponent implements OnInit {
   type: 'child' | 'parent' | null = null;
@@ -57,8 +56,8 @@ export class PeopleEditComponent implements OnInit {
     if (this.type == 'parent') {
       this.api.getParentById(this.id).subscribe({
         next: (response) => {
-          if (response.status == 200 && response.body?.data)
-            this.person = response.body?.data;
+          if (response.status == 200 && response.body?.success)
+            this.person = response.body.data;
           this.loading = false;
         },
         error: (error) => {
@@ -70,8 +69,8 @@ export class PeopleEditComponent implements OnInit {
     } else if (this.type == 'child') {
       this.api.getChildById(this.id).subscribe({
         next: (response) => {
-          if (response.status == 200 && response.body?.data)
-            this.person = response.body?.data;
+          if (response.status == 200 && response.body?.success)
+            this.person = response.body.data;
           this.loading = false;
         },
         error: (error) => {

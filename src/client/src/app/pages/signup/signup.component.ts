@@ -24,7 +24,6 @@ import { RouterLink } from '@angular/router';
     RouterLink,
   ],
   templateUrl: './signup.component.html',
-  styleUrl: './signup.component.css',
 })
 export class SignupComponent {
   faArrowLeft = faArrowLeft;

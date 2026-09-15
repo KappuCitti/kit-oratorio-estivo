@@ -5,7 +5,6 @@ import { Component, Input } from '@angular/core';
   selector: 'app-loading',
   imports: [CommonModule],
   templateUrl: './loading.component.html',
-  styleUrl: './loading.component.css'
 })
 export class LoadingComponent {
   @Input() size: 'sm' | 'md' | 'lg' = 'md';

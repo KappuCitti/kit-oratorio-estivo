@@ -287,8 +287,18 @@
     @apply bg-gray-800 border-gray-800 dark:bg-gray-700/50  dark:border-gray-500 border-2 rounded-lg text-white;
   }
 
+  /*
+   * La variante `dark` si espande in `&:where([data-theme=dark], ...)`: su un
+   * pseudo-elemento produrrebbe `.required::after:where(...)`, che non e' un
+   * selettore valido e faceva scartare la regola in fase di build. Il tema
+   * scuro va quindi espresso sull'antenato, non sul pseudo-elemento.
+   */
   .required::after {
-    @apply text-rose-600 dark:text-rose-500;
+    @apply text-rose-600;
     content: " *";
+  }
+
+  [data-theme='dark'] .required::after {
+    @apply text-rose-500;
   }
 }

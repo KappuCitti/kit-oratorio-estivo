@@ -20,12 +20,19 @@ import { PaginationComponent } from '../../../components/pagination/pagination.c
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { ApiService } from '../../../../services/api.service';
 import { UtilsService } from '../../../../services/utils.service';
-import { AttendanceGetRequest } from '../../../../models/Request.model';
-import Attendance, {
+import {
   AttendanceSearch,
+  EnrollmentAttendanceSearch,
 } from '../../../../models/Attendances.model';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { EnrollmentSearch } from '../../../../models/Enrollment.model';
+import { zip } from 'rxjs';
+import { EnrollmentGetRequest } from '../../../../models/Request.model';
+import { Class, School } from '../../../../models/School.model';
+import Week from '../../../../models/Week.model';
+
+// TODO - Use computed, zip: GET /enrollments and GET /attendances and map the results
 
 @Component({
   selector: 'app-attendances-search',
@@ -40,7 +47,6 @@ import { RouterLink } from '@angular/router';
     RouterLink,
   ],
   templateUrl: './attendances-search.component.html',
-  styleUrl: './attendances-search.component.css',
 })
 export class AttendancesSearchComponent implements OnInit {
   faArrowRotateLeft = faArrowRotateLeft;
@@ -53,6 +59,12 @@ export class AttendancesSearchComponent implements OnInit {
   loading: boolean = true;
   error: string | null = null;
   attendances: AttendanceSearch[] = [];
+  enrollments: EnrollmentSearch[] = [];
+  enrollmentAttendances: EnrollmentAttendanceSearch[] = [];
+  weeks: Week[] = [];
+
+  schools: School[] = [];
+  classes: Class[] = [];
 
   elements: number = 0;
   page: number = 1;
@@ -71,8 +83,8 @@ export class AttendancesSearchComponent implements OnInit {
   ) {
     this.searchForm = this.fb.group({
       date: ['', [Validators.required]],
-      schoolType: [''],
-      className: [''],
+      schoolId: [null],
+      classId: [null],
       query: ['', [Validators.minLength(2), Validators.maxLength(100)]],
     });
 
@@ -83,12 +95,54 @@ export class AttendancesSearchComponent implements OnInit {
     });
 
     this.searchForm.valueChanges.subscribe((value) => {
+      if (
+        this.searchForm.get('schoolId')?.value != value.schoolId ||
+        this.searchForm.get('schoolId')?.value == null
+      ) {
+        this.searchForm.patchValue({ classId: null }, { emitEvent: false });
+      }
+      // If no one is selected get all, else filter by school
+      const selectedSchool = this.schools.find(
+        (school) => school.id == value.schoolId
+      );
+      this.classes = selectedSchool
+        ? selectedSchool.classes.map((cls) => ({
+            ...cls,
+            school: { ...selectedSchool, classes: undefined },
+          }))
+        : [];
+
       if (this.searchForm.valid) this.loadAttendances();
     });
   }
 
   ngOnInit(): void {
     this.onResetSearch();
+
+    this.api.getSchools().subscribe({
+      next: (response) => {
+        if (response.status == 200 && response.body?.success) {
+          this.schools = response.body.data;
+        }
+      },
+      error: (error) => {
+        console.error(error);
+        this.error = this.utils.handleResponse(error, null);
+      },
+    });
+    this.api
+      .getWeeks(new Date(this.searchForm.get('date')?.value).getFullYear())
+      .subscribe({
+        next: (response) => {
+          if (response.status == 200 && response.body?.success) {
+            this.weeks = response.body.data;
+          }
+        },
+        error: (error) => {
+          console.error(error);
+          this.error = this.utils.handleResponse(error, null);
+        },
+      });
   }
 
   onResetSearch() {
@@ -96,9 +150,9 @@ export class AttendancesSearchComponent implements OnInit {
     const now = new Date();
 
     this.searchForm.patchValue({
-      // TODO - Fix this when the backend is ready
-      // date: now.toISOString().slice(0, 10),
-      date: '2025-06-09',
+      date: now.toISOString().slice(0, 10),
+      // TODO - Remove this when the backend is ready
+      // date: '2025-06-09',
     });
   }
 
@@ -114,69 +168,209 @@ export class AttendancesSearchComponent implements OnInit {
   loadAttendances() {
     this.loading = true;
 
-    const params: AttendanceGetRequest = {
-      date: this.searchForm.get('date')?.value,
+    const params: EnrollmentGetRequest = {
+      year: new Date(this.searchForm.get('date')?.value).getFullYear(),
       page: this.page,
       size: this.size,
     };
 
-    if (this.searchForm.get('schoolType')?.value) {
-      params.schoolType = this.searchForm.get('schoolType')?.value;
+    if (this.searchForm.get('schoolId')?.value) {
+      params.schoolId = this.searchForm.get('schoolId')?.value;
     }
-    if (this.searchForm.get('className')?.value) {
-      params.className = this.searchForm.get('className')?.value;
+    if (this.searchForm.get('classId')?.value) {
+      params.classId = this.searchForm.get('classId')?.value;
     }
     if (this.searchForm.get('query')?.value) {
       params.query = this.searchForm.get('query')?.value;
     }
 
-    this.api.getAttendances(params).subscribe({
-      next: (response) => {
-        if (response.status == 200 && response.body?.data) {
-          this.elements = response.body?.data.count;
-          this.attendances = response.body?.data.elements;
+    console.table(params);
+
+    zip(
+      this.api.getAttendances({ date: this.searchForm.get('date')?.value }),
+      this.api.getEnrollments(params)
+    ).subscribe({
+      next: ([attendanceResponse, enrollmentResponse]) => {
+        if (
+          attendanceResponse.status == 200 &&
+          attendanceResponse.body?.success
+        ) {
+          this.attendances = attendanceResponse.body.data;
         }
-        this.loading = false;
+        if (
+          enrollmentResponse.status == 200 &&
+          enrollmentResponse.body?.success
+        ) {
+          this.enrollments = enrollmentResponse.body.data.elements;
+          this.elements = enrollmentResponse.body.data.count;
+        }
+
+        // mix attendances with enrollments
+        this.enrollmentAttendances = [];
+        // Filter attendances by week if the searchForm date is within a week's range
+        const searchDate = new Date(this.searchForm.get('date')?.value);
+
+        // Trova la settimana in cui rientra la data cercata
+        const activeWeek = this.weeks.find(
+          (w) =>
+            new Date(w.startDate) <= searchDate &&
+            searchDate <= new Date(w.endDate)
+        );
+
+        // Filtra solo gli enrollments che includono quella settimana
+        const filteredEnrollments = activeWeek
+          ? this.enrollments.filter((enrollment) => {
+              // L'enrollment è valido solo se contiene la settimana attiva e isPaid è true
+              const isEnrolledAndPaid = enrollment.weeks?.some(
+                (week) => week.weekId == activeWeek.id
+                // TODO - Add isPaid check
+              );
+
+              // console.log(
+              //   `Enrollment ID ${enrollment.id} - valid:`,
+              //   isEnrolledAndPaid
+              // );
+
+              return isEnrolledAndPaid;
+            })
+          : [];
+
+        // Costruisci l’array di enrollment + attendance
+        this.enrollmentAttendances = filteredEnrollments.map((enrollment) => {
+          const attendance = this.attendances.find(
+            (a) => a.enrollmentId === enrollment.id
+          );
+
+          return {
+            attendance: attendance,
+            ...enrollment,
+            present: attendance != undefined,
+          } as EnrollmentAttendanceSearch;
+        });
       },
       error: (error) => {
         console.error(error);
         this.error = this.utils.handleResponse(error, null);
+      },
+      complete: () => {
         this.loading = false;
+        // console.log(this.enrollmentAttendances);
       },
     });
   }
 
-  updateAttendance(attendance: AttendanceSearch) {
-    if (!attendance.present) {
-      attendance.eatsInOratory = false;
-      attendance.eatsPlain = false;
+  onCheckboxUpdateEatsInOratoryChange(
+    event: any,
+    data: EnrollmentAttendanceSearch
+  ) {
+    this.updateAttendance(
+      data.attendance?.id,
+      data.user.id,
+      data.present,
+      event.target.checked
+    );
+  }
+
+  updateAttendance(
+    id: number | undefined,
+    userId: string,
+    present: boolean,
+    eatsInOratory: boolean = false
+  ) {
+    const attendance = this.attendances.find((a) => a.id == id);
+
+    console.log({
+      id,
+      userId,
+      present,
+      eatsInOratory,
+      date: this.searchForm.get('date')?.value,
+      attendance,
+    });
+
+    if (!attendance) {
+      this.api
+        .addAttendance({
+          date: this.searchForm.get('date')?.value,
+          userId: userId,
+        })
+        .subscribe({
+          next: (response) => {
+            if (response.status == 200) {
+              this.loadAttendances();
+            }
+          },
+          error: (error) => {
+            console.error(error);
+            this.error = this.utils.handleResponse(error, null);
+          },
+        });
+    } else {
+      if (present == false && id) {
+        this.api.deleteAttendance(id).subscribe({
+          next: (response) => {
+            if (response.status == 200) {
+              this.loadAttendances();
+            }
+          },
+          error: (error) => {
+            console.error(error);
+            this.error = this.utils.handleResponse(error, null);
+          },
+        });
+        return;
+      } else if (id) {
+        this.api
+          .updateAttendance(
+            id,
+            this.searchForm.get('date')?.value,
+            eatsInOratory
+          )
+          .subscribe({
+            next: (response) => {
+              if (response.status == 200) {
+                this.loadAttendances();
+              }
+            },
+            error: (error) => {
+              console.error(error);
+              this.error = this.utils.handleResponse(error, null);
+            },
+          });
+      }
     }
-
-    const params: Attendance = {
-      enrollmentId: attendance.enrollmentId,
-      date: attendance.date,
-      present: attendance.present,
-      eatsInOratory: attendance.eatsInOratory,
-      eatsPlain: attendance.eatsPlain,
-    };
-
-    this.api.updateAttendance(attendance.id, params).subscribe({
-      next: (response) => {
-        if (response.status == 200) {
-          this.loadAttendances();
-        }
-      },
-      error: (error) => {
-        console.error(error);
-        this.error = this.utils.handleResponse(error, null);
-      },
-    });
   }
+
+  // updateAttendance(attendance: EnrollmentAttendanceSearch) {
+  //   if (!attendance.present) {
+  //     attendance.eatsInOratory = false;
+  //   }
+
+  //   this.api
+  //     .updateAttendance(
+  //       attendance.id,
+  //       this.searchForm.get('date')?.value,
+  //       attendance.eatsInOratory
+  //     )
+  //     .subscribe({
+  //       next: (response) => {
+  //         if (response.status == 200) {
+  //           this.loadAttendances();
+  //         }
+  //       },
+  //       error: (error) => {
+  //         console.error(error);
+  //         this.error = this.utils.handleResponse(error, null);
+  //       },
+  //     });
+  // }
 
   openExtraordinaryAttendanceModal(
-    attendance: AttendanceSearch,
+    attendance: AttendanceSearch | undefined,
     type: 'Join' | 'Left'
   ) {
+    if (!attendance) return;
+
     this.selectedAttendance = attendance;
     this.extraordinaryAttendanceForm.patchValue({
       type: type,

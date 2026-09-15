@@ -53,7 +53,6 @@ import { PaginationComponent } from '../../../components/pagination/pagination.c
     PaginationComponent,
   ],
   templateUrl: './enrollments-create.component.html',
-  styleUrl: './enrollments-create.component.css',
 })
 export class EnrollmentsCreateComponent implements OnInit {
   faInfo = faInfo;
@@ -153,8 +152,8 @@ export class EnrollmentsCreateComponent implements OnInit {
     this.loading = true;
     this.api.getChilds({ query: this.searchForm.value.query }).subscribe({
       next: (response) => {
-        if (response.status === 200 && response.body?.data) {
-          this.childs = response.body.data.childs;
+        if (response.status === 200 && response.body?.success) {
+          this.childs = response.body.data.elements;
           this.elements = response.body.data.count;
 
           this.step = 2;
@@ -340,7 +339,7 @@ export class EnrollmentsCreateComponent implements OnInit {
           })
           .subscribe({
             next: (response) => {
-              if (response.status === 200 && response.body?.data) {
+              if (response.status === 200 && response.body?.success) {
                 window.location.href = '/admin/enrollments';
               }
             },
@@ -353,7 +352,7 @@ export class EnrollmentsCreateComponent implements OnInit {
     } else {
       this.api.createEnrollment(this.enrollment).subscribe({
         next: (response) => {
-          if (response.status === 200 && response.body?.data) {
+          if (response.status === 200 && response.body?.success) {
             window.location.href = '/admin/enrollments';
           }
         },

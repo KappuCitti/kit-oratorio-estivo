@@ -21,7 +21,6 @@ import { FamilyEnrollmentCreateRequest } from '../../../../models/Request.model'
     CommonModule,
   ],
   templateUrl: './people-create.component.html',
-  styleUrl: './people-create.component.css',
 })
 export class PeopleCreateComponent {
   error: string | null = null;

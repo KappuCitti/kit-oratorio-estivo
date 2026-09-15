@@ -28,7 +28,6 @@ import { EnrollmentUpdateRequest } from '../../../../models/Request.model';
     ParentComponent,
   ],
   templateUrl: './enrollments-edit.component.html',
-  styleUrl: './enrollments-edit.component.css',
 })
 export class EnrollmentsEditComponent implements OnInit {
   id: string | null = null;
@@ -51,8 +50,8 @@ export class EnrollmentsEditComponent implements OnInit {
     } else {
       this.api.getEnrollmentById(this.id).subscribe({
         next: (response) => {
-          if (response.status === 200 && response.body?.data) {
-            this.enrollment = response.body?.data;
+          if (response.status === 200 && response.body?.success) {
+            this.enrollment = response.body.data;
 
             this.loading = false;
           }

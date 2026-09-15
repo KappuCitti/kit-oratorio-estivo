@@ -31,7 +31,6 @@ import { UtilsService } from '../../../services/utils.service';
   selector: 'app-team',
   imports: [ReactiveFormsModule, CommonModule, FontAwesomeModule, FormsModule],
   templateUrl: './team.component.html',
-  styleUrl: './team.component.css',
 })
 export class TeamComponent implements OnChanges {
   @Input() team: Team | null = null;

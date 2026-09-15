@@ -16,7 +16,6 @@ import { UtilsService } from '../../../services/utils.service';
   selector: 'app-login',
   imports: [FontAwesomeModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss',
 })
 export class LoginComponent {
   faArrowLeft = faArrowLeft;
@@ -53,6 +52,6 @@ export class LoginComponent {
 
   handleResponse(response: HttpResponse<any>): void {
     if (this.error) this.error = null;
-    this.error = this.utils.handleResponse(response, '/admin');
+    this.error = this.utils.handleResponse(response, '/user');
   }
 }

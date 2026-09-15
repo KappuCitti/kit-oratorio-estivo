@@ -9,7 +9,6 @@ import { Theme } from '../models/Theme.model';
   selector: 'app-root',
   imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
 })
 export class AppComponent {
   private themeService = inject(ThemeService);

@@ -27,7 +27,6 @@ import { zip } from 'rxjs';
   selector: 'app-enrollment',
   imports: [DatePipe, ReactiveFormsModule, FaIconComponent, CommonModule],
   templateUrl: './enrollment.component.html',
-  styleUrl: './enrollment.component.css',
 })
 export class EnrollmentComponent implements OnChanges {
   @Input() enrollment: Enrollment | null = null;
@@ -100,13 +99,13 @@ export class EnrollmentComponent implements OnChanges {
       this.api.getTeams(),
       this.api.getShirts(),
     ]).subscribe(([weeks, teams, shirts]) => {
-      if (weeks.status === 200 && weeks.body?.data) {
+      if (weeks.status === 200 && weeks.body?.success) {
         this.weeks = weeks.body.data;
       }
-      if (teams.status === 200 && teams.body?.data) {
+      if (teams.status === 200 && teams.body?.success) {
         this.teams = teams.body.data;
       }
-      if (shirts.status === 200 && shirts.body?.data) {
+      if (shirts.status === 200 && shirts.body?.success) {
         this.shirts = shirts.body.data;
       }
 
