@@ -1,0 +1,13 @@
+{
+  // Type-check di scripts/ e drizzle.config.ts, che restano fuori dal tsconfig
+  // principale perche' sono fuori da `rootDir` e non vanno emessi in dist/.
+  // Sono gli script che possono cancellare il database: che compilino conta.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": ".",
+    "declaration": false
+  },
+  "include": ["scripts/**/*.ts", "drizzle.config.ts", "src/**/*.ts"],
+  "exclude": ["dist", "node_modules"]
+}

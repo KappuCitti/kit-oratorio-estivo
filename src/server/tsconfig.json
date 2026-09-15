@@ -1,4 +1,7 @@
 {
+  // `scripts/` e `drizzle.config.ts` stanno fuori da `rootDir`, quindi non
+  // possono entrare in questo progetto (che emette in dist/). Sono comunque
+  // type-checkati: vedi tsconfig.scripts.json e `bun run check`.
   "exclude": ["./scripts/*", "./drizzle.config.ts", "./src/globals.ts", "./dist/*"],
   "compilerOptions": {
     // Enable latest features

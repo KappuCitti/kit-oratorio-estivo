@@ -1,3 +1,4 @@
+import config from '../src/config';
 import { db, schema } from '../src/database';
 import { roleTable } from '../src/database/schema/role';
 import { rolePermissionTable } from '../src/database/schema/rolePermission';
@@ -49,7 +50,9 @@ async function main() {
     surname: process.env.ADMIN_SURNAME,
   } as { [key: string]: string };
 
-  const adminData = {
+  // Campi opzionali: il tipo dice esplicitamente che possono mancare, invece di
+  // usare il cast bugiardo `as { [key: string]: string }` degli altri due gruppi.
+  const adminData: Record<string, string | undefined> = {
     phone: process.env.ADMIN_PHONE,
     gender: process.env.ADMIN_GENDER,
     birthDate: process.env.ADMIN_BIRTH_DATE,
@@ -63,12 +66,36 @@ async function main() {
     country: process.env.ADMIN_ADDRESS_COUNTRY,
   } as { [key: string]: string };
 
-  prompts.intro();
+  prompts.intro('Setup dati iniziali');
+
+  // Questo script cancella tutto. In produzione non deve poter partire.
+  if (process.env.NODE_ENV === 'production') {
+    prompts.cancel(
+      'NODE_ENV=production: lo script di setup e distruttivo e non parte in produzione.'
+    );
+    process.exit(1);
+  }
+
+  const target = `${config.database.user}@${config.database.host}:${config.database.port}/${config.database.database}`;
 
   const eraseDB = await prompts.confirm({
-    message: 'Do you want to erase the database?',
-    initialValue: true,
+    // Il default era SI. Su un database con dati veri bastava un invio distratto
+    // per perderli tutti, senza sapere nemmeno su quale database si stava agendo.
+    message: `Vuoi CANCELLARE tutti i dati di ${target}? (TRUNCATE di ogni tabella)`,
+    initialValue: false,
   });
+
+  if (eraseDB) {
+    // Seconda conferma: va riscritto il nome del database a mano.
+    const typed = await prompts.text({
+      message: `Conferma scrivendo il nome del database da cancellare (${config.database.database}):`,
+      placeholder: config.database.database,
+    });
+    if (typed !== config.database.database) {
+      prompts.cancel('Nome non corrispondente: non cancello niente.');
+      process.exit(1);
+    }
+  }
 
   if (eraseDB) {
     const s = prompts.spinner();
@@ -157,7 +184,9 @@ async function main() {
     }
   }
 
-  console.log(requiredAdminData);
+  // `requiredAdminData` contiene la password dell'admin in chiaro: stamparla
+  // la lasciava nella cronologia del terminale e nei log di qualunque CI.
+  console.log({ ...requiredAdminData, password: '<nascosta>' });
   console.log(adminData);
   console.log(adminAddressData);
 

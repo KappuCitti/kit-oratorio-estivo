@@ -7,9 +7,12 @@
   "scripts": {
     "start:ts": "NODE_ENV=production bun .",
     "start": "NODE_ENV=production bun run ./dist/index.js",
-    "dev": "bun run --hot .",
-    "check": "tsc --noEmit --pretty",
+    "dev": "NODE_ENV=development bun run --hot .",
+    "check": "tsc --noEmit --pretty && tsc -p tsconfig.scripts.json --pretty",
     "build": "tsc -b",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:check": "drizzle-kit check",
     "db:setup:data": "bun run ./scripts/setupDBData.ts"
   },
   "keywords": [
