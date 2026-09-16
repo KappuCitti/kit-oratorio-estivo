@@ -4,8 +4,8 @@
     <h1>Impostazioni</h1>
     <!-- Impostazioni del gestionale -->
     <p class="text-secondary">
-      Gestisci le impostazioni sugli eventi e sul tuo Oratorio in modo semplice ed
-      efficace
+      Gestisci le impostazioni sugli eventi e sul tuo Oratorio in modo semplice
+      ed efficace
     </p>
   </header>
 
@@ -92,6 +92,113 @@
       <span class="text-secondary">Ancora nessuna maglietta inserita</span>
     </div>
     }
+  </div>
+
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-8">
+    <div class="flex justify-between mb-2">
+      <h2>Scuole e classi</h2>
+      <fa-icon
+        class="text-md button-secondary"
+        [icon]="faPlus"
+        [routerLink]="[]"
+      ></fa-icon>
+    </div>
+    <!-- cycle schools and insert only corresponding classes -->
+
+    <table class="w-full text-left">
+      <!-- <thead>
+        <tr>
+          <th>Scuola</th>
+          <th>Classi</th>
+          <th class="text-end">Azioni</th>
+        </tr>
+      </thead> -->
+      <tbody>
+        @for (school of schools; track school.id) {
+        <tr>
+          <!-- School name centered with buttons below -->
+          <td class="align-middle text-center">
+            <strong>{{ school.name }}</strong>
+            <div class="space-x-3 text-sm pe-0 mt-2">
+              <button class="button-primary" (click)="(undefined)">
+                <fa-icon [icon]="faPen"></fa-icon>
+              </button>
+              <button class="button-secondary" (click)="(undefined)">
+                <fa-icon [icon]="faTrash"></fa-icon>
+              </button>
+            </div>
+          </td>
+          <!-- Classes list and buttons aligned horizontally -->
+          <td class="align-middle p-0 py-2" colspan="2">
+            <ul class="list-none ps-0 mb-0">
+              @for (class of classes; track class.id) { @if (class.school.id ===
+              school.id) {
+              <li class="flex items-center justify-between mb-1">
+                <span>{{ class.name }}</span>
+                <span>
+                  <div class="space-x-3 space-y-1 text-end text-sm pe-0">
+                    <button class="button-primary" (click)="(undefined)">
+                      <fa-icon [icon]="faPen"></fa-icon>
+                    </button>
+                    <button class="button-secondary" (click)="(undefined)">
+                      <fa-icon [icon]="faTrash"></fa-icon>
+                    </button>
+                  </div>
+                </span>
+              </li>
+              } }
+            </ul>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-12">
+    <div class="flex justify-between mb-2">
+      <h2>Scuole e classi</h2>
+      <fa-icon
+        class="text-md button-secondary"
+        [icon]="faPlus"
+        [routerLink]="[]"
+      ></fa-icon>
+    </div>
+    <!-- Scuole e classi: ogni scuola con le sue classi sotto -->
+    <div class="mt-4">
+      @for (school of schools; track school.id) {
+      <div class="mb-6">
+        <div class="flex items-center justify-between">
+          <strong class="text-lg">{{ school.name }}</strong>
+          <div class="space-x-3 text-end text-sm">
+            <button class="button-primary" (click)="(undefined)">
+              <fa-icon [icon]="faPen"></fa-icon>
+            </button>
+            <button class="button-secondary" (click)="(undefined)">
+              <fa-icon [icon]="faTrash"></fa-icon>
+            </button>
+          </div>
+        </div>
+        <ul class="list-none ps-0 ms-6 mt-2">
+          @for (class of classes; track class.id) { @if (class.school.id ===
+          school.id) {
+          <li class="flex items-center justify-between py-2">
+            <span>{{ class.name }}</span>
+            <div class="space-x-3 text-end text-sm">
+              <button class="button-primary" (click)="(undefined)">
+                <fa-icon [icon]="faPen"></fa-icon>
+              </button>
+              <button class="button-secondary" (click)="(undefined)">
+                <fa-icon [icon]="faTrash"></fa-icon>
+              </button>
+            </div>
+          </li>
+          <hr class="p-0 m-0" />
+          } }
+        </ul>
+      </div>
+      }
+    </div>
   </div>
 
   <div class="bg-auto p-4 rounded-lg shadow-lg mb-8">

@@ -53,9 +53,11 @@ export class ThemeService {
   }
 
   getTheme(): string {
-    const theme = window.location.pathname.startsWith('/admin')
-      ? this.getInitialTheme()
-      : 'dark';
+    const theme =
+      window.location.pathname.startsWith('/admin') ||
+      window.location.pathname.startsWith('/user')
+        ? this.getInitialTheme()
+        : 'dark';
 
     return theme;
   }

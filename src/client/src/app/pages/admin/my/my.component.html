@@ -41,17 +41,13 @@
 
     <details class="w-full mt-4 mb-6">
       <summary class="cursor-pointer text-lg font-semibold rounded">
-        Ruoli
+        Ruolo
       </summary>
 
       <div>
-        <ul>
-          @for ( role of user.roles; track role.id){
-          <li class="text-primary">
-            {{ role.name }}
-          </li>
-          }
-        </ul>
+        <p class="text-primary">
+          {{ user.role.displayName }}
+        </p>
       </div>
     </details>
 

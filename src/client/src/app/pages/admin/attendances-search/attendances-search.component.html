@@ -1,10 +1,8 @@
 <app-navbar></app-navbar>
 <div class="container">
   <header class="mb-6">
-    <h1>Iscrizioni</h1>
-    <p class="text-secondary">
-      Cerca, modifica ed aggiungi le iscrizioni dei ragazzi
-    </p>
+    <h1>Presenze</h1>
+    <p class="text-secondary">Cerca le presenze dei ragazzi</p>
   </header>
 
   <!-- Campo di ricerca -->
@@ -26,25 +24,27 @@
         </div>
         <div class="mb-2 sm:w-1/3 w-full px-2">
           <label class="block">Tipo scuola</label>
-          <select class="w-full" formControlName="schoolType">
-            <option value="">
-              <span class="text-secondary"></span>
-            </option>
-            <option value="Primary">Elementari</option>
-            <option value="Secondary">Medie</option>
+          <select class="w-full" formControlName="schoolId">
+            <option [ngValue]="null" class="text-secondary">Tutti</option>
+            @for(school of schools; track school.id) {
+            <option [value]="school.id">{{ school.name }}</option>
+            }
+            <!-- <option value="Primary">Elementari</option>
+            <option value="Secondary">Medie</option> -->
           </select>
         </div>
         <div class="mb-2 sm:w-1/3 w-full px-2">
           <label class="block">Classe</label>
-          <select class="w-full" formControlName="className">
-            <option value="">
-              <span class="text-secondary"></span>
-            </option>
-            <option value="I">I</option>
+          <select class="w-full" formControlName="classId">
+            <option [ngValue]="null" class="text-secondary">Tutti</option>
+            @for (class of classes; track class.id) {
+            <option [value]="class.id">{{ class.name }}</option>
+            }
+            <!-- <option value="I">I</option>
             <option value="II">II</option>
             <option value="III">III</option>
             <option value="IV">IV</option>
-            <option value="V">V</option>
+            <option value="V">V</option> -->
           </select>
         </div>
 
@@ -70,60 +70,73 @@
             <th>Nome</th>
             <th class="text-center">Presente</th>
             <th class="text-center">Mangia in oratorio</th>
-            <th class="text-center">Mangia in bianco</th>
+            <!-- <th class="text-center">Mangia in bianco</th> -->
             <th class="text-center">Azioni</th>
           </tr>
         </thead>
         <tbody>
-          @for (attendance of attendances; track attendance.id) {
+          @for (data of enrollmentAttendances; track data.id) {
           <tr>
-            <td>{{ attendance.childName }}</td>
-            <td>{{ attendance.childSurname }}</td>
+            <td>{{ data.user.surname }}</td>
+            <td>{{ data.user.name }}</td>
             <td class="text-center">
               <input
                 type="checkbox"
-                [id]="'present-' + attendance.id"
-                [checked]="attendance.present"
-                [(ngModel)]="attendance.present"
-                (change)="updateAttendance(attendance)"
+                [id]="'present-' + data.id"
+                [checked]="data.present"
+                [(ngModel)]="data.present"
+                (change)="
+                  updateAttendance(
+                    data.attendance?.id,
+                    data.user.id,
+                    data.present,
+                    data.attendance?.eatsInOratory
+                  )
+                "
               />
             </td>
             <td class="text-center">
               <input
                 type="checkbox"
-                [id]="'eatsAtOratory-' + attendance.id"
-                [(ngModel)]="attendance.eatsInOratory"
-                [disabled]="!attendance.present"
-                (change)="updateAttendance(attendance)"
+                [id]="'eatsAtOratory-' + data.id"
+                [checked]="data.attendance?.eatsInOratory || false"
+                [disabled]="!data.present"
+                (change)="onCheckboxUpdateEatsInOratoryChange($event, data)"
               />
             </td>
-            <td class="text-center">
+            <!-- <td class="text-center">
               <input
                 type="checkbox"
                 [id]="'eatsInBianco-' + attendance.id"
-                [(ngModel)]="attendance.eatsPlain"
+                [(ngModel)]="attendance.eatsInBianco"
                 [disabled]="!attendance.present || !attendance.eatsInOratory"
                 (change)="updateAttendance(attendance)"
               />
-            </td>
+            </td> -->
             <td class="space-x-0 sm:space-x-3 space-y-1 text-center text-sm">
               <button
-                class="button-success"
-                (click)="openExtraordinaryAttendanceModal(attendance, 'Join')"
-                [disabled]="!attendance.present"
+                class="button-success hidden lg:inline-block"
+                (click)="
+                  openExtraordinaryAttendanceModal(data.attendance, 'Join')
+                "
+                [disabled]="!data.present"
               >
                 <fa-icon [icon]="faRightToBracket"></fa-icon>
               </button>
               <button
-                class="button-danger"
-                (click)="openExtraordinaryAttendanceModal(attendance, 'Left')"
-                [disabled]="!attendance.present"
+                class="button-danger hidden lg:inline-block"
+                (click)="
+                  openExtraordinaryAttendanceModal(data.attendance, 'Left')
+                "
+                [disabled]="!data.present"
               >
                 <fa-icon [icon]="faRightFromBracket"></fa-icon>
               </button>
+              <!-- TODO - Delete disabled status when page is ready -->
               <button
                 class="button-primary"
-                [routerLink]="['/admin/attendances', attendance.childId]"
+                [routerLink]="['/admin/attendances', data.user.id]"
+                disabled
               >
                 <fa-icon [icon]="faCalendarDay"></fa-icon>
               </button>
@@ -134,7 +147,7 @@
       </table>
     </div>
 
-    @if (attendances.length == 0) {
+    @if (enrollmentAttendances.length == 0) {
     <div class="flex justify-center items-center h-20">
       <span class="text-secondary">Nessun risultato</span>
     </div>
@@ -157,8 +170,8 @@
     <p class="text-secondary mb-4">
       Aggiungi un movimento per
       <b>
-        {{ selectedAttendance.childSurname }}
-        {{ selectedAttendance.childName }}</b
+        {{ selectedAttendance.user.surname }}
+        {{ selectedAttendance.user.name }}</b
       >
     </p>
     <!-- Form -->

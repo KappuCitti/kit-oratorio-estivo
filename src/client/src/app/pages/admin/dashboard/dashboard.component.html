@@ -10,16 +10,16 @@
   <!-- Cards Overview -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
     <div class="bg-auto p-4 rounded-lg shadow">
+      <h2>Utenti nella rubrica</h2>
+      <p class="text-2xl font-bold">{{ peopleCount }}</p>
+    </div>
+    <div class="bg-auto p-4 rounded-lg shadow">
       <h2>Iscritti Totali</h2>
-      <p class="text-2xl font-bold">245</p>
+      <p class="text-2xl font-bold">{{ enrollmentsCount }}</p>
     </div>
     <div class="bg-auto p-4 rounded-lg shadow">
-      <h2>Squadre Registrate</h2>
-      <p class="text-2xl font-bold">12</p>
-    </div>
-    <div class="bg-auto p-4 rounded-lg shadow">
-      <h2>Giochi Attivi</h2>
-      <p class="text-2xl font-bold">5</p>
+      <h2>Presenze oggi</h2>
+      <p class="text-2xl font-bold">{{ attendanceCount }}</p>
     </div>
   </div>
 </div>
