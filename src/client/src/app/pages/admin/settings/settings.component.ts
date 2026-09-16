@@ -7,7 +7,7 @@ import {
   faPen,
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
-import { CommonModule } from '@angular/common';
+
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { RouterLink } from '@angular/router';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
@@ -33,11 +33,10 @@ type otherTypes = null;
   selector: 'app-settings',
   imports: [
     FooterComponent,
-    CommonModule,
     FaIconComponent,
     RouterLink,
-    NavbarComponent,
-  ],
+    NavbarComponent
+],
   templateUrl: './settings.component.html',
 })
 export class SettingsComponent implements OnInit {

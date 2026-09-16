@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { Component, computed, signal, inject } from '@angular/core';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import {
@@ -37,7 +37,7 @@ interface Page {
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
-  imports: [RouterLink, CommonModule, FontAwesomeModule],
+  imports: [RouterLink, FontAwesomeModule, NgClass],
 })
 export class NavbarComponent {
   private api = inject(ApiService);

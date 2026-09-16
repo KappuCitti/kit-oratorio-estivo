@@ -2,7 +2,7 @@ import { Component, OnChanges, computed, inject, input, model, output, signal } 
 import Enrollment, {
   EnrollmentWeekSearch,
 } from '../../../models/Enrollment.model';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import {
   FormBuilder,
   FormGroup,
@@ -19,7 +19,7 @@ import { zip } from 'rxjs';
 
 @Component({
   selector: 'app-enrollment',
-  imports: [DatePipe, ReactiveFormsModule, FaIconComponent, CommonModule],
+  imports: [DatePipe, ReactiveFormsModule, FaIconComponent],
   templateUrl: './enrollment.component.html',
 })
 export class EnrollmentComponent implements OnChanges {

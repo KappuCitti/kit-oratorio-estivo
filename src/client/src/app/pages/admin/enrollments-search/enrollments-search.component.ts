@@ -23,7 +23,7 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { PaginationComponent } from '../../../components/pagination/pagination.component';
 import {
   EnrollmentSearch,
@@ -48,11 +48,11 @@ interface EnrollmentWeekEnrolled extends Week {
     FooterComponent,
     FormsModule,
     FontAwesomeModule,
-    CommonModule,
     PaginationComponent,
     ReactiveFormsModule,
     RouterLink,
-  ],
+    DatePipe
+],
   templateUrl: './enrollments-search.component.html',
 })
 export class EnrollmentsSearchComponent implements OnInit {

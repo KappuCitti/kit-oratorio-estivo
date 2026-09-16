@@ -24,7 +24,7 @@ import {
 } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { PaginationComponent } from '../../../components/pagination/pagination.component';
-import { CommonModule } from '@angular/common';
+
 import { PeopleSearch } from '../../../../models/Family.model';
 import { PeopleGetRequest } from '../../../../models/Request.model';
 import { UtilsService } from '../../../../services/utils.service';
@@ -37,9 +37,8 @@ import { UtilsService } from '../../../../services/utils.service';
     FaIconComponent,
     ReactiveFormsModule,
     RouterLink,
-    PaginationComponent,
-    CommonModule,
-  ],
+    PaginationComponent
+],
   templateUrl: './people-search.component.html',
 })
 export class PeopleSearchComponent implements OnInit {

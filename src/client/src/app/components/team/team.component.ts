@@ -14,7 +14,7 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import Team from '../../../models/Team.model';
-import { CommonModule } from '@angular/common';
+
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ApiService } from '../../../services/api.service';
 import { TeamUpdateRequest } from '../../../models/Request.model';
@@ -22,7 +22,7 @@ import { UtilsService } from '../../../services/utils.service';
 
 @Component({
   selector: 'app-team',
-  imports: [ReactiveFormsModule, CommonModule, FontAwesomeModule, FormsModule],
+  imports: [ReactiveFormsModule, FontAwesomeModule, FormsModule],
   templateUrl: './team.component.html',
 })
 export class TeamComponent implements OnChanges {

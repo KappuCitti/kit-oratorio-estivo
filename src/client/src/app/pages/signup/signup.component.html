@@ -5,11 +5,10 @@
     <h1 class="mb-6 text-center text-2xl sm:text-3xl font-bold">
       Crea un account
     </h1>
-    <app-parent
-      [editable]="true"
+    <app-parent [editable]="true"
       (parentChange)="onParentChange($event)"
       (isValid)="onIsParentValidChange($event)"
-    ></app-parent>
+     />
     <form [formGroup]="form" (ngSubmit)="signup()" class="mt-4">
       <div class="flex flex-wrap -mx-2">
         <div class="mb-4 sm:w-1/2 w-full px-2">
@@ -53,7 +52,7 @@
     routerLink="/"
     class="fixed top-2 left-2 sm:top-4 sm:left-4 button-secondary shadow-lg transition text-sm sm:text-base"
   >
-    <fa-icon [icon]="faArrowLeft"></fa-icon>
+    <fa-icon [icon]="faArrowLeft" />
     <span class="ml-1">Torna alla home</span>
   </a>
 

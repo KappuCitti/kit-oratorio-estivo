@@ -1,4 +1,4 @@
-<app-navbar></app-navbar>
+<app-navbar />
 <div class="container min-h-4/5 justify-between">
   <header class="mb-6 flex items-center justify-between">
     <div>
@@ -6,11 +6,10 @@
       <p class="text-secondary">Consulta le squadre disponibili</p>
     </div>
 
-    <fa-icon
-      class="button-primary"
+    <fa-icon class="button-primary"
       [icon]="faPlus"
       (click)="isAddModalOpen.set(true)"
-    ></fa-icon>
+     />
   </header>
 
   <div
@@ -81,4 +80,4 @@
 </div>
 }
 
-<app-footer></app-footer>
+<app-footer />

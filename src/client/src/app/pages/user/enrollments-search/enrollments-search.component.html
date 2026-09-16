@@ -1,4 +1,4 @@
-<app-navbar></app-navbar>
+<app-navbar />
 <div class="container min-h-4/5">
   <header class="mb-6">
     <h1>Le mie iscrizioni</h1>
@@ -11,11 +11,10 @@
   <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
     <div class="flex justify-between mb-2">
       <h2>Oratorio estivo</h2>
-      <fa-icon
-        class="text-md button-secondary"
+      <fa-icon class="text-md button-secondary"
         [icon]="faPlus"
         [routerLink]="['/user/enrollments/new']"
-      ></fa-icon>
+       />
     </div>
 
     <ul class="list-none space-y-2 ps-0">
@@ -49,11 +48,10 @@
   <div class="bg-auto p-4 rounded-lg shadow-lg mb-8">
     <div class="flex justify-between mb-2">
       <h2>Eventi</h2>
-      <fa-icon
-        class="text-md button-secondary"
+      <fa-icon class="text-md button-secondary"
         [icon]="faPlus"
         [routerLink]="['/user/trips/new']"
-      ></fa-icon>
+       />
     </div>
     <ul class="list-none space-y-2 ps-0">
       @for (child of user.children; track user.children) {
@@ -80,4 +78,4 @@
   </div>
 </div>
 
-<app-footer></app-footer>
+<app-footer />

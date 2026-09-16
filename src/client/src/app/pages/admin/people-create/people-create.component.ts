@@ -6,7 +6,7 @@ import { ParentComponent } from '../../../components/parent/parent.component';
 import { FormsModule } from '@angular/forms';
 import { Child, Parent } from '../../../../models/Family.model';
 import { ApiService } from '../../../../services/api.service';
-import { CommonModule } from '@angular/common';
+
 import { UtilsService } from '../../../../services/utils.service';
 import { FamilyEnrollmentCreateRequest } from '../../../../models/Request.model';
 
@@ -17,9 +17,8 @@ import { FamilyEnrollmentCreateRequest } from '../../../../models/Request.model'
     NavbarComponent,
     ChildComponent,
     ParentComponent,
-    FormsModule,
-    CommonModule,
-  ],
+    FormsModule
+],
   templateUrl: './people-create.component.html',
 })
 export class PeopleCreateComponent {

@@ -21,7 +21,7 @@ import { ChildSearch, Child, Parent } from '../../../../models/Family.model';
 import { EnrollmentCreateRequest } from '../../../../models/Request.model';
 import { ApiService } from '../../../../services/api.service';
 import { UtilsService } from '../../../../services/utils.service';
-import { CommonModule } from '@angular/common';
+import { NgClass, DatePipe } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { EnrollmentComponent } from '../../../components/enrollment/enrollment.component';
 import { PaginationComponent } from '../../../components/pagination/pagination.component';
@@ -41,11 +41,12 @@ import { PaginationComponent } from '../../../components/pagination/pagination.c
     FooterComponent,
     FormsModule,
     FontAwesomeModule,
-    CommonModule,
     EnrollmentComponent,
     ReactiveFormsModule,
     PaginationComponent,
-  ],
+    DatePipe,
+    NgClass
+],
   templateUrl: './enrollments-create.component.html',
 })
 export class EnrollmentsCreateComponent implements OnInit {

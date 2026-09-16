@@ -2,14 +2,14 @@
   <div class="container mx-auto flex items-center justify-between p-4">
     <!-- Icona Home -->
     <a [routerLink]="baseURL()" class="text-xl hidden xl:flex text-primary">
-      <fa-icon [icon]="faHouse"></fa-icon>
+      <fa-icon [icon]="faHouse" />
     </a>
 
     <button
       class="text-xl xl:hidden focus:outline-none text-primary"
       (click)="toggleMenu()"
       >
-      <fa-icon [icon]="faBars"></fa-icon>
+      <fa-icon [icon]="faBars" />
     </button>
 
     <!-- Contenuto Collapse -->
@@ -25,7 +25,7 @@
                 page.disabled,
               'hover:underline': !page.disabled
             }"
-              ><fa-icon [icon]="page.icon"></fa-icon>
+              ><fa-icon [icon]="page.icon" />
               <span>{{ page.title }}</span></a
               >
             </li>
@@ -36,7 +36,7 @@
         <!-- Icona Profilo con Dropdown -->
         <div class="relative">
           <button (click)="toggleDropdown()" class="focus:outline-none text-xl">
-            <fa-icon [icon]="faCircleUser"></fa-icon>
+            <fa-icon [icon]="faCircleUser" />
           </button>
           @if (isDropdownOpen()) {
             <div
@@ -61,7 +61,7 @@
 
         <div
           class="xl:hidden fixed top-0 left-0 h-full md:w-3/5 w-4/5 bg-auto shadow-lg transition-transform p-6 text-lg z-10"
-  [ngClass]="{
+  [class]="{
     'translate-x-0': isMenuOpen(),
     '-translate-x-full': !isMenuOpen()
   }"
@@ -72,13 +72,13 @@
                 [routerLink]="[baseURL()]"
                 class="flex items-center text-primary no-underline"
                 >
-                <fa-icon [icon]="faHouse"></fa-icon>
+                <fa-icon [icon]="faHouse" />
                 <span class="ps-2">Progetto KOE</span>
               </a>
             </div>
             <div>
               <button (click)="toggleMenu()">
-                <fa-icon [icon]="faChevronLeft"></fa-icon>
+                <fa-icon [icon]="faChevronLeft" />
               </button>
             </div>
           </div>
@@ -96,7 +96,7 @@
               page.disabled,
             'hover:underline': !page.disabled
           }"
-                    ><fa-icon [icon]="page.icon"></fa-icon>
+                    ><fa-icon [icon]="page.icon" />
                     <span>{{ page.title }}</span></a
                     >
                   </li>

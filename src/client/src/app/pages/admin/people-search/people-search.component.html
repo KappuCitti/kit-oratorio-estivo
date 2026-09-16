@@ -1,4 +1,4 @@
-<app-navbar></app-navbar>
+<app-navbar />
 <div class="container">
   <header class="mb-6">
     <h1>Rubrica</h1>
@@ -9,11 +9,10 @@
   <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
     <div class="flex justify-between mb-2">
       <h2>Filtro</h2>
-      <fa-icon
-        class="text-md button-secondary"
+      <fa-icon class="text-md button-secondary"
         [icon]="faArrowRotateLeft"
         (click)="onResetSearch()"
-      ></fa-icon>
+       />
     </div>
 
     <form [formGroup]="searchForm">
@@ -52,11 +51,10 @@
   <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
     <div class="flex justify-between mb-4">
       <h2>Risultati</h2>
-      <fa-icon
-        class="text-md button-secondary"
+      <fa-icon class="text-md button-secondary"
         [icon]="faPlus"
         [routerLink]="['/admin/people/new']"
-      ></fa-icon>
+       />
     </div>
 
     <table class="w-full text-left">
@@ -76,7 +74,7 @@
           <td>{{ person.name }}</td>
           <td
             class="text-center cursor-pointer hover:underline underline-offset-2"
-            [ngClass]="{
+            [class]="{
               'text-error': person.gender == 'F',
               'text-info': person.gender == 'M'
             }"
@@ -92,7 +90,7 @@
               )
             "
           >
-            <fa-icon [icon]="getPersonIcon(person)"></fa-icon>
+            <fa-icon [icon]="getPersonIcon(person)" />
             {{ getPersonType(person) }}
           </td>
           <td class="space-x-0 sm:space-x-3 space-y-1 text-center text-sm">
@@ -104,10 +102,10 @@
                 person.id
               ]"
             >
-              <fa-icon [icon]="faPen"></fa-icon>
+              <fa-icon [icon]="faPen" />
             </button>
             <button class="button-secondary" (click)="openDeleteModal(person)">
-              <fa-icon [icon]="faTrash"></fa-icon>
+              <fa-icon [icon]="faTrash" />
             </button>
           </td>
         </tr>
@@ -121,11 +119,10 @@
     </div>
     }
 
-    <app-pagination
-      [totalItems]="elements()"
+    <app-pagination [totalItems]="elements()"
       (pageChange)="onPageChange($event)"
       (itemsPerPageChange)="onSizeChange($event)"
-    ></app-pagination>
+     />
   </div>
 </div>
 
@@ -164,4 +161,4 @@
   </div>
 </div>
 } }
-<app-footer></app-footer>
+<app-footer />

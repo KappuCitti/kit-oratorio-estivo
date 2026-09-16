@@ -1,4 +1,4 @@
-<app-navbar></app-navbar>
+<app-navbar />
 <div class="container">
   <header class="mb-6">
     <h1>Iscrizioni</h1>
@@ -11,11 +11,10 @@
   <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
     <div class="flex justify-between mb-2">
       <h2>Filtro</h2>
-      <fa-icon
-        class="text-md button-secondary"
+      <fa-icon class="text-md button-secondary"
         [icon]="faArrowRotateLeft"
         (click)="onResetSearch()"
-      ></fa-icon>
+       />
     </div>
 
     <form [formGroup]="searchForm">
@@ -78,11 +77,10 @@
   <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
     <div class="flex justify-between mb-4">
       <h2>Risultati</h2>
-      <fa-icon
-        class="text-md button-secondary"
+      <fa-icon class="text-md button-secondary"
         [icon]="faPlus"
         [routerLink]="['/admin/enrollments/new']"
-      ></fa-icon>
+       />
     </div>
 
     <table class="w-full text-left">
@@ -113,7 +111,7 @@
             @for (week of weeks(); track week.id) {
             <span
               class="rounded-lg px-2 py-1"
-              [ngClass]="{
+              [class]="{
                 'bg-neon-auto':
                   isEnrollmentWeekEnrolled(enrollment.weeks, week.id) === null,
                 'bg-neon-warning':
@@ -144,9 +142,7 @@
             } @else {
             <span
               class="rounded-lg px-2 py-1"
-              [ngClass]="{
-                'bg-neon-warning': getTotalWeeksPayed(enrollment.weeks) < enrollment.weeks.length,
-              }"
+              [class.bg-neon-warning]="getTotalWeeksPayed(enrollment.weeks) < enrollment.weeks.length"
               >{{ getTotalWeeksPayed(enrollment.weeks) }} /
               {{ enrollment.weeks.length }}</span
             >
@@ -156,26 +152,22 @@
             @if (enrollment.team) {
             <span
               class="underline underline-offset-2"
-              [ngStyle]="{
-                'text-decoration-color': enrollment.team.color
-              }"
+              [style.text-decoration-color]="enrollment.team.color"
             >
               {{ enrollment.team.name }}
-              <fa-icon
-                [icon]="faDroplet"
+              <fa-icon [icon]="faDroplet"
                 [style.color]="enrollment.team.color"
-              ></fa-icon>
+               />
             </span>
             } @else { <span class="text-secondary">-</span> }
           </td>
           <td class="lg:table-cell hidden space-x-3 text-center">
-            <fa-icon
-              [icon]="
+            <fa-icon [icon]="
                 enrollment.dataProcessingConsent
                   ? faThumbTack
                   : faThumbTackSlash
               "
-              [ngClass]="{
+              [class]="{
                 'text-success': enrollment.dataProcessingConsent,
                 'text-error': !enrollment.dataProcessingConsent
               }"
@@ -184,10 +176,9 @@
                 (enrollment.dataProcessingConsent ? 'AUTORIZZA' : 'NEGA') +
                 ' il consenso al trattamento dei dati'
               "
-            ></fa-icon>
-            <fa-icon
-              [icon]="faCamera"
-              [ngClass]="{
+             />
+            <fa-icon [icon]="faCamera"
+              [class]="{
                 'text-success': enrollment.imageProcessingConsent,
                 'text-error': !enrollment.imageProcessingConsent
               }"
@@ -196,10 +187,9 @@
                 (enrollment.imageProcessingConsent ? 'AUTORIZZA' : 'NEGA') +
                 ' le immagini'
               "
-            ></fa-icon>
-            <fa-icon
-              [icon]="enrollment.exitAuthorization ? faDoorOpen : faDoorClosed"
-              [ngClass]="{
+             />
+            <fa-icon [icon]="enrollment.exitAuthorization ? faDoorOpen : faDoorClosed"
+              [class]="{
                 'text-success': enrollment.exitAuthorization,
                 'text-error': !enrollment.exitAuthorization
               }"
@@ -208,20 +198,20 @@
                 (enrollment.exitAuthorization ? 'AUTORIZZA' : 'NEGA') +
                 ' le uscite'
               "
-            ></fa-icon>
+             />
           </td>
           <td class="space-x-0 sm:space-x-3 space-y-1 text-center text-sm">
             <button
               class="button-primary"
               (click)="editEnrollment(enrollment.id)"
             >
-              <fa-icon [icon]="faPen"></fa-icon>
+              <fa-icon [icon]="faPen" />
             </button>
             <button
               class="button-secondary"
               (click)="openDeleteModal(enrollment)"
             >
-              <fa-icon [icon]="faTrash"></fa-icon>
+              <fa-icon [icon]="faTrash" />
             </button>
           </td>
         </tr>
@@ -235,11 +225,10 @@
     </div>
     }
 
-    <app-pagination
-      [totalItems]="elements()"
+    <app-pagination [totalItems]="elements()"
       (pageChange)="onPageChange($event)"
       (itemsPerPageChange)="onSizeChange($event)"
-    ></app-pagination>
+     />
   </div>
 </div>
 
@@ -282,4 +271,4 @@
   </div>
 </div>
 }
-<app-footer></app-footer>
+<app-footer />

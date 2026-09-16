@@ -1,4 +1,4 @@
-<app-navbar></app-navbar>
+<app-navbar />
 <div class="container min-h-4/5 flex flex-col justify-between">
   <!-- Top -->
   <header class="mb-6">
@@ -33,26 +33,23 @@
   </div>
   } @else if (step() == 1) {
   <div class="w-full bg-auto p-4 rounded-lg shadow-lg">
-    <app-child
-      [editable]="true"
+    <app-child [editable]="true"
       [child]="child()"
       (childChange)="onChildChange($event)"
       (isValid)="onIsChildValidChange($event)"
-    ></app-child>
+     />
     <div class="my-8"></div>
-    <app-parent
-      [editable]="true"
+    <app-parent [editable]="true"
       [parent]="parentOne()"
       (parentChange)="onParentChange($event, 1)"
       (isValid)="onIsParentValidChange($event, 1)"
-    ></app-parent>
+     />
     <div class="my-8"></div>
-    <app-parent
-      [editable]="true"
+    <app-parent [editable]="true"
       [parent]="parentTwo()"
       (parentChange)="onParentChange($event, 2)"
       (isValid)="onIsParentValidChange($event, 2)"
-    ></app-parent>
+     />
     <div class="mt-6"></div>
   </div>
   }@else if (step() == 2) {
@@ -113,11 +110,10 @@
       </div>
       }
 
-      <app-pagination
-        [totalItems]="elements()"
+      <app-pagination [totalItems]="elements()"
         (pageChange)="onPageChange($event)"
         (itemsPerPageChange)="onSizeChange($event)"
-      ></app-pagination>
+       />
     </div>
   </div>
   } @else if (step() == 3) {
@@ -141,12 +137,11 @@
     class="container min-h-4/5 flex flex-col justify-center items-center p-0 py-6 z-0"
   >
     <div class="w-full bg-auto p-4 rounded-lg shadow-lg">
-      <app-enrollment
-        [editable]="true"
+      <app-enrollment [editable]="true"
         [year]="enrollment().year"
         (enrollmentChange)="onEnrollmentChange($event)"
         (isValid)="onIsEnrollmentValidChange($event)"
-      ></app-enrollment>
+       />
     </div>
   </div>
   }@else if (step() == 5) {
@@ -244,7 +239,7 @@
       <!-- Step 0 - Choose new or existing enrollment -->
       <li
         class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block"
-        [ngClass]="{
+        [class]="{
           'text-silent': step() == 0,
           'text-primary': step() > 0
         }"
@@ -257,14 +252,14 @@
             'bg-neon-success': step() != 0
           }"
         >
-          <fa-icon [icon]="faInfo"></fa-icon>
+          <fa-icon [icon]="faInfo" />
         </div>
       </li>
 
       <!-- Step 1 or 2 - Create new family tree or Choose existing child -->
       <li
         class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block"
-        [ngClass]="{
+        [class]="{
           'text-silent': step() < 3,
           'text-primary': step() > 3
         }"
@@ -278,14 +273,14 @@
             'bg-neon-success': step() > 2
           }"
         >
-          <fa-icon [icon]="faUsers"></fa-icon>
+          <fa-icon [icon]="faUsers" />
         </div>
       </li>
 
       <!-- Step 3 - Choose year -->
       <li
         class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block"
-        [ngClass]="{
+        [class]="{
           'text-silent': step() < 4,
           'text-primary': step() > 4,
         }"
@@ -299,14 +294,14 @@
             'bg-neon-success': step() > 3
           }"
         >
-          <fa-icon [icon]="faCalendar"></fa-icon>
+          <fa-icon [icon]="faCalendar" />
         </div>
       </li>
 
       <!-- Step 4 - Create enrollment -->
       <li
         class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block"
-        [ngClass]="{
+        [class]="{
           'text-silent': step() < 5,
           'text-primary': step() > 5
         }"
@@ -320,7 +315,7 @@
             'bg-neon-success': step() > 4
           }"
         >
-          <fa-icon [icon]="faIdCardClip"></fa-icon>
+          <fa-icon [icon]="faIdCardClip" />
         </div>
       </li>
       <li class="flex items-center" (click)="setStep(5)">
@@ -332,7 +327,7 @@
             'bg-neon-success': step() > 5
           }"
         >
-          <fa-icon [icon]="faClipboardCheck"></fa-icon>
+          <fa-icon [icon]="faClipboardCheck" />
         </div>
       </li>
     </ol>
@@ -347,4 +342,4 @@
   </div>
 </div>
 
-<app-footer></app-footer>
+<app-footer />

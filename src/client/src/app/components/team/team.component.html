@@ -1,21 +1,19 @@
 @if (team(); as team) {
 <div
   class="bg-auto py-2 px-3 rounded-lg border-l-8 transition shadow-lg"
-  [ngStyle]="{ 'border-left-color': team.color }"
+  [style.border-left-color]="team.color"
 >
   <div class="flex justify-between items-center">
     <p class="font-semibold text-lg text-primary">{{ team.name }}</p>
     <div class="flex space-x-2">
-      <fa-icon
-        class="button-primary"
+      <fa-icon class="button-primary"
         [icon]="faPen"
         (click)="isEditModalOpen.set(true)"
-      ></fa-icon>
-      <fa-icon
-        class="button-secondary"
+       />
+      <fa-icon class="button-secondary"
         [icon]="faTrash"
         (click)="isDeleteModalOpen.set(true)"
-      ></fa-icon>
+       />
     </div>
   </div>
 </div>

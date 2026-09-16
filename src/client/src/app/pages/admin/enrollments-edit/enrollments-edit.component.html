@@ -1,28 +1,24 @@
-<app-navbar></app-navbar>
+<app-navbar />
 <div class="container min-h-4/5 flex flex-col justify-center items-center">
   <div class="w-full bg-auto p-4 rounded-lg shadow-lg mb-6">
     @if (!loading() && !error()) {
-    <app-enrollment
-      [enrollment]="enrollment()"
+    <app-enrollment [enrollment]="enrollment()"
       [editable]="true"
       [save]="saveEnrollment"
       (enrollmentChange)="onEnrollmentChange($event)"
-    ></app-enrollment>
+     />
     <div class="my-8"></div>
-    <app-child
-      [child]="enrollment()?.family?.child || null"
+    <app-child [child]="enrollment()?.family?.child || null"
       [editable]="false"
-    ></app-child>
+     />
     <div class="my-8"></div>
-    <app-parent
-      [parent]="enrollment()?.family?.parents?.[0] || null"
+    <app-parent [parent]="enrollment()?.family?.parents?.[0] || null"
       [editable]="false"
-    ></app-parent>
+     />
     <div class="my-8"></div>
-    <app-parent
-      [parent]="enrollment()?.family?.parents?.[1] || null"
+    <app-parent [parent]="enrollment()?.family?.parents?.[1] || null"
       [editable]="false"
-    ></app-parent>
+     />
     <div class="mt-6"></div>
     } @else if (error(); as error) {
     <div class="flex justify-center items-center">
@@ -34,9 +30,9 @@
     </div>
     } @else {
     <div class="flex justify-center items-center h-20">
-      <app-loading></app-loading>
+      <app-loading />
     </div>
     }
   </div>
 </div>
-<app-footer></app-footer>
+<app-footer />

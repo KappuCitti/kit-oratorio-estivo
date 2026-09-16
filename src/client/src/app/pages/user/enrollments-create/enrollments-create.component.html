@@ -1,4 +1,4 @@
-<app-navbar></app-navbar>
+<app-navbar />
 <div class="container min-h-4/5 flex flex-col justify-between">
     <!-- Top -->
     <header class="mb-6">
@@ -59,7 +59,7 @@
             }
 
             <app-pagination [totalItems]="elements()" (pageChange)="onPageChange($event)"
-                (itemsPerPageChange)="onSizeChange($event)"></app-pagination>
+                (itemsPerPageChange)="onSizeChange($event)" />
         </div>
     </div>
     } @else if (step() == 2) {
@@ -77,7 +77,7 @@
         <div class="w-full bg-auto p-4 rounded-lg shadow-lg">
             <app-enrollment [editable]="true" [year]="enrollment().year"
                 (enrollmentChange)="onEnrollmentChange($event)"
-                (isValid)="onIsEnrollmentValidChange($event)"></app-enrollment>
+                (isValid)="onIsEnrollmentValidChange($event)" />
         </div>
     </div>
     }@else if (step() == 4) {
@@ -147,7 +147,7 @@
 
             <!-- Step 0 - Create new family tree or Choose existing child -->
             <li class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block"
-                [ngClass]="{
+                [class]="{
                 'text-silent': step() == 0,
                 'text-primary': step() > 0
               }" (click)="setStep(0)">
@@ -156,13 +156,13 @@
            'bg-neon-auto text-secondary': step() == 0,
            'bg-neon-success': step() != 0
           }">
-                    <fa-icon [icon]="faCalendar"></fa-icon>
+                    <fa-icon [icon]="faCalendar" />
                 </div>
             </li>
 
             <!-- Step 1 - Choose year -->
             <li class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block"
-                [ngClass]="{
+                [class]="{
           'text-silent': step() < 2,
           'text-primary': step() > 2,
         }" (click)="setStep(1)">
@@ -172,13 +172,13 @@
             'bg-neon-auto text-primary': step() == 1,
             'bg-neon-success': step() > 2
           }">
-                    <fa-icon [icon]="faUsers"></fa-icon>
+                    <fa-icon [icon]="faUsers" />
                 </div>
             </li>
 
             <!-- Step 2 - Create enrollment -->
             <li class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block"
-                [ngClass]="{
+                [class]="{
           'text-silent': step() < 3,
           'text-primary': step() > 3
         }" (click)="setStep(2)">
@@ -188,7 +188,7 @@
             'bg-neon-auto text-primary': step() == 2,
             'bg-neon-success': step() > 3
           }">
-                    <fa-icon [icon]="faIdCardClip"></fa-icon>
+                    <fa-icon [icon]="faIdCardClip" />
                 </div>
             </li>
             <!-- Step 3 - confirm -->
@@ -199,7 +199,7 @@
             'bg-neon-auto text-primary': step() == 3,
             'bg-neon-success': step() > 3
           }">
-                    <fa-icon [icon]="faClipboardCheck"></fa-icon>
+                    <fa-icon [icon]="faClipboardCheck" />
                 </div>
             </li>
         </ol>
@@ -210,4 +210,4 @@
     </div>
 </div>
 
-<app-footer></app-footer>
+<app-footer />
