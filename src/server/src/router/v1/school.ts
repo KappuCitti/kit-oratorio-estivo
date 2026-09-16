@@ -1,10 +1,9 @@
 import createSchoolController from '@/controllers/school/createSchool';
 import getSchoolsController from '@/controllers/school/getSchoolList';
-import type { HonoApp } from '@/models/app.model';
 import { createSchoolRouteDef } from '@/openapi/school/createSchool';
 import { getSchoolListRouteDef } from '@/openapi/school/getSchools';
+import { createRouter } from '@/utils/createRouter';
 
-export default (router: HonoApp) => {
-  router.openapi(getSchoolListRouteDef, getSchoolsController);
-  router.openapi(createSchoolRouteDef, createSchoolController);
-};
+export default createRouter()
+  .openapi(getSchoolListRouteDef, getSchoolsController)
+  .openapi(createSchoolRouteDef, createSchoolController);

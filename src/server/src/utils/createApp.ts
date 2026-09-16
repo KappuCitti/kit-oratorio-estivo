@@ -1,10 +1,10 @@
 import { logger } from '@/middlewares/logger';
-import { OpenAPIHono } from '@hono/zod-openapi';
+import type { HonoApp } from '@/models/app.model';
 import serveEmojiFavicon from './emojiFavicon';
-import type { Bindings } from '@/models/app.model';
 import { configureOpenApi } from './openApi';
 import config from '@/config';
-import router from '@/router';
+import { v1Router } from '@/router';
+import { createRouter } from './createRouter';
 import path from 'path';
 import { cors } from 'hono/cors';
 import { csrf } from 'hono/csrf';
@@ -17,20 +17,8 @@ import { prefixJoin } from './joinPrefix';
 import { serveStatic } from 'hono/bun';
 import { DatabaseError } from '@/errors/database';
 
-export function createRouter() {
-  return new OpenAPIHono<Bindings>({
-    strict: false,
-    defaultHook: (result, c) => {
-      if (!result.success) {
-        return httpErrorResponse(
-          c,
-          HttpStatusCodes.UNPROCESSABLE_ENTITY,
-          parseZodError(result.error)
-        );
-      }
-    },
-  });
-}
+// Riesportata perche' il resto del codice la importava da qui.
+export { createRouter } from './createRouter';
 
 export default function createApp() {
   const app = createRouter();
@@ -115,13 +103,16 @@ export default function createApp() {
     })
   );
 
-  const routers = router();
-  for (const [key, router] of Object.entries(routers)) {
-    app.route(prefixJoin(key), router);
-  }
+  // Il tipo delle rotte NON serve qui: il contratto per il client e' `ApiType`,
+  // esportato direttamente da router/v1. Calcolarlo di nuovo al montaggio lo
+  // farebbe esplodere (TS2589), perche' il prefisso e' configurabile a runtime
+  // e quindi non e' un letterale: TypeScript dovrebbe ricombinare tutti i
+  // percorsi con una stringa sconosciuta. Si monta quindi la versione con lo
+  // schema allargato; a runtime non cambia nulla.
+  app.route(prefixJoin('v1'), v1Router as unknown as HonoApp);
 
   app.get('*', (c) => {
-    return c.redirect('/api/v1');
+    return c.redirect(prefixJoin('v1'));
   });
 
   return app;

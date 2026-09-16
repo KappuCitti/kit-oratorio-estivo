@@ -3,20 +3,16 @@ import deleteAttendanceController from '@/controllers/attendance/deleteAttendanc
 import editAttendanceController from '@/controllers/attendance/editAttendance';
 import getAttendancesController from '@/controllers/attendance/getAttendanceList';
 import getGroupedAttendancesController from '@/controllers/attendance/getGroupedAttendances';
-import type { HonoApp } from '@/models/app.model';
 import { createAttendanceRouteDef } from '@/openapi/attendances/createAttendance';
 import { deleteAttendanceRouteDef } from '@/openapi/attendances/deleteAttendance';
 import { editAttendanceRouteDef } from '@/openapi/attendances/editAttendance';
 import { getAttendanceListRouteDef } from '@/openapi/attendances/getAttendances';
 import { getGroupedAttendancesRouteDef } from '@/openapi/attendances/getGroupedAttendances';
+import { createRouter } from '@/utils/createRouter';
 
-export default (router: HonoApp) => {
-  router.openapi(
-    getGroupedAttendancesRouteDef,
-    getGroupedAttendancesController
-  );
-  router.openapi(getAttendanceListRouteDef, getAttendancesController);
-  router.openapi(deleteAttendanceRouteDef, deleteAttendanceController);
-  router.openapi(editAttendanceRouteDef, editAttendanceController);
-  router.openapi(createAttendanceRouteDef, createAttendanceController);
-};
+export default createRouter()
+  .openapi(getGroupedAttendancesRouteDef, getGroupedAttendancesController)
+  .openapi(getAttendanceListRouteDef, getAttendancesController)
+  .openapi(deleteAttendanceRouteDef, deleteAttendanceController)
+  .openapi(editAttendanceRouteDef, editAttendanceController)
+  .openapi(createAttendanceRouteDef, createAttendanceController);

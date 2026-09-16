@@ -1,7 +1,8 @@
 import usersStatsController from '@/controllers/stats/users';
-import type { HonoApp } from '@/models/app.model';
 import { usersStatsRouteDef } from '@/openapi/stats/users';
+import { createRouter } from '@/utils/createRouter';
 
-export default (router: HonoApp) => {
-  router.openapi(usersStatsRouteDef, usersStatsController);
-};
+export default createRouter().openapi(
+  usersStatsRouteDef,
+  usersStatsController
+);
