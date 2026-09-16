@@ -8,12 +8,13 @@
     "start:ts": "NODE_ENV=production bun .",
     "start": "NODE_ENV=production bun run ./dist/index.js",
     "dev": "NODE_ENV=development bun run --hot .",
-    "check": "tsc --noEmit --pretty && tsc -p tsconfig.scripts.json --pretty",
+    "check": "tsc --noEmit --pretty && tsc -p tsconfig.scripts.json --pretty && bun run sync:permissions -- --check",
     "build": "tsc -b",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:check": "drizzle-kit check",
-    "db:setup:data": "bun run ./scripts/setupDBData.ts"
+    "db:setup:data": "bun run ./scripts/setupDBData.ts",
+    "sync:permissions": "bun run ./scripts/generateClientPermissions.ts"
   },
   "keywords": [
     "oratorio",

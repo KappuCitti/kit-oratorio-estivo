@@ -12,8 +12,22 @@ import { and, eq, gt } from 'drizzle-orm';
 import type { Context, Next } from 'hono';
 import { getCookie } from 'hono/cookie';
 
-export function can(permission: Permission) {
-  return async (c: Context<Bindings, any, {}>, next: Next) => {
+/**
+ * Il permesso richiesto resta leggibile dall'esterno come `.permission` sul
+ * middleware restituito.
+ *
+ * Serve a generare in automatico la mappa rotta -> permesso che usa il client:
+ * senza questo, l'unico modo per sapere cosa protegge una rotta sarebbe
+ * rileggere il sorgente con una regex, oppure riscrivere la stessa lista a mano
+ * nel client e vederla divergere al primo cambio.
+ */
+export type PermissionMiddleware = ((
+  c: Context<Bindings, any, {}>,
+  next: Next
+) => Promise<Response | void>) & { readonly permission: Permission };
+
+export function can(permission: Permission): PermissionMiddleware {
+  const middleware = async (c: Context<Bindings, any, {}>, next: Next) => {
     if (config.development.isDev && config.development.ignorePermissions) {
       return next();
     }
@@ -60,4 +74,6 @@ export function can(permission: Permission) {
       );
     return next();
   };
+
+  return Object.assign(middleware, { permission } as const);
 }
