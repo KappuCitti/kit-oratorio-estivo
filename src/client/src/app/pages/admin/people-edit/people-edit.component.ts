@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   Child,
@@ -21,6 +21,10 @@ import Enrollment from '../../../../models/Enrollment.model';
   templateUrl: './people-edit.component.html',
 })
 export class PeopleEditComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private api = inject(ApiService);
+  private utils = inject(UtilsService);
+
   type: 'child' | 'parent' | null = null;
   id: number | null = null;
   person: ParentResponse | ChildResponse | null = null;
@@ -28,12 +32,6 @@ export class PeopleEditComponent implements OnInit {
 
   loading: boolean = true;
   error: string | null = null;
-
-  constructor(
-    private route: ActivatedRoute,
-    private api: ApiService,
-    private utils: UtilsService
-  ) {}
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -19,16 +19,16 @@ import { UtilsService } from '../../../services/utils.service';
   templateUrl: './login.component.html',
 })
 export class LoginComponent {
+  private fb = inject(FormBuilder);
+  private api = inject(ApiService);
+  private utils = inject(UtilsService);
+
   faArrowLeft = faArrowLeft;
 
   form: FormGroup;
   error: string | null = null;
 
-  constructor(
-    private fb: FormBuilder,
-    private api: ApiService,
-    private utils: UtilsService
-  ) {
+  constructor() {
     this.form = this.fb.group({
       username: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(8)]],

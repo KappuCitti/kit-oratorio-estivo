@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { ChildComponent } from '../../../components/child/child.component';
@@ -24,6 +24,9 @@ import { FamilyEnrollmentCreateRequest } from '../../../../models/Request.model'
   templateUrl: './people-create.component.html',
 })
 export class PeopleCreateComponent {
+  private api = inject(ApiService);
+  private utils = inject(UtilsService);
+
   error: string | null = null;
 
   parents: Array<Parent | null> = [];
@@ -31,7 +34,7 @@ export class PeopleCreateComponent {
 
   isValid: boolean[] = [];
 
-  constructor(private api: ApiService, private utils: UtilsService) {
+  constructor() {
     this.changeArrayLength(this.parents, 2);
     this.changeArrayLength(this.childs, 1);
 

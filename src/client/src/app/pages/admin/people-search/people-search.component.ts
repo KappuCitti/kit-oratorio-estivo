@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import {
@@ -44,6 +44,10 @@ import { UtilsService } from '../../../../services/utils.service';
   templateUrl: './people-search.component.html',
 })
 export class PeopleSearchComponent implements OnInit {
+  private api = inject(ApiService);
+  private fb = inject(FormBuilder);
+  private utils = inject(UtilsService);
+
   searchForm: FormGroup;
 
   people: PeopleSearch[] = [];
@@ -65,11 +69,7 @@ export class PeopleSearchComponent implements OnInit {
   faChild = faChild;
   faChildDress = faChildDress;
 
-  constructor(
-    private api: ApiService,
-    private fb: FormBuilder,
-    private utils: UtilsService
-  ) {
+  constructor() {
     this.searchForm = this.fb.group({
       query: ['', [Validators.minLength(2), Validators.maxLength(100)]],
       gender: [''],

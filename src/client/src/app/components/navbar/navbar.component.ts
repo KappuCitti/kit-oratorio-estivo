@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, OnInit, Signal, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, OnInit, Signal, signal, ChangeDetectionStrategy, inject } from '@angular/core';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import {
   FontAwesomeModule,
@@ -41,6 +41,9 @@ interface Page {
   imports: [RouterLink, CommonModule, FontAwesomeModule],
 })
 export class NavbarComponent implements OnInit {
+  private api = inject(ApiService);
+  private router = inject(Router);
+
   faHouse = faHouse;
   faBars = faBars;
   faChevronLeft = faChevronLeft;
@@ -152,7 +155,7 @@ export class NavbarComponent implements OnInit {
     },
   ]);
 
-  constructor(private api: ApiService, private router: Router) {
+  constructor() {
     this.isAdmin.set(false);
 
     this.router.events

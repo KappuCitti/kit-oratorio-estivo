@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -27,6 +27,8 @@ import { RouterLink } from '@angular/router';
   templateUrl: './signup.component.html',
 })
 export class SignupComponent {
+  private fb = inject(FormBuilder);
+
   faArrowLeft = faArrowLeft;
 
   parent: Parent | null = null;
@@ -34,7 +36,7 @@ export class SignupComponent {
   form: FormGroup;
   error: string | null = null;
 
-  constructor(private fb: FormBuilder) {
+  constructor() {
     this.form = this.fb.group(
       {
         confirmPasswordOne: [

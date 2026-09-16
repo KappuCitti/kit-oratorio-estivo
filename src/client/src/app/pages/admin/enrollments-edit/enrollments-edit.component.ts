@@ -1,11 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  ModelSignal,
-  OnInit,
-  Signal,
-  ChangeDetectionStrategy
-} from '@angular/core';
+import { Component, EventEmitter, ModelSignal, OnInit, Signal, ChangeDetectionStrategy, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import Enrollment from '../../../../models/Enrollment.model';
 import { UtilsService } from '../../../../services/utils.service';
@@ -32,18 +25,16 @@ import { EnrollmentUpdateRequest } from '../../../../models/Request.model';
   templateUrl: './enrollments-edit.component.html',
 })
 export class EnrollmentsEditComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private utils = inject(UtilsService);
+  private api = inject(ApiService);
+
   id: string | null = null;
   loading: boolean = true;
   enrollment: Enrollment | null = null;
   error: string | null = null;
 
   updatedEnrollment: Enrollment | null = null;
-
-  constructor(
-    private route: ActivatedRoute,
-    private utils: UtilsService,
-    private api: ApiService
-  ) {}
 
   ngOnInit() {
     this.id = this.route.snapshot.paramMap.get('id');

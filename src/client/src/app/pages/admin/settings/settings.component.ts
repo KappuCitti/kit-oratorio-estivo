@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import {
   faEye,
@@ -42,6 +42,8 @@ type otherTypes = null;
   templateUrl: './settings.component.html',
 })
 export class SettingsComponent implements OnInit {
+  private api = inject(ApiService);
+
   faPlus = faPlus;
   faEye = faEye;
   faEyeLowVision = faEyeLowVision;
@@ -67,10 +69,6 @@ export class SettingsComponent implements OnInit {
     action: CRUD | otherTypes;
     id: string | number | null;
   } = { id: null, name: null, action: null };
-
-  // TODO - Add loading spinner to everything
-
-  constructor(private api: ApiService) {}
 
   ngOnInit(): void {
     this.api.getShirts().subscribe((response) => {

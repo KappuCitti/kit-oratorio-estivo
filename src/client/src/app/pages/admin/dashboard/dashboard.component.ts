@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -15,14 +15,14 @@ import { toDateOnly } from '../../../../services/utils.service';
   templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent implements OnInit {
+  private api = inject(ApiService);
+
   // TODO - Nessun endpoint espone il numero totale di utenti in rubrica:
   // questa casella resta a 0 finche' non viene aggiunto lato server.
   peopleCount: number = 0;
   enrollmentsCount: number = 0;
   attendanceStats: AttendancesStat | null = null;
   attendanceCount: number = 0;
-
-  constructor(private api: ApiService) {}
 
   ngOnInit(): void {
     const today = toDateOnly(new Date());

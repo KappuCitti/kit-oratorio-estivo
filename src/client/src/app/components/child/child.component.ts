@@ -1,12 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  ChangeDetectionStrategy
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ChangeDetectionStrategy, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -24,6 +16,8 @@ import { Child } from '../../../models/Family.model';
   templateUrl: './child.component.html',
 })
 export class ChildComponent implements OnChanges {
+  private fb = inject(FormBuilder);
+
   @Input() child: Child | null = null;
   @Output() childChange = new EventEmitter<Child | null>();
   @Output() isValid = new EventEmitter<boolean>(false);
@@ -37,7 +31,7 @@ export class ChildComponent implements OnChanges {
 
   faFloppyDisk = faFloppyDisk;
 
-  constructor(private fb: FormBuilder) {
+  constructor() {
     this.childForm = this.fb.group({
       name: ['', [Validators.required]],
       surname: ['', [Validators.required]],

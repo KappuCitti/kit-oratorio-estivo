@@ -1,12 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  ChangeDetectionStrategy
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ChangeDetectionStrategy, inject } from '@angular/core';
 import {
   FormGroup,
   FormBuilder,
@@ -24,6 +16,8 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
   templateUrl: './parent.component.html',
 })
 export class ParentComponent implements OnChanges {
+  private fb = inject(FormBuilder);
+
   @Input() parent: Parent | null = null;
   @Output() parentChange = new EventEmitter<Parent | null>();
   @Output() isValid = new EventEmitter<boolean>(false);
@@ -36,7 +30,7 @@ export class ParentComponent implements OnChanges {
 
   faFloppyDisk = faFloppyDisk;
 
-  constructor(private fb: FormBuilder) {
+  constructor() {
     this.parentForm = this.fb.group({
       name: ['', [Validators.required]],
       surname: ['', [Validators.required]],

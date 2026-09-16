@@ -7,14 +7,15 @@
  */
 // src/app/services/cookie.service.ts
 
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { CookieService as NgxCookieService } from 'ngx-cookie-service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CookiesService {
-  constructor(private cookieService: NgxCookieService) {}
+  private cookieService = inject(NgxCookieService);
+
 
   setCookie(name: string, value: string, days: number = 1): void {
     const expireDate = new Date();

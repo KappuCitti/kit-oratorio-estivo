@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { environment } from '../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { PagedResponse, Response } from '../models/Response.model';
@@ -36,9 +36,9 @@ import { toDateOnly } from './utils.service';
   providedIn: 'root',
 })
 export class ApiService {
-  private baseUrl = environment.server + '/api/v1';
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {}
+  private baseUrl = environment.server + '/api/v1';
 
   // User
   login(username: string, password: string) {

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { ApiService } from '../../../../services/api.service';
@@ -57,6 +57,10 @@ interface EnrollmentWeekEnrolled extends Week {
   templateUrl: './enrollments-search.component.html',
 })
 export class EnrollmentsSearchComponent implements OnInit {
+  private api = inject(ApiService);
+  private fb = inject(FormBuilder);
+  private utils = inject(UtilsService);
+
   faThumbTackSlash = faThumbTackSlash;
   faThumbTack = faThumbTack;
   faCamera = faCamera;
@@ -86,11 +90,7 @@ export class EnrollmentsSearchComponent implements OnInit {
   isDeleteModalOpen: boolean = false;
   errorDelete: string | null = null;
 
-  constructor(
-    private api: ApiService,
-    private fb: FormBuilder,
-    private utils: UtilsService
-  ) {
+  constructor() {
     this.searchForm = this.fb.group({
       year: [this.year, [Validators.required, Validators.min(1980)]],
       week: [null],

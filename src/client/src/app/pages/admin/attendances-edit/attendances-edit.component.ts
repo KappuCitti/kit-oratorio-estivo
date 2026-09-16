@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { NavbarComponent } from "../../../components/navbar/navbar.component";
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
@@ -20,6 +20,8 @@ import { addMonths, subMonths } from 'date-fns';
   templateUrl: './attendances-edit.component.html',
 })
 export class AttendancesEditComponent implements OnInit {
+  private fb = inject(FormBuilder);
+
   faArrowRotateLeft = faArrowRotateLeft;
   faRightToBracket = faRightToBracket;
   faRightFromBracket = faRightFromBracket;
@@ -44,7 +46,7 @@ export class AttendancesEditComponent implements OnInit {
 
   today = new Date();
 
-  constructor(private fb: FormBuilder) {
+  constructor() {
     this.searchForm = this.fb.group({
       date: ['', []],
       type: ['', []],

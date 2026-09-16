@@ -1,11 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  ChangeDetectionStrategy
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, ChangeDetectionStrategy, inject } from '@angular/core';
 import Enrollment, {
   EnrollmentWeekSearch,
 } from '../../../models/Enrollment.model';
@@ -31,6 +24,9 @@ import { zip } from 'rxjs';
   templateUrl: './enrollment.component.html',
 })
 export class EnrollmentComponent implements OnChanges {
+  private fb = inject(FormBuilder);
+  private api = inject(ApiService);
+
   @Input() enrollment: Enrollment | null = null;
   @Output() enrollmentChange = new EventEmitter<Enrollment | null>();
   @Output() isValid = new EventEmitter<boolean>(false);
@@ -49,7 +45,7 @@ export class EnrollmentComponent implements OnChanges {
 
   faFloppyDisk = faFloppyDisk;
 
-  constructor(private fb: FormBuilder, private api: ApiService) {
+  constructor() {
     this.enrollmentForm = this.fb.group({
       schoolType: [
         '',

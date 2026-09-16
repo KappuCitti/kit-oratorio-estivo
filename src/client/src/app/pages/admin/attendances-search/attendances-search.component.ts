@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
   faArrowRotateLeft,
@@ -49,6 +49,10 @@ import Week from '../../../../models/Week.model';
   templateUrl: './attendances-search.component.html',
 })
 export class AttendancesSearchComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private api = inject(ApiService);
+  private utils = inject(UtilsService);
+
   faArrowRotateLeft = faArrowRotateLeft;
   faPen = faPen;
   faTrash = faTrash;
@@ -76,11 +80,7 @@ export class AttendancesSearchComponent implements OnInit {
   extraordinaryAttendanceForm: FormGroup;
   selectedAttendance: AttendanceSearch | null = null;
 
-  constructor(
-    private fb: FormBuilder,
-    private api: ApiService,
-    private utils: UtilsService
-  ) {
+  constructor() {
     this.searchForm = this.fb.group({
       date: ['', [Validators.required]],
       schoolId: [null],

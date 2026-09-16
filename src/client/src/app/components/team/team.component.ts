@@ -1,12 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  ChangeDetectionStrategy
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ChangeDetectionStrategy, inject } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -35,6 +27,10 @@ import { UtilsService } from '../../../services/utils.service';
   templateUrl: './team.component.html',
 })
 export class TeamComponent implements OnChanges {
+  private api = inject(ApiService);
+  private fb = inject(FormBuilder);
+  private utils = inject(UtilsService);
+
   @Input() team: Team | null = null;
   @Output() teamChange = new EventEmitter<Team | null>();
   @Output() teamDelete = new EventEmitter<number>();
@@ -55,11 +51,7 @@ export class TeamComponent implements OnChanges {
   isEditModalOpen = false;
   isDeleteModalOpen = false;
 
-  constructor(
-    private api: ApiService,
-    private fb: FormBuilder,
-    private utils: UtilsService
-  ) {
+  constructor() {
     this.teamForm = this.fb.group(
       {
         name: ['', [Validators.required]],

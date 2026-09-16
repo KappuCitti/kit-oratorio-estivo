@@ -1,11 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  SimpleChanges,
-  ChangeDetectionStrategy
-} from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges, ChangeDetectionStrategy, inject } from '@angular/core';
 import { FamilyMember } from '../../../models/Family.model';
 import {
   FormGroup,
@@ -23,6 +16,8 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
   templateUrl: './family-member.component.html',
 })
 export class FamilyMemberComponent {
+  private fb = inject(FormBuilder);
+
   @Input() familyMember: FamilyMember | null = null;
   @Output() familyMemberChange = new EventEmitter<FamilyMember | null>();
   @Output() isValid = new EventEmitter<boolean>(false);
@@ -35,7 +30,7 @@ export class FamilyMemberComponent {
 
   faFloppyDisk = faFloppyDisk;
 
-  constructor(private fb: FormBuilder) {
+  constructor() {
     this.familyMemberForm = this.fb.group({
       email: ['', [Validators.email]],
       phone: ['', [Validators.pattern(/^\+?[0-9\s]+$/)]],

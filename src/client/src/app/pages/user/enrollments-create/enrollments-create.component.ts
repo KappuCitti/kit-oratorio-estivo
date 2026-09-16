@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import {
@@ -50,6 +50,11 @@ import { PaginationComponent } from '../../../components/pagination/pagination.c
   templateUrl: './enrollments-create.component.html',
 })
 export class EnrollmentsCreateComponent {
+  private api = inject(ApiService);
+  private route = inject(ActivatedRoute);
+  private utils = inject(UtilsService);
+  private fb = inject(FormBuilder);
+
   // TODO - Create enrollment form
   // This page will show to child's parents to create an enrollment for their child
 
@@ -80,12 +85,7 @@ export class EnrollmentsCreateComponent {
   error: string | null = null;
   loading: boolean = true;
 
-  constructor(
-    private api: ApiService,
-    private route: ActivatedRoute,
-    private utils: UtilsService,
-    private fb: FormBuilder
-  ) {
+  constructor() {
     this.searchForm = this.fb.group({
       query: [
         '',

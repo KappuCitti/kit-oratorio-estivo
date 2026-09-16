@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectionStrategy, inject } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -27,6 +27,11 @@ import { UtilsService } from '../../../../services/utils.service';
   templateUrl: './my.component.html',
 })
 export class MyComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private theme = inject(ThemeService);
+  private api = inject(ApiService);
+  private utils = inject(UtilsService);
+
   user!: User;
 
   dataForm: FormGroup;
@@ -38,12 +43,7 @@ export class MyComponent implements OnInit {
   isPasswordFormValid = signal(false); // Signal per lo stato della validità del form
   isPasswordFormEmpty = signal(true); // Signal per lo stato di vuotezza dei campi del form
 
-  constructor(
-    private fb: FormBuilder,
-    private theme: ThemeService,
-    private api: ApiService,
-    private utils: UtilsService
-  ) {
+  constructor() {
     this.dataForm = this.fb.group({
       surname: [{ value: '', disabled: true }, Validators.required],
       name: [{ value: '', disabled: true }, Validators.required],

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { ParentComponent } from '../../../components/parent/parent.component';
@@ -24,6 +24,8 @@ import { FamilyMemberComponent } from '../../../components/family-member/family-
   templateUrl: './people-search.component.html',
 })
 export class PeopleSearchComponent implements OnInit {
+  private api = inject(ApiService);
+
   // TODO - Load personal data schedule from the backend
   // TODO - Load other adults data from the backend
   // TODO - Load children data from the backend
@@ -33,8 +35,6 @@ export class PeopleSearchComponent implements OnInit {
   user: any;
   parent: Parent | null = null;
   childs: FamilyMember[] = [];
-
-  constructor(private api: ApiService) {}
 
   ngOnInit(): void {
     this.loadData();

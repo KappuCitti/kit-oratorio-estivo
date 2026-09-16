@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { ApiService } from '../../../../services/api.service';
@@ -56,6 +56,11 @@ import { PaginationComponent } from '../../../components/pagination/pagination.c
   templateUrl: './enrollments-create.component.html',
 })
 export class EnrollmentsCreateComponent implements OnInit {
+  private api = inject(ApiService);
+  private route = inject(ActivatedRoute);
+  private utils = inject(UtilsService);
+  private fb = inject(FormBuilder);
+
   faInfo = faInfo;
   faUsers = faUsers;
   faCalendar = faCalendar;
@@ -86,12 +91,7 @@ export class EnrollmentsCreateComponent implements OnInit {
   error: string | null = null;
   loading: boolean = true;
 
-  constructor(
-    private api: ApiService,
-    private route: ActivatedRoute,
-    private utils: UtilsService,
-    private fb: FormBuilder
-  ) {
+  constructor() {
     this.searchForm = this.fb.group({
       query: [
         '',

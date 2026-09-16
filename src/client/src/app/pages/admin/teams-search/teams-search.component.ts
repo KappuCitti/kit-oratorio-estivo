@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import Team from '../../../../models/Team.model';
@@ -27,6 +27,10 @@ import { UtilsService } from '../../../../services/utils.service';
   templateUrl: './teams-search.component.html',
 })
 export class TeamsSearchComponent implements OnInit {
+  private api = inject(ApiService);
+  private fb = inject(FormBuilder);
+  private utils = inject(UtilsService);
+
   teams: Team[] = [];
   loading = true;
 
@@ -37,11 +41,7 @@ export class TeamsSearchComponent implements OnInit {
 
   isAddModalOpen = false;
 
-  constructor(
-    private api: ApiService,
-    private fb: FormBuilder,
-    private utils: UtilsService
-  ) {
+  constructor() {
     this.teamForm = this.fb.group({
       name: ['', [Validators.required]],
       color: ['', [Validators.required]],
