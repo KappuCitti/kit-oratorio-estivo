@@ -1,31 +1,24 @@
+import type { InferResponseType } from 'hono/client';
+import { api } from '../services/api-client';
+
 /**
- * Risposta di GET /attendances/grouped.
+ * Risposta di GET /attendances/grouped: le presenze del giorno raggruppate per
+ * scuola e classe.
  *
- * Forma verificata contro il server:
- *   { "total": 0, "schools": [] }
- *   { "total": 12, "schools": [
- *       { "id": 1, "name": "Elementari", "total": 12,
- *         "classes": [ { "id": 3, "name": "III", "total": 5 } ] } ] }
- *
- * Era dichiarata come `School[] & { total, classes }`, cioe' un array
- * intersecato con un oggetto: non corrispondeva alla risposta del server e
- * avrebbe fatto accettare al compilatore accessi che a runtime davano
- * undefined.
+ * Non e' piu' scritta a mano. Prima ancora era dichiarata come
+ * `School[] & { total, classes }`, cioe' un array intersecato con un oggetto:
+ * non corrispondeva alla risposta del server e faceva accettare al compilatore
+ * accessi che a runtime davano undefined.
  */
-export interface ClassAttendancesStat {
-  id: number;
-  name: string;
-  total: number;
-}
+type GroupedResponse = InferResponseType<
+  typeof api.attendances.grouped.$get,
+  200
+>;
 
-export interface SchoolAttendancesStat {
-  id: number;
-  name: string;
-  total: number;
-  classes: ClassAttendancesStat[];
-}
+export type AttendancesStat = Extract<
+  GroupedResponse,
+  { success: true }
+>['data'];
 
-export interface AttendancesStat {
-  total: number;
-  schools: SchoolAttendancesStat[];
-}
+export type SchoolAttendancesStat = AttendancesStat['schools'][number];
+export type ClassAttendancesStat = SchoolAttendancesStat['classes'][number];

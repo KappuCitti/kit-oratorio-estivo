@@ -339,65 +339,31 @@ export class ApiService {
 
   // Attendance
   getAttendances(params: { date: string }) {
-    return this.http.get<Response<AttendanceSearch[]>>(
-      `${this.baseUrl}/attendances`,
-      {
-        params: { ...params },
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
+    return request(api.attendances.$get({ query: params }));
+  }
+
+  addAttendance(params: { date: string | Date; userId: string }) {
+    return request(
+      api.attendances.$post({
+        json: { date: toDateOnly(params.date), userId: params.userId },
+      })
     );
   }
 
-  addAttendance(params: { date: string | Date; userId: number | string }) {
-    return this.http.post<Response<number>>(
-      `${this.baseUrl}/attendances`,
-      params,
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
-  }
-
-  deleteAttendance(id: string | number) {
-    return this.http.delete<Response<null>>(
-      `${this.baseUrl}/attendances/${id.toString()}`,
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
+  deleteAttendance(id: number) {
+    return request(api.attendances[':id'].$delete({ param: { id } }));
   }
 
   updateAttendance(
-    id: string | number,
+    id: number,
     date: string | Date,
     eatsInOratory: boolean
   ) {
-    return this.http.put<Response<null>>(
-      `${this.baseUrl}/attendances/${id}`,
-      { date, eatsInOratory },
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
+    return request(
+      api.attendances[':id'].$put({
+        param: { id },
+        json: { date: toDateOnly(date), eatsInOratory },
+      })
     );
   }
 
@@ -435,17 +401,8 @@ export class ApiService {
    * come YYYY-MM-DD, altrimenti il server risponde 422 "Invalid date".
    */
   getAttendancesStat(date: string | Date) {
-    return this.http.get<Response<AttendancesStat>>(
-      `${this.baseUrl}/attendances/grouped`,
-      {
-        params: { date: toDateOnly(date) },
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
+    return request(
+      api.attendances.grouped.$get({ query: { date: toDateOnly(date) } })
     );
   }
 }
