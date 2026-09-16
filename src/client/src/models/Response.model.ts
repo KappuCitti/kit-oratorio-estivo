@@ -1,22 +1,25 @@
-export type Response<T> = ResponseSuccess<T> | ResponseError | RequestErrror;
+export type Response<T> = ResponseSuccess<T> | ResponseError | RequestZodError;
+export type PagedResponse<T> = ResponseSuccess<Paged<T>> | ResponseError;
 
 interface ResponseError {
   success: false;
-  error: string;
 
-  data?: undefined;
+  error: string;
 }
 
-interface RequestErrror {
+interface RequestZodError {
   success: false;
-  error: string[];
 
-  data?: undefined;
+  error: string[];
 }
 
 interface ResponseSuccess<T> {
-  success: boolean;
-  data: T;
+  success: true;
 
-  error?: string;
+  data: T;
+}
+
+export interface Paged<T> {
+  count: number;
+  elements: T[];
 }

@@ -1,5 +1,6 @@
 import Address from './Address.model';
 import Enrollment from './Enrollment.model';
+import { Role } from './User.model';
 
 export interface Family {
   child: Child;
@@ -8,6 +9,7 @@ export interface Family {
 
 export type gender = 'M' | 'F' | 'Other';
 
+// TODO - Old
 export interface PeopleSearch {
   id: number;
   name: string;
@@ -16,6 +18,20 @@ export interface PeopleSearch {
   type?: string;
 }
 
+// TODO - New
+export interface FamilyMember {
+  id: string;
+  email: string | null;
+  phone: string | null;
+  role: Role;
+  name: string;
+  surname: string;
+  gender: gender;
+  birthDate: string | null;
+  birthPlace: string | null;
+}
+
+// TODO - Old
 export interface Child {
   id: number;
   name: string;
@@ -26,6 +42,7 @@ export interface Child {
   address: Address;
 }
 
+// TODO - Old
 export interface ChildSearch {
   id: number;
   name: string;
@@ -37,7 +54,7 @@ export interface ChildSearch {
 export type ChildResponse = Child & {
   enrollments: Enrollment[];
   parents: Parent[];
-}
+};
 
 export interface Parent {
   id: number;
@@ -55,4 +72,4 @@ export interface ParentSearch {
   gender: gender;
 }
 
-export type ParentResponse = Parent & { childrens: Child[] }
+export type ParentResponse = Parent & { childrens: Child[] };

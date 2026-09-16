@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Response } from '../models/Response.model';
+import { PagedResponse, Response } from '../models/Response.model';
 import User from '../models/User.model';
 import { Theme } from '../models/Theme.model';
 import Enrollment, { EnrollmentSearch } from '../models/Enrollment.model';
@@ -13,7 +13,8 @@ import {
   FamilyEnrollmentCreateRequest,
   TeamCreateRequest,
   TeamUpdateRequest,
-  AttendanceGetRequest,
+  SchoolCreateRequest,
+  ClassCreateRequest,
 } from '../models/Request.model';
 import Week from '../models/Week.model';
 import Team from '../models/Team.model';
@@ -22,12 +23,15 @@ import {
   Child,
   ChildResponse,
   ChildSearch,
+  FamilyMember,
   Parent,
   ParentResponse,
   ParentSearch,
   PeopleSearch,
 } from '../models/Family.model';
-import Attendance, { AttendanceSearch } from '../models/Attendances.model';
+import { AttendanceSearch } from '../models/Attendances.model';
+import { AttendancesStat } from '../models/Stat.model';
+import { toDateOnly } from './utils.service';
 @Injectable({
   providedIn: 'root',
 })
@@ -71,7 +75,7 @@ export class ApiService {
   }
 
   getUser() {
-    return this.http.get<Response<User>>(`${this.baseUrl}/user`, {
+    return this.http.get<Response<User>>(`${this.baseUrl}/users/self`, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
@@ -113,17 +117,18 @@ export class ApiService {
 
   // Enrollments
   getEnrollments(params: EnrollmentGetRequest) {
-    return this.http.get<
-      Response<{ enrollments: EnrollmentSearch[]; count: number }>
-    >(`${this.baseUrl}/enrollments`, {
-      params: { ...params },
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-      responseType: 'json',
-      withCredentials: true,
-      observe: 'response',
-    });
+    return this.http.get<PagedResponse<EnrollmentSearch>>(
+      `${this.baseUrl}/enrollments`,
+      {
+        params: { ...params },
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
   }
 
   getEnrollmentById(id: string | number) {
@@ -262,8 +267,19 @@ export class ApiService {
   }
 
   // Families
+  getManagedPeople() {
+    return this.http.get<Response<FamilyMember[]>>(`${this.baseUrl}/users`, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      responseType: 'json',
+      withCredentials: true,
+      observe: 'response',
+    });
+  }
+
   getPeople(params: PeopleGetRequest) {
-    return this.http.get<Response<{ people: PeopleSearch[]; count: number }>>(
+    return this.http.get<PagedResponse<PeopleSearch>>(
       `${this.baseUrl}/people`,
       {
         params: { ...params },
@@ -278,18 +294,15 @@ export class ApiService {
   }
 
   getChilds(params: PeopleGetRequest) {
-    return this.http.get<Response<{ childs: ChildSearch[]; count: number }>>(
-      `${this.baseUrl}/childs`,
-      {
-        params: { ...params },
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
+    return this.http.get<PagedResponse<ChildSearch>>(`${this.baseUrl}/childs`, {
+      params: { ...params },
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      responseType: 'json',
+      withCredentials: true,
+      observe: 'response',
+    });
   }
 
   getChildById(id: string | number) {
@@ -347,7 +360,7 @@ export class ApiService {
   }
 
   getParents(params: PeopleGetRequest) {
-    return this.http.get<Response<{ parents: ParentSearch[]; count: number }>>(
+    return this.http.get<PagedResponse<ParentSearch>>(
       `${this.baseUrl}/parents`,
       {
         params: { ...params },
@@ -428,11 +441,84 @@ export class ApiService {
   }
 
   // Attendance
-  getAttendances(params: AttendanceGetRequest) {
-    return this.http.get<
-      Response<{ elements: AttendanceSearch[]; count: number }>
-    >(`${this.baseUrl}/attendances`, {
-      params: { ...params },
+  getAttendances(params: { date: string }) {
+    return this.http.get<Response<AttendanceSearch[]>>(
+      `${this.baseUrl}/attendances`,
+      {
+        params: { ...params },
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
+  }
+
+  addAttendance(params: { date: string | Date; userId: number | string }) {
+    return this.http.post<Response<number>>(
+      `${this.baseUrl}/attendances`,
+      params,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
+  }
+
+  deleteAttendance(id: string | number) {
+    return this.http.delete<Response<null>>(
+      `${this.baseUrl}/attendances/${id.toString()}`,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
+  }
+
+  updateAttendance(
+    id: string | number,
+    date: string | Date,
+    eatsInOratory: boolean
+  ) {
+    return this.http.put<Response<null>>(
+      `${this.baseUrl}/attendances/${id}`,
+      { date, eatsInOratory },
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
+  }
+
+  // Schools and classes
+  getSchools(query?: string) {
+    return this.http.get<Response<any>>(`${this.baseUrl}/schools`, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      responseType: 'json',
+      withCredentials: true,
+      observe: 'response',
+      params: query ? { query } : {},
+    });
+  }
+
+  createSchool(school: SchoolCreateRequest) {
+    return this.http.post<Response<number>>(`${this.baseUrl}/schools`, school, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       }),
@@ -442,11 +528,47 @@ export class ApiService {
     });
   }
 
-  updateAttendance(id: string | number, attendance: Attendance) {
-    return this.http.put<Response<null>>(
-      `${this.baseUrl}/attendances/${id}`,
-      attendance,
+  getClasses(query?: string) {
+    return this.http.get<Response<any>>(`${this.baseUrl}/classes`, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      responseType: 'json',
+      withCredentials: true,
+      observe: 'response',
+      params: query ? { query } : {},
+    });
+  }
+
+  createClass(classData: ClassCreateRequest) {
+    // La rotta e' POST /classes: /schools/classes non esiste sul server.
+    return this.http.post<Response<number>>(
+      `${this.baseUrl}/classes`,
+      classData,
       {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+        responseType: 'json',
+        withCredentials: true,
+        observe: 'response',
+      }
+    );
+  }
+
+  // Stats
+  /**
+   * Presenze del giorno raggruppate per scuola e classe.
+   *
+   * L'endpoint e' GET /attendances/grouped: /stats/attendances non esiste (il
+   * server ha /stats/users/{year}, che e' un'altra cosa). La data va passata
+   * come YYYY-MM-DD, altrimenti il server risponde 422 "Invalid date".
+   */
+  getAttendancesStat(date: string | Date) {
+    return this.http.get<Response<AttendancesStat>>(
+      `${this.baseUrl}/attendances/grouped`,
+      {
+        params: { date: toDateOnly(date) },
         headers: new HttpHeaders({
           'Content-Type': 'application/json',
         }),

@@ -1,5 +1,21 @@
 import { HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Role } from '../models/User.model';
+
+/**
+ * Formatta una data come YYYY-MM-DD **nel fuso locale**, che e' il formato
+ * preteso dal server (z.string().date()).
+ *
+ * Non si usa toISOString(): quello converte prima in UTC, quindi in Italia una
+ * data locale fra mezzanotte e le 01:00/02:00 diventa il giorno precedente. Per
+ * le presenze "di oggi" significherebbe mostrare il giorno sbagliato.
+ */
+export function toDateOnly(date: string | Date): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  const month = `${d.getMonth() + 1}`.padStart(2, '0');
+  const day = `${d.getDate()}`.padStart(2, '0');
+  return `${d.getFullYear()}-${month}-${day}`;
+}
 
 @Injectable({
   providedIn: 'root',

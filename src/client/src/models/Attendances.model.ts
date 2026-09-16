@@ -1,14 +1,18 @@
-export interface AttendanceSearch extends Attendance {
-  id: number | string;
-  childId: number | string;
-  childName: string;
-  childSurname: string;
+import { EnrollmentSearch } from './Enrollment.model';
+import { UserSimplified } from './User.model';
+
+export interface AttendanceSearch {
+  id: number;
+  enrollmentId: number;
+  eatsInOratory: boolean;
+  user: UserSimplified;
 }
 
-export default interface Attendance {
-  enrollmentId: number | string;
-  date: Date;
+// mix enrollmentId with attendance in one type
+export type EnrollmentAttendanceSearch = EnrollmentSearch & {
   present: boolean;
-  eatsInOratory: boolean;
-  eatsPlain: boolean;
-}
+  attendance?: AttendanceSearch;
+};
+
+//   eatsPlain: boolean;
+// }

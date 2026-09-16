@@ -11,8 +11,8 @@ export interface EnrollmentGetRequest extends Request {
   weekId?: number | string;
   teamId?: number | string;
   query?: string;
-  schoolType?: schoolType;
-  className?: className;
+  schoolId?: number;
+  classId?: number;
 }
 
 export interface EnrollmentUpdateRequest {
@@ -22,6 +22,7 @@ export interface EnrollmentUpdateRequest {
   weeks: { id: number | string; isPaid: boolean }[];
   dataProcessingConsent: boolean;
   exitAuthorization: boolean;
+  // TODO - Change
   schoolType: schoolType;
   className: className;
   section: string;
@@ -83,11 +84,14 @@ export interface TeamUpdateRequest {
     ids: number[];
   };
 }
+export interface SchoolCreateRequest {
+  name: string;
+  canChooseActivities: boolean;
+}
 
-export interface AttendanceGetRequest extends Request {
-  date: string;
-  schoolType?: schoolType;
-  className?: className;
-  teamId?: number | string;
-  query?: string;
+export interface ClassCreateRequest {
+  name: string;
+  // Il server si aspetta `schoolId` (e un numero): era scritto `schooldId`,
+  // quindi la chiamata sarebbe stata rifiutata con 422 appena collegata alla UI.
+  schoolId: number;
 }
