@@ -52,11 +52,11 @@
     <span class="ml-1">Torna alla home</span>
   </a>
 
-  @if (error) {
+  @if (error()) {
   <div
     class="bg-neon-error p-3 rounded-lg mt-4 shadow-lg w-full max-w-md text-center text-sm sm:text-base"
   >
-    {{ error }}
+    {{ error() }}
   </div>
   }
 </div>

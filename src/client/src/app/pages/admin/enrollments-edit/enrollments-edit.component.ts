@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import Enrollment from '../../../../models/Enrollment.model';
 import { UtilsService } from '../../../../services/utils.service';
@@ -21,7 +21,6 @@ import { EnrollmentUpdateRequest } from '../../../../models/Request.model';
     ChildComponent,
     ParentComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './enrollments-edit.component.html',
 })
 export class EnrollmentsEditComponent implements OnInit {
@@ -30,9 +29,9 @@ export class EnrollmentsEditComponent implements OnInit {
   private api = inject(ApiService);
 
   id: string | null = null;
-  loading: boolean = true;
-  enrollment: Enrollment | null = null;
-  error: string | null = null;
+  readonly loading = signal(true);
+  readonly enrollment = signal<Enrollment | null>(null);
+  readonly error = signal<string | null>(null);
 
   updatedEnrollment: Enrollment | null = null;
 
@@ -44,15 +43,15 @@ export class EnrollmentsEditComponent implements OnInit {
       this.api.getEnrollmentById(this.id).subscribe({
         next: (response) => {
           if (response.status === 200 && response.body?.success) {
-            this.enrollment = response.body.data;
+            this.enrollment.set(response.body.data);
 
-            this.loading = false;
+            this.loading.set(false);
           }
         },
         error: (error) => {
           console.log(error);
-          this.error = this.utils.handleResponse(error, null);
-          this.loading = false;
+          this.error.set(this.utils.handleResponse(error, null));
+          this.loading.set(false);
         },
       });
     }
@@ -69,7 +68,7 @@ export class EnrollmentsEditComponent implements OnInit {
     });
 
     if (
-      this.enrollment &&
+      this.enrollment() &&
       this.updatedEnrollment &&
       this.updatedEnrollment.id
     ) {
@@ -93,11 +92,12 @@ export class EnrollmentsEditComponent implements OnInit {
 
       this.api.updateEnrollment(params).subscribe({
         next: (response) => {
-          if (response.status === 200) this.enrollment = this.updatedEnrollment;
+          if (response.status === 200)
+            this.enrollment.set(this.updatedEnrollment);
         },
         error: (error) => {
           console.log(error);
-          this.error = this.utils.handleResponse(error, null);
+          this.error.set(this.utils.handleResponse(error, null));
         },
       });
     }

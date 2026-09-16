@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { ApiService } from '../../../../services/api.service';
@@ -52,7 +52,6 @@ import { PaginationComponent } from '../../../components/pagination/pagination.c
     ReactiveFormsModule,
     PaginationComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './enrollments-create.component.html',
 })
 export class EnrollmentsCreateComponent implements OnInit {
@@ -67,29 +66,36 @@ export class EnrollmentsCreateComponent implements OnInit {
   faIdCardClip = faIdCardClip;
   faClipboardCheck = faClipboardCheck;
 
-  existing: boolean = false;
-  step: number = 0;
-  maxStep: number = 0;
+  readonly existing = signal(false);
+  readonly step = signal(0);
+  readonly maxStep = signal(0);
 
-  elements: number = 0;
+  readonly elements = signal(0);
   page: number = 1;
   size: number = 25;
 
   searchForm: FormGroup;
-  childs: ChildSearch[] = [];
+  readonly childs = signal<ChildSearch[]>([]);
 
-  child: Child | null = null;
-  parentOne: Parent | null = null;
-  parentTwo: Parent | null = null;
-  enrollment: EnrollmentCreateRequest = {} as EnrollmentCreateRequest;
+  readonly child = signal<Child | null>(null);
+  readonly parentOne = signal<Parent | null>(null);
+  readonly parentTwo = signal<Parent | null>(null);
+  readonly enrollment = signal<EnrollmentCreateRequest>(
+    {} as EnrollmentCreateRequest
+  );
 
-  isChildValid: boolean = false;
-  isParentOneValid: boolean = false;
-  isParentTwoValid: boolean = false;
-  isEnrollmentValid: boolean = false;
+  private readonly isChildValid = signal(false);
+  private readonly isParentOneValid = signal(false);
+  private readonly isParentTwoValid = signal(false);
+  private isEnrollmentValid: boolean = false;
 
-  error: string | null = null;
-  loading: boolean = true;
+  readonly error = signal<string | null>(null);
+  readonly loading = signal(true);
+
+  readonly isFamilyFormValid = computed(
+    () =>
+      this.isChildValid() && this.isParentOneValid() && this.isParentTwoValid()
+  );
 
   constructor() {
     this.searchForm = this.fb.group({
@@ -117,111 +123,108 @@ export class EnrollmentsCreateComponent implements OnInit {
       const year = params['year'];
 
       console.table({ existing, id, year });
-      this.existing = existing == 'true';
+      this.existing.set(existing == 'true');
 
       if (existing == 'false') {
-        this.step = 1;
+        this.step.set(1);
       } else if (existing == 'true') {
         this.loadChilds();
       }
 
       if (year) {
-        if (this.checkIfYearIsValid(year)) this.enrollment.year = year;
+        if (this.checkIfYearIsValid(year)) this.patchEnrollment({ year });
       } else {
-        this.enrollment.year = new Date().getFullYear();
+        this.patchEnrollment({ year: new Date().getFullYear() });
       }
 
       if (id) {
-        this.enrollment.child = id;
-        this.step = 3;
+        this.patchEnrollment({ child: id });
+        this.step.set(3);
       }
     });
   }
 
+  // `enrollment` e' un signal: va sostituito, non modificato sul posto.
+  private patchEnrollment(changes: Partial<EnrollmentCreateRequest>) {
+    this.enrollment.update((enrollment) => ({ ...enrollment, ...changes }));
+  }
+
   createFromExistingEnrollment(existing: boolean) {
-    this.existing = existing;
+    this.existing.set(existing);
     if (!existing) {
-      this.step = 1;
+      this.step.set(1);
     } else {
       this.loadChilds();
     }
 
-    this.maxStep = 1;
+    this.maxStep.set(1);
   }
 
   loadChilds() {
-    this.loading = true;
+    this.loading.set(true);
     this.api.getChilds({ query: this.searchForm.value.query }).subscribe({
       next: (response) => {
         if (response.status === 200 && response.body?.success) {
-          this.childs = response.body.data.elements;
-          this.elements = response.body.data.count;
+          this.childs.set(response.body.data.elements);
+          this.elements.set(response.body.data.count);
 
-          this.step = 2;
-          this.maxStep = 2;
+          this.step.set(2);
+          this.maxStep.set(this.enrollment().child ? 3 : 2);
 
-          if (this.enrollment.child) {
-            this.maxStep = 3;
-          }
-          this.loading = false;
+          this.loading.set(false);
         }
       },
       error: (error) => {
         console.error(error);
-        this.error = this.utils.handleResponse(error, null);
-        this.loading = false;
+        this.error.set(this.utils.handleResponse(error, null));
+        this.loading.set(false);
       },
     });
   }
 
   onChildChange(updated: Child | null) {
-    this.child = updated ? { ...updated } : null;
+    this.child.set(updated ? { ...updated } : null);
   }
 
   onIsChildValidChange(valid: boolean) {
-    this.isChildValid = valid;
+    this.isChildValid.set(valid);
     this.checkIfNewFamilyIsValid();
   }
 
   getChildInfo(): string {
-    const child: ChildSearch = this.childs.filter(
-      (c) => c.id == this.enrollment.child
-    )[0];
-    if (this.child) {
-      return `${this.child.name} ${this.child.surname}`;
+    const child = this.child();
+    if (child) {
+      return `${child.name} ${child.surname}`;
     }
-    return child ? `${child.name} ${child.surname}` : '';
+
+    const selected = this.childs().filter(
+      (c) => c.id == this.enrollment().child
+    )[0];
+    return selected ? `${selected.name} ${selected.surname}` : '';
   }
 
   onParentChange(parent: Parent | null, index: number) {
     if (index == 1) {
-      this.parentOne = parent;
+      this.parentOne.set(parent);
     } else if (index == 2) {
-      this.parentTwo = parent;
+      this.parentTwo.set(parent);
     }
   }
 
   onIsParentValidChange(valid: boolean, index: number) {
     if (index == 1) {
-      this.isParentOneValid = valid;
+      this.isParentOneValid.set(valid);
     } else {
-      this.isParentTwoValid = valid;
+      this.isParentTwoValid.set(valid);
     }
     this.checkIfNewFamilyIsValid();
   }
 
-  get isFamilyFormValid(): boolean {
-    return this.isChildValid && this.isParentOneValid && this.isParentTwoValid;
-  }
-
   checkIfNewFamilyIsValid() {
-    const valid = this.isFamilyFormValid;
-    if (valid) {
-      this.maxStep = 3;
-
-      if (this.checkIfYearIsValid(this.enrollment.year)) {
-        this.maxStep = 4;
-      }
+    if (this.isFamilyFormValid()) {
+      this.maxStep.set(
+        this.checkIfYearIsValid(this.enrollment().year) ? 4 : 3
+      );
     }
   }
 
@@ -230,25 +233,23 @@ export class EnrollmentsCreateComponent implements OnInit {
   }
 
   onSelectedChildChange(id: string | number) {
-    this.enrollment.child = parseInt(id.toString());
-    this.maxStep = 3;
-
-    if (this.checkIfYearIsValid(this.enrollment.year)) {
-      this.maxStep = 4;
-    }
+    this.patchEnrollment({ child: parseInt(id.toString()) });
+    this.maxStep.set(this.checkIfYearIsValid(this.enrollment().year) ? 4 : 3);
   }
 
   onYearChange(year: number) {
     if (this.checkIfYearIsValid(year)) {
-      this.enrollment.year = year;
-      this.maxStep = 4;
+      this.patchEnrollment({ year });
+      this.maxStep.set(4);
     }
   }
 
   onEnrollmentChange(enrollment: Enrollment | null) {
-    this.enrollment = {
-      child: this.enrollment.child
-        ? parseInt(this.enrollment.child.toString())
+    const current = this.enrollment();
+
+    this.enrollment.set({
+      child: current.child
+        ? parseInt(current.child.toString())
         : enrollment!.family.child.id,
       team: enrollment!.team?.id || null,
       shirt: enrollment!.shirt?.id || null,
@@ -264,16 +265,12 @@ export class EnrollmentsCreateComponent implements OnInit {
       year: enrollment!.year,
       parentNotes: enrollment!.parentNotes || null,
       managerNotes: enrollment!.managerNotes || null,
-    };
+    });
   }
 
   onIsEnrollmentValidChange(valid: boolean) {
     this.isEnrollmentValid = valid;
-    if (valid) {
-      this.maxStep = 5;
-    } else {
-      this.maxStep = 4;
-    }
+    this.maxStep.set(valid ? 5 : 4);
   }
 
   onPageChange(page: number) {
@@ -286,57 +283,65 @@ export class EnrollmentsCreateComponent implements OnInit {
   }
 
   setStep(step: number) {
-    if (this.step == 0) {
-      this.maxStep = 0;
-      this.step = 0;
+    if (this.step() == 0) {
+      this.maxStep.set(0);
+      this.step.set(0);
       return;
     }
-    if (step <= this.maxStep) {
-      this.step = step;
+    if (step <= this.maxStep()) {
+      this.step.set(step);
     }
   }
 
   nextStep() {
-    if (this.step == 0) {
-      this.step = this.existing ? 2 : 1;
-    } else if (this.step == 1 || this.step == 2) {
-      this.step = 3;
-    } else if (this.step == 3) {
-      this.step = 4;
-    } else if (this.step == 4) {
+    const step = this.step();
+
+    if (step == 0) {
+      this.step.set(this.existing() ? 2 : 1);
+    } else if (step == 1 || step == 2) {
+      this.step.set(3);
+    } else if (step == 3) {
+      this.step.set(4);
+    } else if (step == 4) {
       this.setStep(5);
     }
   }
 
   previousStep() {
-    if (this.step == 3) {
-      this.step = this.existing ? 2 : 1;
-    } else if (this.step == 1 || this.step == 2) {
-      this.maxStep = 0;
-      this.step = 0;
-    } else if (this.step == 4) {
-      this.step = 3;
-    } else if (this.step == 5) {
-      this.step = 4;
+    const step = this.step();
+
+    if (step == 3) {
+      this.step.set(this.existing() ? 2 : 1);
+    } else if (step == 1 || step == 2) {
+      this.maxStep.set(0);
+      this.step.set(0);
+    } else if (step == 4) {
+      this.step.set(3);
+    } else if (step == 5) {
+      this.step.set(4);
     }
   }
 
   createEnrollment() {
-    if (!this.existing) {
+    if (!this.existing()) {
+      const child = this.child();
+      const parentOne = this.parentOne();
+      const parentTwo = this.parentTwo();
+
       if (
-        this.child &&
-        this.parentOne &&
-        this.parentTwo &&
-        this.isFamilyFormValid &&
+        child &&
+        parentOne &&
+        parentTwo &&
+        this.isFamilyFormValid() &&
         this.isEnrollmentValid
       ) {
-        const data: any = { ...this.enrollment };
+        const data: any = { ...this.enrollment() };
         delete data.child;
 
         this.api
           .createFamilyWithEnrollment({
-            childs: [{ ...this.child, enrollments: [data] }],
-            parents: [this.parentOne, this.parentTwo],
+            childs: [{ ...child, enrollments: [data] }],
+            parents: [parentOne, parentTwo],
           })
           .subscribe({
             next: (response) => {
@@ -346,12 +351,12 @@ export class EnrollmentsCreateComponent implements OnInit {
             },
             error: (error) => {
               console.error(error);
-              this.error = this.utils.handleResponse(error, null);
+              this.error.set(this.utils.handleResponse(error, null));
             },
           });
       }
     } else {
-      this.api.createEnrollment(this.enrollment).subscribe({
+      this.api.createEnrollment(this.enrollment()).subscribe({
         next: (response) => {
           if (response.status === 200 && response.body?.success) {
             window.location.href = '/admin/enrollments';
@@ -359,7 +364,7 @@ export class EnrollmentsCreateComponent implements OnInit {
         },
         error: (error) => {
           console.error(error);
-          this.error = this.utils.handleResponse(error, null);
+          this.error.set(this.utils.handleResponse(error, null));
         },
       });
     }

@@ -1,10 +1,9 @@
 
-import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-loading',
   imports: [],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './loading.component.html',
 })
 export class LoadingComponent {

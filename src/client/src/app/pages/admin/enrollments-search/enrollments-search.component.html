@@ -29,7 +29,7 @@
           <label class="block">Settimane</label>
           <select class="w-full" formControlName="week">
             <option [ngValue]="null" class="text-secondary">Tutti</option>
-            @for (week of weeks; track week.id) {
+            @for (week of weeks(); track week.id) {
             <option [value]="week.id">
               {{ week.startDate | date }} - {{ week.endDate | date }}
             </option>
@@ -46,7 +46,7 @@
           <label class="block">Tipo scuola</label>
           <select class="w-full" formControlName="schoolId">
             <option [ngValue]="null" class="text-secondary">Tutti</option>
-            @for(school of schools; track school.id) {
+            @for(school of schools(); track school.id) {
             <option [value]="school.id">{{ school.name }}</option>
             }
           </select>
@@ -56,7 +56,7 @@
           <label class="block">Classe</label>
           <select class="w-full" formControlName="classId">
             <option [ngValue]="null" class="text-secondary">Tutti</option>
-            @for (class of classes; track class.id) {
+            @for (class of classes(); track class.id) {
             <option [value]="class.id">{{ class.name }}</option>
             }
           </select>
@@ -65,7 +65,7 @@
           <label class="block">Squadra</label>
           <select class="w-full" formControlName="teamId">
             <option [ngValue]="null" class="text-secondary">Tutti</option>
-            @for (team of teams; track team.id) {
+            @for (team of teams(); track team.id) {
             <option [value]="team.id">{{ team.name }}</option>
             }
           </select>
@@ -99,7 +99,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (enrollment of enrollments; track enrollment.id) {
+        @for (enrollment of enrollments(); track enrollment.id) {
         <tr>
           <td>{{ enrollment.user.surname }}</td>
           <td>{{ enrollment.user.name }}</td>
@@ -110,7 +110,7 @@
             </span>
           </td>
           <td class="text-center space-x-2">
-            @for (week of weeks; track week.id) {
+            @for (week of weeks(); track week.id) {
             <span
               class="rounded-lg px-2 py-1"
               [ngClass]="{
@@ -229,14 +229,14 @@
       </tbody>
     </table>
 
-    @if (enrollments.length == 0) {
+    @if (enrollments().length == 0) {
     <div class="flex justify-center items-center h-20">
       <span class="text-secondary">Nessun risultato</span>
     </div>
     }
 
     <app-pagination
-      [totalItems]="elements"
+      [totalItems]="elements()"
       (pageChange)="onPageChange($event)"
       (itemsPerPageChange)="onSizeChange($event)"
     ></app-pagination>
@@ -244,7 +244,7 @@
 </div>
 
 <!-- Overlay -->
-@if (isDeleteModalOpen) {
+@if (isDeleteModalOpen()) {
 <div
   class="fixed inset-0 bg-black/50 transition-opacity flex items-center justify-center z-0"
 >
@@ -255,8 +255,8 @@
       <p class="mb-4">
         Sei sicuro di voler eliminare l'iscrizione di
         <b
-          >{{ enrollmentToDelete?.user?.name }}
-          {{ enrollmentToDelete?.user?.surname }}</b
+          >{{ enrollmentToDelete()?.user?.name }}
+          {{ enrollmentToDelete()?.user?.surname }}</b
         >?
       </p>
 
@@ -270,7 +270,7 @@
         </button>
       </div>
     </div>
-    @if (errorDelete) {
+    @if (errorDelete(); as errorDelete) {
     <div class="bg-auto flex justify-center items-center mt-4">
       <div
         class="bg-neon-error p-3 rounded-lg shadow-lg w-full max-w-md text-center"

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
   faArrowRotateLeft,
@@ -45,7 +45,6 @@ import Week from '../../../../models/Week.model';
     FormsModule,
     RouterLink
 ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './attendances-search.component.html',
 })
 export class AttendancesSearchComponent implements OnInit {
@@ -60,25 +59,25 @@ export class AttendancesSearchComponent implements OnInit {
   faRightFromBracket = faRightFromBracket;
   faCalendarDay = faCalendarDay;
 
-  loading: boolean = true;
-  error: string | null = null;
-  attendances: AttendanceSearch[] = [];
-  enrollments: EnrollmentSearch[] = [];
-  enrollmentAttendances: EnrollmentAttendanceSearch[] = [];
-  weeks: Week[] = [];
+  readonly loading = signal(true);
+  readonly error = signal<string | null>(null);
+  readonly attendances = signal<AttendanceSearch[]>([]);
+  readonly enrollments = signal<EnrollmentSearch[]>([]);
+  readonly enrollmentAttendances = signal<EnrollmentAttendanceSearch[]>([]);
+  readonly weeks = signal<Week[]>([]);
 
-  schools: School[] = [];
-  classes: Class[] = [];
+  readonly schools = signal<School[]>([]);
+  readonly classes = signal<Class[]>([]);
 
-  elements: number = 0;
+  readonly elements = signal(0);
   page: number = 1;
   size: number = 25;
 
   searchForm: FormGroup;
 
-  isExtraordinaryAttendanceModalOpen: boolean = false;
+  readonly isExtraordinaryAttendanceModalOpen = signal(false);
   extraordinaryAttendanceForm: FormGroup;
-  selectedAttendance: AttendanceSearch | null = null;
+  readonly selectedAttendance = signal<AttendanceSearch | null>(null);
 
   constructor() {
     this.searchForm = this.fb.group({
@@ -102,15 +101,17 @@ export class AttendancesSearchComponent implements OnInit {
         this.searchForm.patchValue({ classId: null }, { emitEvent: false });
       }
       // If no one is selected get all, else filter by school
-      const selectedSchool = this.schools.find(
+      const selectedSchool = this.schools().find(
         (school) => school.id == value.schoolId
       );
-      this.classes = selectedSchool
-        ? selectedSchool.classes.map((cls) => ({
-            ...cls,
-            school: { ...selectedSchool, classes: undefined },
-          }))
-        : [];
+      this.classes.set(
+        selectedSchool
+          ? selectedSchool.classes.map((cls) => ({
+              ...cls,
+              school: { ...selectedSchool, classes: undefined },
+            }))
+          : []
+      );
 
       if (this.searchForm.valid) this.loadAttendances();
     });
@@ -122,12 +123,12 @@ export class AttendancesSearchComponent implements OnInit {
     this.api.getSchools().subscribe({
       next: (response) => {
         if (response.status == 200 && response.body?.success) {
-          this.schools = response.body.data;
+          this.schools.set(response.body.data);
         }
       },
       error: (error) => {
         console.error(error);
-        this.error = this.utils.handleResponse(error, null);
+        this.error.set(this.utils.handleResponse(error, null));
       },
     });
     this.api
@@ -135,12 +136,12 @@ export class AttendancesSearchComponent implements OnInit {
       .subscribe({
         next: (response) => {
           if (response.status == 200 && response.body?.success) {
-            this.weeks = response.body.data;
+            this.weeks.set(response.body.data);
           }
         },
         error: (error) => {
           console.error(error);
-          this.error = this.utils.handleResponse(error, null);
+          this.error.set(this.utils.handleResponse(error, null));
         },
       });
   }
@@ -166,7 +167,7 @@ export class AttendancesSearchComponent implements OnInit {
   }
 
   loadAttendances() {
-    this.loading = true;
+    this.loading.set(true);
 
     const params: EnrollmentGetRequest = {
       year: new Date(this.searchForm.get('date')?.value).getFullYear(),
@@ -195,23 +196,22 @@ export class AttendancesSearchComponent implements OnInit {
           attendanceResponse.status == 200 &&
           attendanceResponse.body?.success
         ) {
-          this.attendances = attendanceResponse.body.data;
+          this.attendances.set(attendanceResponse.body.data);
         }
         if (
           enrollmentResponse.status == 200 &&
           enrollmentResponse.body?.success
         ) {
-          this.enrollments = enrollmentResponse.body.data.elements;
-          this.elements = enrollmentResponse.body.data.count;
+          this.enrollments.set(enrollmentResponse.body.data.elements);
+          this.elements.set(enrollmentResponse.body.data.count);
         }
 
         // mix attendances with enrollments
-        this.enrollmentAttendances = [];
         // Filter attendances by week if the searchForm date is within a week's range
         const searchDate = new Date(this.searchForm.get('date')?.value);
 
         // Trova la settimana in cui rientra la data cercata
-        const activeWeek = this.weeks.find(
+        const activeWeek = this.weeks().find(
           (w) =>
             new Date(w.startDate) <= searchDate &&
             searchDate <= new Date(w.endDate)
@@ -219,7 +219,7 @@ export class AttendancesSearchComponent implements OnInit {
 
         // Filtra solo gli enrollments che includono quella settimana
         const filteredEnrollments = activeWeek
-          ? this.enrollments.filter((enrollment) => {
+          ? this.enrollments().filter((enrollment) => {
               // L'enrollment è valido solo se contiene la settimana attiva e isPaid è true
               const isEnrolledAndPaid = enrollment.weeks?.some(
                 (week) => week.weekId == activeWeek.id
@@ -236,24 +236,26 @@ export class AttendancesSearchComponent implements OnInit {
           : [];
 
         // Costruisci l’array di enrollment + attendance
-        this.enrollmentAttendances = filteredEnrollments.map((enrollment) => {
-          const attendance = this.attendances.find(
-            (a) => a.enrollmentId === enrollment.id
-          );
+        this.enrollmentAttendances.set(
+          filteredEnrollments.map((enrollment) => {
+            const attendance = this.attendances().find(
+              (a) => a.enrollmentId === enrollment.id
+            );
 
-          return {
-            attendance: attendance,
-            ...enrollment,
-            present: attendance != undefined,
-          } as EnrollmentAttendanceSearch;
-        });
+            return {
+              attendance: attendance,
+              ...enrollment,
+              present: attendance != undefined,
+            } as EnrollmentAttendanceSearch;
+          })
+        );
       },
       error: (error) => {
         console.error(error);
-        this.error = this.utils.handleResponse(error, null);
+        this.error.set(this.utils.handleResponse(error, null));
       },
       complete: () => {
-        this.loading = false;
+        this.loading.set(false);
         // console.log(this.enrollmentAttendances);
       },
     });
@@ -277,7 +279,7 @@ export class AttendancesSearchComponent implements OnInit {
     present: boolean,
     eatsInOratory: boolean = false
   ) {
-    const attendance = this.attendances.find((a) => a.id == id);
+    const attendance = this.attendances().find((a) => a.id == id);
 
     console.log({
       id,
@@ -302,7 +304,7 @@ export class AttendancesSearchComponent implements OnInit {
           },
           error: (error) => {
             console.error(error);
-            this.error = this.utils.handleResponse(error, null);
+            this.error.set(this.utils.handleResponse(error, null));
           },
         });
     } else {
@@ -315,7 +317,7 @@ export class AttendancesSearchComponent implements OnInit {
           },
           error: (error) => {
             console.error(error);
-            this.error = this.utils.handleResponse(error, null);
+            this.error.set(this.utils.handleResponse(error, null));
           },
         });
         return;
@@ -334,7 +336,7 @@ export class AttendancesSearchComponent implements OnInit {
             },
             error: (error) => {
               console.error(error);
-              this.error = this.utils.handleResponse(error, null);
+              this.error.set(this.utils.handleResponse(error, null));
             },
           });
       }
@@ -360,7 +362,7 @@ export class AttendancesSearchComponent implements OnInit {
   //       },
   //       error: (error) => {
   //         console.error(error);
-  //         this.error = this.utils.handleResponse(error, null);
+  //         this.error.set(this.utils.handleResponse(error, null));
   //       },
   //     });
   // }
@@ -371,16 +373,16 @@ export class AttendancesSearchComponent implements OnInit {
   ) {
     if (!attendance) return;
 
-    this.selectedAttendance = attendance;
+    this.selectedAttendance.set(attendance);
     this.extraordinaryAttendanceForm.patchValue({
       type: type,
     });
 
-    this.isExtraordinaryAttendanceModalOpen = true;
+    this.isExtraordinaryAttendanceModalOpen.set(true);
   }
 
   closeExtraordinaryAttendanceModal() {
-    this.isExtraordinaryAttendanceModalOpen = false;
+    this.isExtraordinaryAttendanceModalOpen.set(false);
     this.extraordinaryAttendanceForm.reset();
   }
 

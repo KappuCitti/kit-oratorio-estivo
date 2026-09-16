@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, computed, inject, input, model, output } from '@angular/core';
+import { Component, computed, inject, input, model, output } from '@angular/core';
 import { FamilyMember } from '../../../models/Family.model';
 import {
   FormGroup,
@@ -12,7 +12,6 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 @Component({
   selector: 'app-family-member',
   imports: [FaIconComponent, ReactiveFormsModule],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './family-member.component.html',
 })
 export class FamilyMemberComponent {

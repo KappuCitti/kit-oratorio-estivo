@@ -15,7 +15,7 @@
     <div class="flex flex-wrap -mx-2">
       <div class="mb-2 sm:w-1/2 w-full px-2">
         <label class="block required"
-          >Numero di genitori ({{ parents.length }})</label
+          >Numero di genitori ({{ parents().length }})</label
         >
         <input
           type="range"
@@ -23,13 +23,13 @@
           min="1"
           max="2"
           step="1"
-          [ngModel]="parents.length"
-          (ngModelChange)="changeArrayLength(parents, $event)"
+          [ngModel]="parents().length"
+          (ngModelChange)="changeParentsLength($event)"
         />
       </div>
       <div class="mb-2 sm:w-1/2 w-full px-2">
         <label class="block required"
-          >Numero di figli ({{ childs.length }})</label
+          >Numero di figli ({{ childs().length }})</label
         >
         <input
           type="range"
@@ -37,29 +37,29 @@
           min="1"
           max="10"
           step="1"
-          [ngModel]="childs.length"
-          (ngModelChange)="changeArrayLength(childs, $event)"
+          [ngModel]="childs().length"
+          (ngModelChange)="changeChildsLength($event)"
         />
       </div>
     </div>
   </div>
 
   <div class="w-full bg-auto p-4 rounded-lg shadow-lg mb-6">
-    @for (p of parents; track idx; let idx = $index) {
+    @for (p of parents(); track idx; let idx = $index) {
     <app-parent
       (parentChange)="onParentChange($event, idx)"
       [editable]="true"
       (isValid)="onIsParentValidChange($event, idx)"
     ></app-parent>
     <div class="my-8"></div>
-    } @for (c of childs; track idx; let idx = $index) {
+    } @for (c of childs(); track idx; let idx = $index) {
     <app-child
       (childChange)="onChildChange($event, idx)"
       [editable]="true"
       (isValid)="onIsChildValidChange($event, idx)"
     ></app-child>
     <div
-      [ngClass]="{ 'my-6': idx == childs.length, 'my-8': idx != childs.length }"
+      [ngClass]="{ 'my-6': idx == childs().length, 'my-8': idx != childs().length }"
     ></div>
     }
 
@@ -73,7 +73,7 @@
       </button>
     </div>
 
-    @if (error) {
+    @if (error(); as error) {
     <div class="flex justify-center items-center">
       <div
         class="bg-neon-error p-3 rounded-lg shadow-lg w-full max-w-md text-center"

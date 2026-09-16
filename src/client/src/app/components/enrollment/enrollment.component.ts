@@ -1,4 +1,4 @@
-import { Component, OnChanges, ChangeDetectionStrategy, computed, inject, input, model, output } from '@angular/core';
+import { Component, OnChanges, computed, inject, input, model, output, signal } from '@angular/core';
 import Enrollment, {
   EnrollmentWeekSearch,
 } from '../../../models/Enrollment.model';
@@ -20,7 +20,6 @@ import { zip } from 'rxjs';
 @Component({
   selector: 'app-enrollment',
   imports: [DatePipe, ReactiveFormsModule, FaIconComponent, CommonModule],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './enrollment.component.html',
 })
 export class EnrollmentComponent implements OnChanges {
@@ -34,7 +33,7 @@ export class EnrollmentComponent implements OnChanges {
   readonly save = input<Function | null>(null);
 
   enrollmentForm!: FormGroup;
-  selectedWeeks: EnrollmentWeekSearch[] = [];
+  readonly selectedWeeks = signal<EnrollmentWeekSearch[]>([]);
 
   readonly year = input<number>(new Date().getFullYear());
 
@@ -49,9 +48,9 @@ export class EnrollmentComponent implements OnChanges {
     () => this.enrollment()?.year || this.year()
   );
 
-  teams: Team[] = [];
-  weeks: Week[] = [];
-  shirts: Shirt[] = [];
+  readonly teams = signal<Team[]>([]);
+  readonly weeks = signal<Week[]>([]);
+  readonly shirts = signal<Shirt[]>([]);
 
   faFloppyDisk = faFloppyDisk;
 
@@ -110,13 +109,13 @@ export class EnrollmentComponent implements OnChanges {
       this.api.getShirts(),
     ]).subscribe(([weeks, teams, shirts]) => {
       if (weeks.status === 200 && weeks.body?.success) {
-        this.weeks = weeks.body.data;
+        this.weeks.set(weeks.body.data);
       }
       if (teams.status === 200 && teams.body?.success) {
-        this.teams = teams.body.data;
+        this.teams.set(teams.body.data);
       }
       if (shirts.status === 200 && shirts.body?.success) {
-        this.shirts = shirts.body.data;
+        this.shirts.set(shirts.body.data);
       }
 
       if (this.enrollment() != null) {
@@ -137,10 +136,11 @@ export class EnrollmentComponent implements OnChanges {
     const enrollment = this.enrollment();
 
     if (enrollment) {
-      this.selectedWeeks =
+      this.selectedWeeks.set(
         enrollment.weeks.map((week) => {
           return { weekId: week.id, isPaid: week.isPaid };
-        }) || [];
+        }) || []
+      );
 
       this.enrollmentForm.patchValue({
         schoolType: enrollment.schoolType,
@@ -169,20 +169,20 @@ export class EnrollmentComponent implements OnChanges {
     const updatedEnrollment: Enrollment = {
       ...this.enrollment(),
       ...this.enrollmentForm.value,
-      team: this.teams.find(
+      team: this.teams().find(
         (team) => team.id == this.enrollmentForm.value.team
       ),
-      shirt: this.shirts.find(
+      shirt: this.shirts().find(
         (shirt) => shirt.id == this.enrollmentForm.value.shirt
       ),
-      weeks: this.weeks
+      weeks: this.weeks()
         .filter((week) =>
-          this.selectedWeeks.some(
+          this.selectedWeeks().some(
             (selectedWeek) => selectedWeek.weekId === week.id
           )
         )
         .map((week) => {
-          const selectedWeek = this.selectedWeeks.find(
+          const selectedWeek = this.selectedWeeks().find(
             (selectedWeek) => selectedWeek.weekId === week.id
           ) || { weekId: week.id, isPaid: false };
           return { ...week, isPaid: selectedWeek.isPaid, weekId: week.id };
@@ -198,12 +198,11 @@ export class EnrollmentComponent implements OnChanges {
   }
 
   isWeekEnrolled(id: number | string): boolean {
-    const enrolled = this.selectedWeeks.some((week) => week.weekId == id);
-    return enrolled;
+    return this.selectedWeeks().some((week) => week.weekId == id);
   }
 
   isWeekPaid(id: number | string): boolean {
-    return this.selectedWeeks.some((week) => week.weekId == id && week.isPaid);
+    return this.selectedWeeks().some((week) => week.weekId == id && week.isPaid);
   }
 
   toggleWeekSelection(
@@ -211,21 +210,30 @@ export class EnrollmentComponent implements OnChanges {
     event: Event,
     type: 'e' | 'p'
   ): void {
-    const input = event.target as HTMLInputElement;
-    const checked = input.checked;
-    const index = this.selectedWeeks.findIndex((w) => w.weekId == id);
+    const checked = (event.target as HTMLInputElement).checked;
 
-    if (type === 'e') {
-      if (checked && index == -1) {
-        this.selectedWeeks.push({ weekId: id, isPaid: false });
-      } else if (!checked && index != -1) {
-        this.selectedWeeks.splice(index, 1);
+    // Aggiornamento immutabile: prima si usavano push/splice e l'assegnazione
+    // di isPaid sull'elemento, che mutavano l'array sul posto. Un signal
+    // notifica solo se il riferimento cambia, quindi serve un array nuovo.
+    this.selectedWeeks.update((weeks) => {
+      const index = weeks.findIndex((w) => w.weekId == id);
+
+      if (type === 'e') {
+        if (checked && index == -1) {
+          return [...weeks, { weekId: id, isPaid: false }];
+        }
+        if (!checked && index != -1) {
+          return weeks.filter((_, i) => i !== index);
+        }
+        return weeks;
       }
-    } else if (type === 'p') {
-      if (index != -1) {
-        this.selectedWeeks[index].isPaid = checked;
-      }
-    }
+
+      if (index == -1) return weeks;
+
+      return weeks.map((week, i) =>
+        i === index ? { ...week, isPaid: checked } : week
+      );
+    });
 
     this.updateEnrollment();
   }

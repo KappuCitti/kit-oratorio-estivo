@@ -1,75 +1,62 @@
-import {
-  Component,
-  OnChanges,
-  OnInit,
-  ChangeDetectionStrategy,
-  input,
-  output
-} from '@angular/core';
+import { Component, OnInit, computed, input, output, signal } from '@angular/core';
 
 @Component({
   selector: 'app-pagination',
   imports: [],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './pagination.component.html',
 })
-export class PaginationComponent implements OnInit, OnChanges {
+export class PaginationComponent implements OnInit {
   readonly totalItems = input<number>(10); // Numero totale di elementi
   readonly pageChange = output<number>(); // Evento per cambiare pagina
   readonly itemsPerPageChange = output<number>(); // Evento per cambiare numero di elementi per pagina
 
-  itemsPerPage: number = 25;
-  currentPage: number = 1;
-  totalPages: number = 1;
+  readonly itemsPerPage = signal(25);
+  readonly currentPage = signal(1);
   // TODO add item per page change event and dropdown
 
-  ngOnInit(): void {
-    this.pageChange.emit(this.currentPage);
-    this.itemsPerPageChange.emit(this.itemsPerPage);
-  }
+  // Era ricalcolato in ngOnChanges a ogni cambio di totalItems: come computed
+  // si aggiorna da solo e ngOnChanges non serve piu'.
+  readonly totalPages = computed(() =>
+    Math.ceil(this.totalItems() / this.itemsPerPage())
+  );
 
-  ngOnChanges(): void {
-    console.log('PaginationComponent initialized');
-    const totalItems = this.totalItems();
-    console.table({
-      totalItems: totalItems,
-      itemsPerPage: this.itemsPerPage,
-      currentPage: this.currentPage,
-      totalPages: this.totalPages,
-    });
+  readonly middlePages = computed<number[]>(() => {
+    const totalPages = this.totalPages();
+    const currentPage = this.currentPage();
 
-    this.totalPages = Math.ceil(totalItems / this.itemsPerPage);
-  }
-
-  changePage(page: number) {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.pageChange.emit(page);
-    }
-  }
-
-  getMiddlePages(): number[] {
-    if (this.totalPages <= 5) {
-      return this.range(2, this.totalPages - 1);
+    if (totalPages <= 5) {
+      return this.range(2, totalPages - 1);
     }
 
-    if (this.currentPage <= 3) {
+    if (currentPage <= 3) {
       return this.range(2, 4);
     }
 
-    if (this.currentPage >= this.totalPages - 2) {
-      return this.range(this.totalPages - 3, this.totalPages - 1);
+    if (currentPage >= totalPages - 2) {
+      return this.range(totalPages - 3, totalPages - 1);
     }
 
-    return this.range(this.currentPage - 1, this.currentPage + 1);
+    return this.range(currentPage - 1, currentPage + 1);
+  });
+
+  readonly showLeftDots = computed(
+    () => this.totalPages() > 5 && this.currentPage() > 3
+  );
+
+  readonly showRightDots = computed(
+    () => this.totalPages() > 5 && this.currentPage() < this.totalPages() - 2
+  );
+
+  ngOnInit(): void {
+    this.pageChange.emit(this.currentPage());
+    this.itemsPerPageChange.emit(this.itemsPerPage());
   }
 
-  shouldShowLeftDots(): boolean {
-    return this.totalPages > 5 && this.currentPage > 3;
-  }
-
-  shouldShowRightDots(): boolean {
-    return this.totalPages > 5 && this.currentPage < this.totalPages - 2;
+  changePage(page: number) {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+      this.pageChange.emit(page);
+    }
   }
 
   private range(start: number, end: number): number[] {

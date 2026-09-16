@@ -1,11 +1,10 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component } from '@angular/core';
 import { NavbarComponent } from "../../../components/navbar/navbar.component";
 import { FooterComponent } from "../../../components/footer/footer.component";
 
 @Component({
   selector: 'app-people-create',
   imports: [NavbarComponent, FooterComponent],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './people-create.component.html',
 })
 export class PeopleCreateComponent {

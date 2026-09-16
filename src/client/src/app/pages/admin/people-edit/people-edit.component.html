@@ -3,11 +3,11 @@
   <header class="mb-6">
     <h1>Modifica persona</h1>
     <p class="text-secondary">Modifica la persona visualizzata</p>
-  </header>  
+  </header>
 
   <!-- Tabella iscrizioni -->
   <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
-    @if (!loading && person) {
+    @if (!loading()) { @if (person(); as person) {
        @if (type == 'parent' && isParent(person)) {
         <app-parent [parent]="person" [editable]="true" [save]="save" (parentChange)="onPersonEdited($event)"></app-parent>
 
@@ -23,9 +23,9 @@
             <app-parent [parent]="parent" [editable]="false"></app-parent>
         }
        }
-    }
+    } }
   </div>
-    
+
 </div>
 
 <app-footer></app-footer>

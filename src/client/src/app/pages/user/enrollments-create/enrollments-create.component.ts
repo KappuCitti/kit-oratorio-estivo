@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import {
@@ -46,10 +46,9 @@ import { PaginationComponent } from '../../../components/pagination/pagination.c
     ReactiveFormsModule,
     PaginationComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './enrollments-create.component.html',
 })
-export class EnrollmentsCreateComponent {
+export class EnrollmentsCreateComponent implements OnInit {
   private api = inject(ApiService);
   private route = inject(ActivatedRoute);
   private utils = inject(UtilsService);
@@ -64,26 +63,28 @@ export class EnrollmentsCreateComponent {
   faIdCardClip = faIdCardClip;
   faClipboardCheck = faClipboardCheck;
 
-  step: number = 0;
-  maxStep: number = 0;
+  readonly step = signal(0);
+  readonly maxStep = signal(0);
 
-  elements: number = 0;
+  readonly elements = signal(0);
   page: number = 1;
   size: number = 25;
 
   searchForm: FormGroup;
-  childs: ChildSearch[] = [];
+  readonly childs = signal<ChildSearch[]>([]);
 
-  child: Child | null = null;
-  enrollment: EnrollmentCreateRequest = {} as EnrollmentCreateRequest;
+  readonly child = signal<Child | null>(null);
+  readonly enrollment = signal<EnrollmentCreateRequest>(
+    {} as EnrollmentCreateRequest
+  );
 
   isChildValid: boolean = false;
   isParentOneValid: boolean = false;
   isParentTwoValid: boolean = false;
   isEnrollmentValid: boolean = false;
 
-  error: string | null = null;
-  loading: boolean = true;
+  readonly error = signal<string | null>(null);
+  readonly loading = signal(true);
 
   constructor() {
     this.searchForm = this.fb.group({
@@ -114,53 +115,57 @@ export class EnrollmentsCreateComponent {
 
       this.loadChilds();
       if (year) {
-        if (this.checkIfYearIsValid(year)) this.enrollment.year = year;
+        if (this.checkIfYearIsValid(year)) this.patchEnrollment({ year });
       } else {
-        this.enrollment.year = new Date().getFullYear();
+        this.patchEnrollment({ year: new Date().getFullYear() });
       }
-      this.maxStep = 1;
+      this.maxStep.set(1);
 
       // Child id is valid only if year is selected
-      if (id && this.enrollment.year) {
-        this.enrollment.child = id;
-        this.step = 2;
+      if (id && this.enrollment().year) {
+        this.patchEnrollment({ child: id });
+        this.step.set(2);
       }
     });
   }
 
   loadChilds() {
-    this.loading = true;
+    this.loading.set(true);
     this.api.getChilds({ query: this.searchForm.value.query }).subscribe({
       next: (response) => {
         if (response.status === 200 && response.body?.success) {
-          this.childs = response.body.data.elements;
-          this.elements = response.body.data.count;
+          this.childs.set(response.body.data.elements);
+          this.elements.set(response.body.data.count);
 
-          this.step = 2;
-          this.maxStep = 2;
+          this.step.set(2);
+          this.maxStep.set(2);
 
-          if (this.enrollment.child) {
-            this.maxStep = 2;
-          }
-          this.loading = false;
+          this.loading.set(false);
         }
       },
       error: (error) => {
         console.error(error);
-        this.error = this.utils.handleResponse(error, null);
-        this.loading = false;
+        this.error.set(this.utils.handleResponse(error, null));
+        this.loading.set(false);
       },
     });
   }
 
+  // `enrollment` e' un signal: va sostituito, non modificato sul posto.
+  private patchEnrollment(changes: Partial<EnrollmentCreateRequest>) {
+    this.enrollment.update((enrollment) => ({ ...enrollment, ...changes }));
+  }
+
   getChildInfo(): string {
-    const child: ChildSearch = this.childs.filter(
-      (c) => c.id == this.enrollment.child
-    )[0];
-    if (this.child) {
-      return `${this.child.name} ${this.child.surname}`;
+    const child = this.child();
+    if (child) {
+      return `${child.name} ${child.surname}`;
     }
-    return child ? `${child.name} ${child.surname}` : '';
+
+    const selected = this.childs().filter(
+      (c) => c.id == this.enrollment().child
+    )[0];
+    return selected ? `${selected.name} ${selected.surname}` : '';
   }
 
   checkIfYearIsValid(year: number) {
@@ -168,25 +173,23 @@ export class EnrollmentsCreateComponent {
   }
 
   onSelectedChildChange(id: string | number) {
-    this.enrollment.child = parseInt(id.toString());
-    this.maxStep = 2;
-
-    if (this.checkIfYearIsValid(this.enrollment.year)) {
-      this.maxStep = 2;
-    }
+    this.patchEnrollment({ child: parseInt(id.toString()) });
+    this.maxStep.set(2);
   }
 
   onYearChange(year: number) {
     if (this.checkIfYearIsValid(year)) {
-      this.enrollment.year = year;
-      this.maxStep = 1;
+      this.patchEnrollment({ year });
+      this.maxStep.set(1);
     }
   }
 
   onEnrollmentChange(enrollment: Enrollment | null) {
-    this.enrollment = {
-      child: this.enrollment.child
-        ? parseInt(this.enrollment.child.toString())
+    const current = this.enrollment();
+
+    this.enrollment.set({
+      child: current.child
+        ? parseInt(current.child.toString())
         : enrollment!.family.child.id,
       team: enrollment!.team?.id || null,
       shirt: enrollment!.shirt?.id || null,
@@ -202,16 +205,12 @@ export class EnrollmentsCreateComponent {
       year: enrollment!.year,
       parentNotes: enrollment!.parentNotes || null,
       managerNotes: enrollment!.managerNotes || null,
-    };
+    });
   }
 
   onIsEnrollmentValidChange(valid: boolean) {
     this.isEnrollmentValid = valid;
-    if (valid) {
-      this.maxStep = 3;
-    } else {
-      this.maxStep = 2;
-    }
+    this.maxStep.set(valid ? 3 : 2);
   }
 
   onPageChange(page: number) {
@@ -224,39 +223,43 @@ export class EnrollmentsCreateComponent {
   }
 
   setStep(step: number) {
-    if (this.step == 0) {
-      this.maxStep = 0;
-      this.step = 0;
+    if (this.step() == 0) {
+      this.maxStep.set(0);
+      this.step.set(0);
       return;
     }
-    if (step <= this.maxStep) {
-      this.step = step;
+    if (step <= this.maxStep()) {
+      this.step.set(step);
     }
   }
 
   nextStep() {
-    if (this.step == 0) {
-      this.step = 1;
-    } else if (this.step == 1) {
-      this.step = 2;
-    } else if (this.step == 2) {
+    const step = this.step();
+
+    if (step == 0) {
+      this.step.set(1);
+    } else if (step == 1) {
+      this.step.set(2);
+    } else if (step == 2) {
       this.setStep(3);
     }
   }
 
   previousStep() {
-    if (this.step == 3) {
-      this.step = 2;
-    } else if (this.step == 2) {
-      this.step = 1;
-    } else if (this.step == 1) {
-      this.maxStep = 0;
-      this.step = 0;
+    const step = this.step();
+
+    if (step == 3) {
+      this.step.set(2);
+    } else if (step == 2) {
+      this.step.set(1);
+    } else if (step == 1) {
+      this.maxStep.set(0);
+      this.step.set(0);
     }
   }
 
   createEnrollment() {
-    this.api.createEnrollment(this.enrollment).subscribe({
+    this.api.createEnrollment(this.enrollment()).subscribe({
       next: (response) => {
         if (response.status === 200 && response.body?.success) {
           window.location.href = '/admin/enrollments';
@@ -264,7 +267,7 @@ export class EnrollmentsCreateComponent {
       },
       error: (error) => {
         console.error(error);
-        this.error = this.utils.handleResponse(error, null);
+        this.error.set(this.utils.handleResponse(error, null));
       },
     });
   }

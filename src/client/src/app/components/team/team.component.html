@@ -9,12 +9,12 @@
       <fa-icon
         class="button-primary"
         [icon]="faPen"
-        (click)="isEditModalOpen = true"
+        (click)="isEditModalOpen.set(true)"
       ></fa-icon>
       <fa-icon
         class="button-secondary"
         [icon]="faTrash"
-        (click)="isDeleteModalOpen = true"
+        (click)="isDeleteModalOpen.set(true)"
       ></fa-icon>
     </div>
   </div>
@@ -22,7 +22,7 @@
 }
 
 <!-- Modale modifica squadra -->
-@if (team() && isEditModalOpen) {
+@if (team() && isEditModalOpen()) {
 <div
   class="fixed inset-0 bg-black/50 transition-opacity flex items-center justify-center z-50"
 >
@@ -68,14 +68,14 @@
     </div>
 
     <!-- Errore -->
-    @if (error) {
+    @if (error(); as error) {
     <div class="bg-neon-error p-3 rounded-lg shadow-lg mt-4 text-center">
       {{ error }}
     </div>
     }
   </div>
 </div>
-} @if (team() && isDeleteModalOpen) {
+} @if (team() && isDeleteModalOpen()) {
 <div
   class="fixed inset-0 bg-black/50 transition-opacity flex items-center justify-center z-0"
 >
@@ -93,7 +93,7 @@
       <div class="flex justify-end space-x-3">
         <button
           class="px-4 py-2 button-secondary"
-          (click)="isDeleteModalOpen = false"
+          (click)="isDeleteModalOpen.set(false)"
         >
           Annulla
         </button>
@@ -102,7 +102,7 @@
         </button>
       </div>
     </div>
-    @if (errorDelete) {
+    @if (errorDelete(); as errorDelete) {
     <div class="bg-auto flex justify-center items-center mt-4">
       <div
         class="bg-neon-error p-3 rounded-lg shadow-lg w-full max-w-md text-center"

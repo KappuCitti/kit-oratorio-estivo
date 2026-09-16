@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import {
@@ -40,7 +40,6 @@ import { UtilsService } from '../../../../services/utils.service';
     PaginationComponent,
     CommonModule,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './people-search.component.html',
 })
 export class PeopleSearchComponent implements OnInit {
@@ -50,13 +49,13 @@ export class PeopleSearchComponent implements OnInit {
 
   searchForm: FormGroup;
 
-  people: PeopleSearch[] = [];
+  readonly people = signal<PeopleSearch[]>([]);
 
-  peopleToDelete: PeopleSearch | null = null;
-  isDeleteModalOpen: boolean = false;
-  errorDelete: string | null = null;
+  readonly peopleToDelete = signal<PeopleSearch | null>(null);
+  readonly isDeleteModalOpen = signal(false);
+  readonly errorDelete = signal<string | null>(null);
 
-  elements: number = 0;
+  readonly elements = signal(0);
   page: number = 1;
   size: number = 25;
 
@@ -109,25 +108,24 @@ export class PeopleSearchComponent implements OnInit {
       case 'Child':
         this.api.getChilds(params).subscribe((response) => {
           if (response.status == 200 && response.body?.success) {
-            this.people = response.body.data.elements as PeopleSearch[];
-            this.elements = response.body.data.count;
+            this.people.set(response.body.data.elements as PeopleSearch[]);
+            this.elements.set(response.body.data.count);
           }
         });
         break;
       case 'Parent':
         this.api.getParents(params).subscribe((response) => {
           if (response.status == 200 && response.body?.success) {
-            this.people = response.body.data.elements as PeopleSearch[];
-            this.elements = response.body.data.count;
+            this.people.set(response.body.data.elements as PeopleSearch[]);
+            this.elements.set(response.body.data.count);
           }
         });
         break;
       default:
         this.api.getPeople(params).subscribe((response) => {
           if (response.status == 200 && response.body?.success) {
-            this.people = response.body.data.elements as PeopleSearch[];
-            this.elements = response.body.data.count;
-            console.log(response.body.data.count);
+            this.people.set(response.body.data.elements as PeopleSearch[]);
+            this.elements.set(response.body.data.count);
           }
         });
     }
@@ -167,23 +165,25 @@ export class PeopleSearchComponent implements OnInit {
   }
 
   openDeleteModal(p: PeopleSearch) {
-    this.peopleToDelete = p;
-    this.isDeleteModalOpen = true;
+    this.peopleToDelete.set(p);
+    this.isDeleteModalOpen.set(true);
 
-    this.errorDelete = null;
+    this.errorDelete.set(null);
   }
 
   closeDeleteModal() {
-    this.peopleToDelete = null;
-    this.isDeleteModalOpen = false;
+    this.peopleToDelete.set(null);
+    this.isDeleteModalOpen.set(false);
   }
 
   deletePerson() {
     const type = this.searchForm.get('type')?.value;
 
-    if (!this.peopleToDelete) return;
-    if (this.peopleToDelete.type == 'Parent' || type == 'Parent') {
-      this.api.deleteParent(this.peopleToDelete.id).subscribe({
+    const peopleToDelete = this.peopleToDelete();
+
+    if (!peopleToDelete) return;
+    if (peopleToDelete.type == 'Parent' || type == 'Parent') {
+      this.api.deleteParent(peopleToDelete.id).subscribe({
         next: (response) => {
           if (response.status == 200) {
             this.loadPeople();
@@ -192,11 +192,11 @@ export class PeopleSearchComponent implements OnInit {
         },
         error: (error) => {
           console.error(error);
-          this.errorDelete = this.utils.handleResponse(error, null);
+          this.errorDelete.set(this.utils.handleResponse(error, null));
         },
       });
-    } else if (this.peopleToDelete.type == 'Child' || type == 'Child') {
-      this.api.deleteChild(this.peopleToDelete.id).subscribe({
+    } else if (peopleToDelete.type == 'Child' || type == 'Child') {
+      this.api.deleteChild(peopleToDelete.id).subscribe({
         next: (response) => {
           if (response.status == 200) {
             this.loadPeople();
@@ -205,11 +205,11 @@ export class PeopleSearchComponent implements OnInit {
         },
         error: (error) => {
           console.error(error);
-          this.errorDelete = this.utils.handleResponse(error, null);
+          this.errorDelete.set(this.utils.handleResponse(error, null));
         },
       });
     } else {
-      this.errorDelete = 'Ruolo non trovato';
+      this.errorDelete.set('Ruolo non trovato');
     }
   }
 

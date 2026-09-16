@@ -1,4 +1,4 @@
-import { Component, OnChanges, ChangeDetectionStrategy, inject, input, model, output } from '@angular/core';
+import { Component, OnChanges, inject, input, model, output } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -12,7 +12,6 @@ import { Child } from '../../../models/Family.model';
 @Component({
   selector: 'app-child',
   imports: [FaIconComponent, ReactiveFormsModule],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './child.component.html',
 })
 export class ChildComponent implements OnChanges {

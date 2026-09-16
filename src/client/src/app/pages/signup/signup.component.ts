@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -23,7 +23,6 @@ import { RouterLink } from '@angular/router';
     ParentComponent,
     RouterLink,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './signup.component.html',
 })
 export class SignupComponent {
@@ -34,7 +33,7 @@ export class SignupComponent {
   parent: Parent | null = null;
   isParentValid: boolean = false;
   form: FormGroup;
-  error: string | null = null;
+  readonly error = signal<string | null>(null);
 
   constructor() {
     this.form = this.fb.group(

@@ -1,7 +1,7 @@
 <app-navbar></app-navbar>
 <div class="container min-h-4/5 flex flex-col justify-center items-center">
   <div class="max-w-3xl w-full bg-auto p-4 rounded-lg shadow-lg mb-6">
-    @if (user) {
+    @if (user(); as user) {
 
     <h1 class="mb-6 text-center">Ciao {{ user.name }}!</h1>
 
@@ -106,7 +106,7 @@
     </div>
     }
   </div>
-  @if (error) {
+  @if (error(); as error) {
   <div
     class="bg-neon-error p-3 rounded-lg mt-4 shadow-lg w-full max-w-3xl text-center"
   >

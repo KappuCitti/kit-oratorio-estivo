@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -15,7 +15,6 @@ import { UtilsService } from '../../../services/utils.service';
 @Component({
   selector: 'app-login',
   imports: [FontAwesomeModule, ReactiveFormsModule, RouterLink],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './login.component.html',
 })
 export class LoginComponent {
@@ -26,15 +25,13 @@ export class LoginComponent {
   faArrowLeft = faArrowLeft;
 
   form: FormGroup;
-  error: string | null = null;
+  readonly error = signal<string | null>(null);
 
   constructor() {
     this.form = this.fb.group({
       username: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(8)]],
     });
-
-    this.form.valueChanges.subscribe((value) => {});
   }
 
   login(): void {
@@ -52,7 +49,6 @@ export class LoginComponent {
   }
 
   handleResponse(response: HttpResponse<any>): void {
-    if (this.error) this.error = null;
-    this.error = this.utils.handleResponse(response, '/user');
+    this.error.set(this.utils.handleResponse(response, '/user'));
   }
 }

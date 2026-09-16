@@ -9,7 +9,7 @@
   </header>
 
   <!-- Middle -->
-  @if (step == 0) {
+  @if (step() == 0) {
   <div class="flex flex-col items-center justify-center">
     <button
       class="button-primary w-full md:w-auto"
@@ -31,31 +31,31 @@
       Crea da un ragazzo nuovo
     </button>
   </div>
-  } @else if (step == 1) {
+  } @else if (step() == 1) {
   <div class="w-full bg-auto p-4 rounded-lg shadow-lg">
     <app-child
       [editable]="true"
-      [child]="child"
+      [child]="child()"
       (childChange)="onChildChange($event)"
       (isValid)="onIsChildValidChange($event)"
     ></app-child>
     <div class="my-8"></div>
     <app-parent
       [editable]="true"
-      [parent]="parentOne"
+      [parent]="parentOne()"
       (parentChange)="onParentChange($event, 1)"
       (isValid)="onIsParentValidChange($event, 1)"
     ></app-parent>
     <div class="my-8"></div>
     <app-parent
       [editable]="true"
-      [parent]="parentTwo"
+      [parent]="parentTwo()"
       (parentChange)="onParentChange($event, 2)"
       (isValid)="onIsParentValidChange($event, 2)"
     ></app-parent>
     <div class="mt-6"></div>
   </div>
-  }@else if (step == 2) {
+  }@else if (step() == 2) {
   <div class="flex flex-col justify-center items-center">
     <div class="w-full bg-auto p-4 rounded-lg shadow-lg mb-6">
       <div class="flex justify-between mb-2">
@@ -87,14 +87,14 @@
           </tr>
         </thead>
         <tbody>
-          @if (!loading) { @for (child of childs; track child.id) {
+          @if (!loading()) { @for (child of childs(); track child.id) {
           <tr>
             <td class="text-center">
               <input
                 type="radio"
                 [value]="child.id"
                 (change)="onSelectedChildChange(child.id)"
-                [checked]="enrollment.child == child.id"
+                [checked]="enrollment().child == child.id"
               />
             </td>
             <td class="text-start">{{ child.name }}</td>
@@ -107,20 +107,20 @@
         </tbody>
       </table>
 
-      @if (childs.length == 0) {
+      @if (childs().length == 0) {
       <div class="flex justify-center items-center h-20">
         <span class="text-secondary">Nessun risultato</span>
       </div>
       }
 
       <app-pagination
-        [totalItems]="elements"
+        [totalItems]="elements()"
         (pageChange)="onPageChange($event)"
         (itemsPerPageChange)="onSizeChange($event)"
       ></app-pagination>
     </div>
   </div>
-  } @else if (step == 3) {
+  } @else if (step() == 3) {
   <div class="flex flex-col justify-center items-center">
     <div class="w-full md:max-w-lg bg-auto p-4 rounded-lg shadow-lg">
       <div class="flex flex-col">
@@ -130,26 +130,26 @@
           step="1"
           id="year"
           min="1980"
-          [ngModel]="this.enrollment.year"
+          [ngModel]="enrollment().year"
           (ngModelChange)="onYearChange($event)"
         />
       </div>
     </div>
   </div>
-  }@else if (step == 4) {
+  }@else if (step() == 4) {
   <div
     class="container min-h-4/5 flex flex-col justify-center items-center p-0 py-6 z-0"
   >
     <div class="w-full bg-auto p-4 rounded-lg shadow-lg">
       <app-enrollment
         [editable]="true"
-        [year]="this.enrollment.year"
+        [year]="enrollment().year"
         (enrollmentChange)="onEnrollmentChange($event)"
         (isValid)="onIsEnrollmentValidChange($event)"
       ></app-enrollment>
     </div>
   </div>
-  }@else if (step == 5) {
+  }@else if (step() == 5) {
   <div
     class="container min-h-4/5 flex flex-col justify-center items-center z-0 p-0"
   >
@@ -165,19 +165,19 @@
           </div>
 
           <!-- Condizione: ragazzo esistente -->
-          @if (!existing) {
+          @if (!existing()) {
           <div>
             <h2>Soggetti da registrare</h2>
             <p>
-              <strong>Minore:</strong> {{ child?.name }} {{ child?.surname }}
+              <strong>Minore:</strong> {{ child()?.name }} {{ child()?.surname }}
             </p>
             <p>
-              <strong>Genitore 1:</strong> {{ parentOne?.name }}
-              {{ parentOne?.surname }} ({{ parentOne?.gender }})
+              <strong>Genitore 1:</strong> {{ parentOne()?.name }}
+              {{ parentOne()?.surname }} ({{ parentOne()?.gender }})
             </p>
             <p>
-              <strong>Genitore 2:</strong> {{ parentTwo?.name }}
-              {{ parentTwo?.surname }} ({{ parentTwo?.gender }})
+              <strong>Genitore 2:</strong> {{ parentTwo()?.name }}
+              {{ parentTwo()?.surname }} ({{ parentTwo()?.gender }})
             </p>
           </div>
 
@@ -189,29 +189,29 @@
           <div>
             <p>
               Ragazzo iscritto:
-              <strong>{{ child?.name }} {{ child?.surname }}</strong>
+              <strong>{{ child()?.name }} {{ child()?.surname }}</strong>
             </p>
             <p>
-              Anno: <strong>{{ enrollment.year }}</strong>
+              Anno: <strong>{{ enrollment().year }}</strong>
             </p>
             <p>
               Scuola
               <strong>{{
-                enrollment.schoolType == "Primary" ? "Elementare" : "Media"
+                enrollment().schoolType == "Primary" ? "Elementare" : "Media"
               }}</strong
               >, classe
               <strong
-                >{{ enrollment.className }}° {{ enrollment.section }}</strong
+                >{{ enrollment().className }}° {{ enrollment().section }}</strong
               >
             </p>
             <p>
               Numero di settimane:
-              <strong>{{ enrollment.weeks.length }}</strong>
+              <strong>{{ enrollment().weeks.length }}</strong>
             </p>
-            @if (enrollment.team) {
+            @if (enrollment().team) {
             <p>
               Squadra assegnata:
-              <strong>{{ enrollment.team ? "Si" : "No" }}</strong>
+              <strong>{{ enrollment().team ? "Si" : "No" }}</strong>
             </p>
             }
           </div>
@@ -234,7 +234,7 @@
   <div class="my-6 flex justify-center space-x-10 md:space-x-60 sm:space-x-30">
     <button
       class="px-4 py-2 h-min button-primary"
-      [disabled]="step == 0"
+      [disabled]="step() == 0"
       (click)="previousStep()"
     >
       «
@@ -245,16 +245,16 @@
       <li
         class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block"
         [ngClass]="{
-          'text-silent': step == 0,
-          'text-primary': step > 0
+          'text-silent': step() == 0,
+          'text-primary': step() > 0
         }"
         (click)="setStep(0)"
       >
         <div
           class="flex items-center text-primary justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 shadow-lg"
           [ngClass]="{
-            'bg-neon-auto text-secondary': step == 0,
-            'bg-neon-success': step != 0
+            'bg-neon-auto text-secondary': step() == 0,
+            'bg-neon-success': step() != 0
           }"
         >
           <fa-icon [icon]="faInfo"></fa-icon>
@@ -265,17 +265,17 @@
       <li
         class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block"
         [ngClass]="{
-          'text-silent': step < 3,
-          'text-primary': step > 3
+          'text-silent': step() < 3,
+          'text-primary': step() > 3
         }"
-        (click)="setStep(existing ? 2 : 1)"
+        (click)="setStep(existing() ? 2 : 1)"
       >
         <div
           class="flex items-center text-primary justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 shadow-lg"
           [ngClass]="{
-            'bg-auto text-secondary': step < 1,
-            'bg-neon-auto text-primary': step == 1 || step == 2,
-            'bg-neon-success': step > 2
+            'bg-auto text-secondary': step() < 1,
+            'bg-neon-auto text-primary': step() == 1 || step() == 2,
+            'bg-neon-success': step() > 2
           }"
         >
           <fa-icon [icon]="faUsers"></fa-icon>
@@ -286,17 +286,17 @@
       <li
         class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block"
         [ngClass]="{
-          'text-silent': step < 4,
-          'text-primary': step > 4,
+          'text-silent': step() < 4,
+          'text-primary': step() > 4,
         }"
         (click)="setStep(3)"
       >
         <div
           class="flex items-center text-primary justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 shadow-lg bg-neon-auto"
           [ngClass]="{
-            'bg-auto text-secondary': step < 3,
-            'bg-neon-auto text-primary': step == 3,
-            'bg-neon-success': step > 3
+            'bg-auto text-secondary': step() < 3,
+            'bg-neon-auto text-primary': step() == 3,
+            'bg-neon-success': step() > 3
           }"
         >
           <fa-icon [icon]="faCalendar"></fa-icon>
@@ -307,17 +307,17 @@
       <li
         class="flex w-full items-center after:content-[''] after:w-full after:h-1 after:border-b after:border-4 after:inline-block"
         [ngClass]="{
-          'text-silent': step < 5,
-          'text-primary': step > 5
+          'text-silent': step() < 5,
+          'text-primary': step() > 5
         }"
         (click)="setStep(4)"
       >
         <div
           class="flex items-center text-primary justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 shadow-lg bg-neon-auto"
           [ngClass]="{
-            'bg-auto text-secondary': step < 4,
-            'bg-neon-auto text-primary': step == 4,
-            'bg-neon-success': step > 4
+            'bg-auto text-secondary': step() < 4,
+            'bg-neon-auto text-primary': step() == 4,
+            'bg-neon-success': step() > 4
           }"
         >
           <fa-icon [icon]="faIdCardClip"></fa-icon>
@@ -327,9 +327,9 @@
         <div
           class="flex items-center text-primary justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 shadow-lg bg-auto"
           [ngClass]="{
-            'bg-auto text-secondary': step < 5,
-            'bg-neon-auto text-primary': step == 5,
-            'bg-neon-success': step > 5
+            'bg-auto text-secondary': step() < 5,
+            'bg-neon-auto text-primary': step() == 5,
+            'bg-neon-success': step() > 5
           }"
         >
           <fa-icon [icon]="faClipboardCheck"></fa-icon>
@@ -339,7 +339,7 @@
 
     <button
       class="px-4 py-2 h-min button-primary"
-      [disabled]="step == 5 || maxStep <= step"
+      [disabled]="step() == 5 || maxStep() <= step()"
       (click)="nextStep()"
     >
       »

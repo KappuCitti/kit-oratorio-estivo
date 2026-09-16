@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -23,7 +23,6 @@ import { UtilsService } from '../../../../services/utils.service';
     NavbarComponent,
     LoadingComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './my.component.html',
 })
 export class MyComponent implements OnInit {
@@ -32,12 +31,12 @@ export class MyComponent implements OnInit {
   private api = inject(ApiService);
   private utils = inject(UtilsService);
 
-  user!: User;
+  readonly user = signal<User | null>(null);
 
   dataForm: FormGroup;
   passwordForm: FormGroup;
 
-  error: string | null = null;
+  readonly error = signal<string | null>(null);
 
   isPasswordFieldOpened = signal(false); // Signal per gestire lo stato di apertura del details
   isPasswordFormValid = signal(false); // Signal per lo stato della validità del form
@@ -73,9 +72,9 @@ export class MyComponent implements OnInit {
   ngOnInit(): void {
     this.api.getUser().subscribe((response) => {
       if (response.status === 200 && response.body?.success) {
-        this.user = response.body.data;
+        this.user.set(response.body.data);
 
-        this.dataForm.patchValue(this.user);
+        this.dataForm.patchValue(response.body.data);
       }
     });
 
@@ -96,7 +95,7 @@ export class MyComponent implements OnInit {
 
   onSubmit(): void {
     if (this.passwordForm.valid) {
-      this.error = null;
+      this.error.set(null);
 
       this.api
         .setUserPassword(
@@ -111,14 +110,14 @@ export class MyComponent implements OnInit {
           },
           error: (error) => {
             console.error(error);
-            this.error = this.utils.handleResponse(error, null);
+            this.error.set(this.utils.handleResponse(error, null));
           },
         });
     }
   }
 
   onResetPasswordForm(): void {
-    this.error = null;
+    this.error.set(null);
 
     this.passwordForm.reset();
     this.isPasswordFieldOpened.set(false);

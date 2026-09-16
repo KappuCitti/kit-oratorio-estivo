@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
@@ -7,7 +7,6 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons';
 @Component({
   selector: 'app-footer',
   imports: [RouterLink, FontAwesomeModule],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './footer.component.html',
 })
 export class FooterComponent {

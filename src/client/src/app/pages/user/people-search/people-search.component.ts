@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { ParentComponent } from '../../../components/parent/parent.component';
@@ -6,7 +6,7 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../../services/api.service';
-import { Child, FamilyMember, Parent } from '../../../../models/Family.model';
+import { FamilyMember } from '../../../../models/Family.model';
 import { ChildComponent } from '../../../components/child/child.component';
 import { FamilyMemberComponent } from '../../../components/family-member/family-member.component';
 
@@ -20,7 +20,6 @@ import { FamilyMemberComponent } from '../../../components/family-member/family-
     RouterLink,
     FamilyMemberComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './people-search.component.html',
 })
 export class PeopleSearchComponent implements OnInit {
@@ -32,9 +31,7 @@ export class PeopleSearchComponent implements OnInit {
 
   faPlus = faPlus;
 
-  user: any;
-  parent: Parent | null = null;
-  childs: FamilyMember[] = [];
+  readonly childs = signal<FamilyMember[]>([]);
 
   ngOnInit(): void {
     this.loadData();
@@ -44,8 +41,7 @@ export class PeopleSearchComponent implements OnInit {
     this.api.getManagedPeople().subscribe({
       next: (response) => {
         if (response.status == 200 && response.body?.success) {
-          console.log(response.body.data);
-          this.childs = response.body.data || [];
+          this.childs.set(response.body.data || []);
         }
       },
       error: (error) => {

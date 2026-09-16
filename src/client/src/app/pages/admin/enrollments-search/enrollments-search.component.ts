@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { ApiService } from '../../../../services/api.service';
@@ -53,7 +53,6 @@ interface EnrollmentWeekEnrolled extends Week {
     ReactiveFormsModule,
     RouterLink,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './enrollments-search.component.html',
 })
 export class EnrollmentsSearchComponent implements OnInit {
@@ -72,23 +71,23 @@ export class EnrollmentsSearchComponent implements OnInit {
   faArrowRotateLeft = faArrowRotateLeft;
   faPlus = faPlus;
 
-  enrollments: EnrollmentSearch[] = [];
-  weeks: Week[] = [];
-  teams: Team[] = [];
+  readonly enrollments = signal<EnrollmentSearch[]>([]);
+  readonly weeks = signal<Week[]>([]);
+  readonly teams = signal<Team[]>([]);
 
-  schools: School[] = [];
-  classes: Class[] = [];
+  readonly schools = signal<School[]>([]);
+  readonly classes = signal<Class[]>([]);
 
-  elements: number = 0;
+  readonly elements = signal(0);
   page: number = 1;
   size: number = 25;
 
   year: number = new Date().getFullYear();
   searchForm: FormGroup;
 
-  enrollmentToDelete: EnrollmentSearch | null = null;
-  isDeleteModalOpen: boolean = false;
-  errorDelete: string | null = null;
+  readonly enrollmentToDelete = signal<EnrollmentSearch | null>(null);
+  readonly isDeleteModalOpen = signal(false);
+  readonly errorDelete = signal<string | null>(null);
 
   constructor() {
     this.searchForm = this.fb.group({
@@ -108,15 +107,17 @@ export class EnrollmentsSearchComponent implements OnInit {
         this.searchForm.patchValue({ classId: null }, { emitEvent: false });
       }
       // If no one is selected get all, else filter by school
-      const selectedSchool = this.schools.find(
+      const selectedSchool = this.schools().find(
         (school) => school.id == value.schoolId
       );
-      this.classes = selectedSchool
-        ? selectedSchool.classes.map((cls) => ({
-            ...cls,
-            school: { ...selectedSchool, classes: undefined },
-          }))
-        : [];
+      this.classes.set(
+        selectedSchool
+          ? selectedSchool.classes.map((cls) => ({
+              ...cls,
+              school: { ...selectedSchool, classes: undefined },
+            }))
+          : []
+      );
 
       if (this.searchForm.valid) {
         if (value.year != this.year) {
@@ -134,13 +135,13 @@ export class EnrollmentsSearchComponent implements OnInit {
     this.api.getSchools().subscribe({
       next: (response) => {
         if (response.status == 200 && response.body?.success) {
-          this.schools = response.body.data;
+          this.schools.set(response.body.data);
         }
       },
     });
     this.api.getTeams().subscribe((response) => {
       if (response.status == 200 && response.body?.success) {
-        this.teams = response.body.data;
+        this.teams.set(response.body.data);
       }
     });
 
@@ -150,7 +151,7 @@ export class EnrollmentsSearchComponent implements OnInit {
   loadWeeks() {
     this.api.getWeeks(this.year).subscribe((response) => {
       if (response.status == 200 && response.body?.success) {
-        this.weeks = response.body.data;
+        this.weeks.set(response.body.data);
         this.loadEnrollments();
       }
     });
@@ -159,7 +160,7 @@ export class EnrollmentsSearchComponent implements OnInit {
   loadEnrollments() {
     this.api.getWeeks(this.year).subscribe((response) => {
       if (response.status == 200 && response.body?.success) {
-        this.weeks = response.body.data;
+        this.weeks.set(response.body.data);
       }
     });
 
@@ -187,15 +188,14 @@ export class EnrollmentsSearchComponent implements OnInit {
 
     this.api.getEnrollments(params).subscribe((response) => {
       if (response.status == 200 && response.body?.success) {
-        this.enrollments = response.body.data.elements;
-        console.log(this.enrollments);
-        this.elements = response.body.data.count;
+        this.enrollments.set(response.body.data.elements);
+        this.elements.set(response.body.data.count);
       }
     });
   }
 
   getWeeksStatus(weeks: EnrollmentWeekSearch[]): EnrollmentWeekEnrolled[] {
-    return [...this.weeks]
+    return [...this.weeks()]
       .sort((a, b) => a.id - b.id)
       .map((week, index) => {
         const enrolled = weeks.find((w) => w.weekId === week.id);
@@ -265,20 +265,21 @@ export class EnrollmentsSearchComponent implements OnInit {
   }
 
   openDeleteModal(e: EnrollmentSearch) {
-    this.enrollmentToDelete = e;
-    this.isDeleteModalOpen = true;
+    this.enrollmentToDelete.set(e);
+    this.isDeleteModalOpen.set(true);
 
-    this.errorDelete = null;
+    this.errorDelete.set(null);
   }
 
   closeDeleteModal() {
-    this.enrollmentToDelete = null;
-    this.isDeleteModalOpen = false;
+    this.enrollmentToDelete.set(null);
+    this.isDeleteModalOpen.set(false);
   }
 
   deleteEnrollment() {
-    if (this.enrollmentToDelete) {
-      this.api.deleteEnrollment(this.enrollmentToDelete.id).subscribe({
+    const enrollmentToDelete = this.enrollmentToDelete();
+    if (enrollmentToDelete) {
+      this.api.deleteEnrollment(enrollmentToDelete.id).subscribe({
         next: (response) => {
           if (response.status == 200) {
             this.loadEnrollments();
@@ -287,7 +288,7 @@ export class EnrollmentsSearchComponent implements OnInit {
         },
         error: (error) => {
           console.error(error);
-          this.errorDelete = this.utils.handleResponse(error, null);
+          this.errorDelete.set(this.utils.handleResponse(error, null));
         },
       });
     }

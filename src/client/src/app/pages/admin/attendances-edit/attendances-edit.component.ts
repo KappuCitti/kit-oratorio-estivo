@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { NavbarComponent } from "../../../components/navbar/navbar.component";
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
@@ -16,7 +16,6 @@ import { addMonths, subMonths } from 'date-fns';
   imports: [NavbarComponent, FooterComponent, FaIconComponent, ReactiveFormsModule, PaginationComponent,
     CalendarModule, DatePipe,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './attendances-edit.component.html',
 })
 export class AttendancesEditComponent implements OnInit {
@@ -30,21 +29,21 @@ export class AttendancesEditComponent implements OnInit {
   searchForm: FormGroup;
   extraordinaryAttendanceForm: FormGroup;
 
-  error: string | null = null;
+  readonly error = signal<string | null>(null);
 
-  extraordinaryAttendances: any[] = [];
-  selectedExtraordinaryAttendance: any = null;
+  readonly extraordinaryAttendances = signal<any[]>([]);
+  readonly selectedExtraordinaryAttendance = signal<any>(null);
 
-  isExtraordinaryAttendanceModalOpen: boolean = false;
+  readonly isExtraordinaryAttendanceModalOpen = signal(false);
 
-  elements: number = 0;
+  readonly elements = signal(0);
   page: number = 1;
   size: number = 25;
 
   refresh = new Subject<void>();
-  events: CalendarEvent[] = [];
+  readonly events = signal<CalendarEvent[]>([]);
 
-  today = new Date();
+  readonly today = signal(new Date());
 
   constructor() {
     this.searchForm = this.fb.group({
@@ -60,12 +59,12 @@ export class AttendancesEditComponent implements OnInit {
 
     this.searchForm.valueChanges.subscribe((value) => {
       if (this.searchForm.valid) this.loadExtraordinaryAttendances();
-      this.today = this.getDate();
+      this.today.set(this.getDate());
     });
   }
 
   ngOnInit(): void {
-    this.events = [{
+    this.events.set([{
       start: new Date('2025-04-09T09:00:00'),
       title: 'Ingresso puntuale',
       color: { primary: '#4caf50', secondary: '#c8e6c9' }, // verde
@@ -82,7 +81,7 @@ export class AttendancesEditComponent implements OnInit {
         type: 'Left',
         note: 'Uscita anticipata per appuntamento medico',
       },
-    }]
+    }]);
 
     this.loadExtraordinaryAttendances();
   }
@@ -101,32 +100,33 @@ export class AttendancesEditComponent implements OnInit {
   loadExtraordinaryAttendances() { }
 
   getDate() {
-    return this.searchForm.get('date')?.value || this.today;
+    return this.searchForm.get('date')?.value || this.today();
   }
   isToday(date: Date): boolean {
-    return date.toDateString() === this.today.toDateString();
+    return date.toDateString() === this.today().toDateString();
   }
   previousMonth(): void {
-    this.today = subMonths(this.today, 1);
+    this.today.update((today) => subMonths(today, 1));
     this.searchForm.patchValue({ date: '' });
   }
 
   nextMonth(): void {
-    this.today = addMonths(this.today, 1);
+    this.today.update((today) => addMonths(today, 1));
     this.searchForm.patchValue({ date: '' });
   }
   onDayClicked(event: { day: MonthViewDay<any>; sourceEvent: MouseEvent | KeyboardEvent; }): void {
-    this.today = new Date(event.day.date);
-    this.searchForm.patchValue({ date: this.today.toISOString().slice(0, 10) });
+    const day = new Date(event.day.date);
+    this.today.set(day);
+    this.searchForm.patchValue({ date: day.toISOString().slice(0, 10) });
   }
 
   openExtraordinaryAttendanceModal(extraordinaryAttendance: any) {
-    this.selectedExtraordinaryAttendance = extraordinaryAttendance;
-    this.isExtraordinaryAttendanceModalOpen = true;
+    this.selectedExtraordinaryAttendance.set(extraordinaryAttendance);
+    this.isExtraordinaryAttendanceModalOpen.set(true);
   }
 
   closeExtraordinaryAttendanceModal() {
-    this.isExtraordinaryAttendanceModalOpen = false;
+    this.isExtraordinaryAttendanceModalOpen.set(false);
     this.extraordinaryAttendanceForm.reset();
   }
 

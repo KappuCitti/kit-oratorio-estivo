@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -11,7 +11,6 @@ import { toDateOnly } from '../../../../services/utils.service';
 @Component({
   selector: 'app-dashboard',
   imports: [NavbarComponent, FooterComponent, FontAwesomeModule],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent implements OnInit {
@@ -19,10 +18,10 @@ export class DashboardComponent implements OnInit {
 
   // TODO - Nessun endpoint espone il numero totale di utenti in rubrica:
   // questa casella resta a 0 finche' non viene aggiunto lato server.
-  peopleCount: number = 0;
-  enrollmentsCount: number = 0;
-  attendanceStats: AttendancesStat | null = null;
-  attendanceCount: number = 0;
+  readonly peopleCount = signal(0);
+  readonly enrollmentsCount = signal(0);
+  readonly attendanceStats = signal<AttendancesStat | null>(null);
+  readonly attendanceCount = signal(0);
 
   ngOnInit(): void {
     const today = toDateOnly(new Date());
@@ -43,13 +42,13 @@ export class DashboardComponent implements OnInit {
         .pipe(catchError(() => of(null))),
     }).subscribe(({ enrollments, stats, attendances }) => {
       if (enrollments?.status === 200 && enrollments.body?.success) {
-        this.enrollmentsCount = enrollments.body.data.count;
+        this.enrollmentsCount.set(enrollments.body.data.count);
       }
       if (stats?.status === 200 && stats.body?.success) {
-        this.attendanceStats = stats.body.data;
+        this.attendanceStats.set(stats.body.data);
       }
       if (attendances?.status === 200 && attendances.body?.success) {
-        this.attendanceCount = attendances.body.data.length;
+        this.attendanceCount.set(attendances.body.data.length);
       }
     });
   }

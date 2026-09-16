@@ -70,7 +70,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (person of people; track person.id + '' + person.surname) {
+        @for (person of people(); track person.id + '' + person.surname) {
         <tr>
           <td>{{ person.surname }}</td>
           <td>{{ person.name }}</td>
@@ -115,14 +115,14 @@
       </tbody>
     </table>
 
-    @if (people.length == 0) {
+    @if (people().length == 0) {
     <div class="flex justify-center items-center h-20">
       <span class="text-secondary">Nessun risultato</span>
     </div>
     }
 
     <app-pagination
-      [totalItems]="elements"
+      [totalItems]="elements()"
       (pageChange)="onPageChange($event)"
       (itemsPerPageChange)="onSizeChange($event)"
     ></app-pagination>
@@ -130,7 +130,7 @@
 </div>
 
 <!-- Overlay -->
-@if (isDeleteModalOpen && peopleToDelete) {
+@if (isDeleteModalOpen()) { @if (peopleToDelete(); as peopleToDelete) {
 <div
   class="fixed inset-0 bg-black/50 transition-opacity flex items-center justify-center z-0"
 >
@@ -152,7 +152,7 @@
         </button>
       </div>
     </div>
-    @if (errorDelete) {
+    @if (errorDelete(); as errorDelete) {
     <div class="bg-auto flex justify-center items-center mt-4">
       <div
         class="bg-neon-error p-3 rounded-lg shadow-lg w-full max-w-md text-center"
@@ -163,5 +163,5 @@
     }
   </div>
 </div>
-}
+} }
 <app-footer></app-footer>

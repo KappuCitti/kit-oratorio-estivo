@@ -9,14 +9,14 @@
     <fa-icon
       class="button-primary"
       [icon]="faPlus"
-      (click)="isAddModalOpen = true"
+      (click)="isAddModalOpen.set(true)"
     ></fa-icon>
   </header>
 
   <div
     class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
   >
-    @for (team of teams; track team.id) {
+    @for (team of teams(); track team.id) {
     <app-team
       [team]="team"
       (teamChange)="onTeamChange($event)"
@@ -26,7 +26,7 @@
   </div>
 </div>
 
-@if (isAddModalOpen) {
+@if (isAddModalOpen()) {
 <div
   class="fixed inset-0 bg-black/50 transition-opacity flex items-center justify-center z-50"
 >
@@ -72,7 +72,7 @@
     </div>
 
     <!-- Errore -->
-    @if (error) {
+    @if (error(); as error) {
     <div class="bg-neon-error p-3 rounded-lg shadow-lg mt-4 text-center">
       {{ error }}
     </div>

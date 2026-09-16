@@ -1,5 +1,5 @@
 import { DatePipe, CommonModule } from '@angular/common';
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component } from '@angular/core';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -15,7 +15,6 @@ import { RouterLink } from '@angular/router';
     FaIconComponent,
     RouterLink,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './enrollments-search.component.html',
 })
 export class EnrollmentsSearchComponent {

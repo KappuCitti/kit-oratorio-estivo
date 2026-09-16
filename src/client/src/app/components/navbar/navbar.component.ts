@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, OnInit, Signal, signal, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, computed, signal, inject } from '@angular/core';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import {
   FontAwesomeModule,
@@ -37,10 +37,9 @@ interface Page {
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [RouterLink, CommonModule, FontAwesomeModule],
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent {
   private api = inject(ApiService);
   private router = inject(Router);
 
@@ -60,13 +59,13 @@ export class NavbarComponent implements OnInit {
   faGears = faGears;
   faCircleUser = faCircleUser;
 
-  isMenuOpenSignal = signal(false);
-  isDropdownOpenSignal = signal(false);
+  // Erano due signal privati piu' due computed che si limitavano a rileggerli:
+  // un signal e' gia' leggibile dal template, quindi il doppio livello non
+  // serviva.
+  readonly isMenuOpen = signal(false);
+  readonly isDropdownOpen = signal(false);
 
-  isMenuOpen = computed(() => this.isMenuOpenSignal());
-  isDropdownOpen = computed(() => this.isDropdownOpenSignal());
-
-  isAdmin = signal(false);
+  readonly isAdmin = signal(false);
   baseURL = computed(() => (this.isAdmin() ? '/admin' : '/user'));
 
   // TODO - Replace all display with a proper check for the user role
@@ -156,8 +155,6 @@ export class NavbarComponent implements OnInit {
   ]);
 
   constructor() {
-    this.isAdmin.set(false);
-
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
@@ -166,14 +163,12 @@ export class NavbarComponent implements OnInit {
       });
   }
 
-  ngOnInit(): void {}
-
   toggleMenu(): void {
-    this.isMenuOpenSignal.set(!this.isMenuOpenSignal());
+    this.isMenuOpen.update((open) => !open);
   }
 
   toggleDropdown(): void {
-    this.isDropdownOpenSignal.set(!this.isDropdownOpenSignal());
+    this.isDropdownOpen.update((open) => !open);
   }
 
   logout(): void {

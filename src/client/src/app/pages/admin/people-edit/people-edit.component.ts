@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   Child,
@@ -17,7 +17,6 @@ import Enrollment from '../../../../models/Enrollment.model';
 @Component({
   selector: 'app-people-edit',
   imports: [FooterComponent, NavbarComponent, ParentComponent, ChildComponent],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './people-edit.component.html',
 })
 export class PeopleEditComponent implements OnInit {
@@ -27,11 +26,11 @@ export class PeopleEditComponent implements OnInit {
 
   type: 'child' | 'parent' | null = null;
   id: number | null = null;
-  person: ParentResponse | ChildResponse | null = null;
+  readonly person = signal<ParentResponse | ChildResponse | null>(null);
   personCopy: Child | Parent | null = null;
 
-  loading: boolean = true;
-  error: string | null = null;
+  readonly loading = signal(true);
+  readonly error = signal<string | null>(null);
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
@@ -50,32 +49,32 @@ export class PeopleEditComponent implements OnInit {
 
   loadPerson() {
     if (!this.type || !this.id) return;
-    this.loading = true;
+    this.loading.set(true);
 
     if (this.type == 'parent') {
       this.api.getParentById(this.id).subscribe({
         next: (response) => {
           if (response.status == 200 && response.body?.success)
-            this.person = response.body.data;
-          this.loading = false;
+            this.person.set(response.body.data);
+          this.loading.set(false);
         },
         error: (error) => {
           console.error(error);
-          this.error = this.utils.handleResponse(error, null);
-          this.loading = false;
+          this.error.set(this.utils.handleResponse(error, null));
+          this.loading.set(false);
         },
       });
     } else if (this.type == 'child') {
       this.api.getChildById(this.id).subscribe({
         next: (response) => {
           if (response.status == 200 && response.body?.success)
-            this.person = response.body.data;
-          this.loading = false;
+            this.person.set(response.body.data);
+          this.loading.set(false);
         },
         error: (error) => {
           console.error(error);
-          this.error = this.utils.handleResponse(error, null);
-          this.loading = false;
+          this.error.set(this.utils.handleResponse(error, null));
+          this.loading.set(false);
         },
       });
     }
@@ -97,31 +96,31 @@ export class PeopleEditComponent implements OnInit {
     console.table({
       id: this.id,
       type: this.type,
-      person: this.person?.surname,
-      isParent: this.isParent(this.person),
-      isChild: this.isChild(this.person),
+      person: this.person()?.surname,
+      isParent: this.isParent(this.person()),
+      isChild: this.isChild(this.person()),
     });
 
     if (this.isParent(this.personCopy)) {
       this.api.updateParent(this.personCopy).subscribe({
         next: (response) => {
-          this.loading = false;
+          this.loading.set(false);
         },
         error: (error) => {
           console.error(error);
-          this.error = this.utils.handleResponse(error, '/admin/people');
-          this.loading = false;
+          this.error.set(this.utils.handleResponse(error, '/admin/people'));
+          this.loading.set(false);
         },
       });
     } else if (this.isChild(this.personCopy)) {
       this.api.updateChild(this.personCopy).subscribe({
         next: (response) => {
-          this.loading = false;
+          this.loading.set(false);
         },
         error: (error) => {
           console.error(error);
-          this.error = this.utils.handleResponse(error, '/admin/people');
-          this.loading = false;
+          this.error.set(this.utils.handleResponse(error, '/admin/people'));
+          this.loading.set(false);
         },
       });
     }

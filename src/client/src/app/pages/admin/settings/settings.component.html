@@ -55,7 +55,7 @@
         </tr>
       </thead> -->
       <tbody>
-        @for (shirt of shirts; track shirt.id) {
+        @for (shirt of shirts(); track shirt.id) {
         <tr>
           <td class="ps-0">{{ shirt.sizeName }}</td>
 
@@ -87,7 +87,7 @@
       </tbody>
     </table>
 
-    @if (shirts.length === 0) {
+    @if (shirts().length === 0) {
     <div class="flex justify-center items-center h-20">
       <span class="text-secondary">Ancora nessuna maglietta inserita</span>
     </div>
@@ -114,7 +114,7 @@
         </tr>
       </thead> -->
       <tbody>
-        @for (school of schools; track school.id) {
+        @for (school of schools(); track school.id) {
         <tr>
           <!-- School name centered with buttons below -->
           <td class="align-middle text-center">
@@ -131,7 +131,7 @@
           <!-- Classes list and buttons aligned horizontally -->
           <td class="align-middle p-0 py-2" colspan="2">
             <ul class="list-none ps-0 mb-0">
-              @for (class of classes; track class.id) { @if (class.school.id ===
+              @for (class of classes(); track class.id) { @if (class.school.id ===
               school.id) {
               <li class="flex items-center justify-between mb-1">
                 <span>{{ class.name }}</span>
@@ -166,7 +166,7 @@
     </div>
     <!-- Scuole e classi: ogni scuola con le sue classi sotto -->
     <div class="mt-4">
-      @for (school of schools; track school.id) {
+      @for (school of schools(); track school.id) {
       <div class="mb-6">
         <div class="flex items-center justify-between">
           <strong class="text-lg">{{ school.name }}</strong>
@@ -180,7 +180,7 @@
           </div>
         </div>
         <ul class="list-none ps-0 ms-6 mt-2">
-          @for (class of classes; track class.id) { @if (class.school.id ===
+          @for (class of classes(); track class.id) { @if (class.school.id ===
           school.id) {
           <li class="flex items-center justify-between py-2">
             <span>{{ class.name }}</span>

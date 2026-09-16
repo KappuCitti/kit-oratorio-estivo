@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
@@ -7,7 +7,6 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 @Component({
   selector: 'app-styleguide',
   imports: [FooterComponent, FaIconComponent],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './styleguide.component.html',
 })
 export class StyleguideComponent implements OnInit {

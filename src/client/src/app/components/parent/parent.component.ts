@@ -1,4 +1,4 @@
-import { Component, OnChanges, ChangeDetectionStrategy, inject, input, model, output } from '@angular/core';
+import { Component, OnChanges, inject, input, model, output } from '@angular/core';
 import {
   FormGroup,
   FormBuilder,
@@ -12,7 +12,6 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 @Component({
   selector: 'app-parent',
   imports: [FaIconComponent, ReactiveFormsModule],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './parent.component.html',
 })
 export class ParentComponent implements OnChanges {

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import Team from '../../../../models/Team.model';
@@ -23,7 +23,6 @@ import { UtilsService } from '../../../../services/utils.service';
     FontAwesomeModule,
     ReactiveFormsModule,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './teams-search.component.html',
 })
 export class TeamsSearchComponent implements OnInit {
@@ -31,15 +30,15 @@ export class TeamsSearchComponent implements OnInit {
   private fb = inject(FormBuilder);
   private utils = inject(UtilsService);
 
-  teams: Team[] = [];
-  loading = true;
+  readonly teams = signal<Team[]>([]);
+  readonly loading = signal(true);
 
   faPlus = faPlus;
 
   teamForm: FormGroup;
-  error: string | null = null;
+  readonly error = signal<string | null>(null);
 
-  isAddModalOpen = false;
+  readonly isAddModalOpen = signal(false);
 
   constructor() {
     this.teamForm = this.fb.group({
@@ -49,26 +48,30 @@ export class TeamsSearchComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loading = true;
+    this.loading.set(true);
     this.api.getTeams().subscribe((response) => {
-      if (response.body?.success) this.teams = response.body.data;
-      this.loading = false;
+      if (response.body?.success) this.teams.set(response.body.data);
+      this.loading.set(false);
     });
   }
 
   onTeamChange(team: Team | null) {
-    if (team) this.teams = this.teams.map((t) => (t.id === team.id ? team : t));
+    if (team) {
+      this.teams.update((teams) =>
+        teams.map((t) => (t.id === team.id ? team : t))
+      );
+    }
   }
 
   onTeamDelete(id: number) {
-    this.teams = this.teams.filter((t) => t.id !== id);
+    this.teams.update((teams) => teams.filter((t) => t.id !== id));
   }
 
   closeEditModal() {
     this.teamForm.reset();
-    this.error = null;
+    this.error.set(null);
 
-    this.isAddModalOpen = false;
+    this.isAddModalOpen.set(false);
   }
 
   onSaveNewTeam() {
@@ -79,17 +82,19 @@ export class TeamsSearchComponent implements OnInit {
     this.api.createTeam(this.teamForm.value).subscribe({
       next: (response) => {
         if (response.body?.success) {
-          this.teams.push({
-            id: response.body?.success,
-            ...this.teamForm.value,
-          });
+          // Aggiornamento immutabile al posto di push: un signal notifica
+          // solo se cambia il riferimento dell'array.
+          this.teams.update((teams) => [
+            ...teams,
+            { id: response.body!.success, ...this.teamForm.value },
+          ]);
         }
 
         this.closeEditModal();
       },
       error: (error) => {
         console.error(error);
-        this.error = this.utils.handleResponse(error, null);
+        this.error.set(this.utils.handleResponse(error, null));
       },
     });
   }

@@ -1,4 +1,4 @@
-import { Component, OnChanges, ChangeDetectionStrategy, inject, input, model, output } from '@angular/core';
+import { Component, OnChanges, inject, input, model, output, signal } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -23,7 +23,6 @@ import { UtilsService } from '../../../services/utils.service';
 @Component({
   selector: 'app-team',
   imports: [ReactiveFormsModule, CommonModule, FontAwesomeModule, FormsModule],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './team.component.html',
 })
 export class TeamComponent implements OnChanges {
@@ -40,15 +39,15 @@ export class TeamComponent implements OnChanges {
 
   teamForm!: FormGroup;
 
-  error: string | null = null;
-  errorDelete: string | null = null;
+  readonly error = signal<string | null>(null);
+  readonly errorDelete = signal<string | null>(null);
 
   faFloppyDisk = faFloppyDisk;
   faPen = faPen;
   faTrash = faTrash;
 
-  isEditModalOpen = false;
-  isDeleteModalOpen = false;
+  readonly isEditModalOpen = signal(false);
+  readonly isDeleteModalOpen = signal(false);
 
   constructor() {
     this.teamForm = this.fb.group(
@@ -107,14 +106,14 @@ export class TeamComponent implements OnChanges {
       color: team?.color || '',
     });
 
-    this.isEditModalOpen = false;
+    this.isEditModalOpen.set(false);
   }
 
   saveTeam() {
     const team = this.team();
 
     if (this.teamForm.valid && team) {
-      this.error = null;
+      this.error.set(null);
 
       const data: TeamUpdateRequest = {
         id: team.id,
@@ -146,12 +145,12 @@ export class TeamComponent implements OnChanges {
           },
           error: (error) => {
             console.error(error);
-            this.error = this.utils.handleResponse(error, null);
+            this.error.set(this.utils.handleResponse(error, null));
           },
         });
       }
     } else {
-      this.error = 'Modifica prima di salvare!';
+      this.error.set('Modifica prima di salvare!');
     }
   }
 }

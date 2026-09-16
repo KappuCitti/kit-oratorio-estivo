@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import {
   faEye,
@@ -38,7 +38,6 @@ type otherTypes = null;
     RouterLink,
     NavbarComponent,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './settings.component.html',
 })
 export class SettingsComponent implements OnInit {
@@ -50,9 +49,9 @@ export class SettingsComponent implements OnInit {
   faPen = faPen;
   faTrash = faTrash;
 
-  shirts: Shirt[] = [];
-  schools: School[] = [];
-  classes: Class[] = [];
+  readonly shirts = signal<Shirt[]>([]);
+  readonly schools = signal<School[]>([]);
+  readonly classes = signal<Class[]>([]);
 
   loading: Record<Exclude<tabTypes, null>, boolean> = {
     openings: true,
@@ -73,7 +72,7 @@ export class SettingsComponent implements OnInit {
   ngOnInit(): void {
     this.api.getShirts().subscribe((response) => {
       if (response.status == 200 && response.body?.success) {
-        this.shirts = response.body.data;
+        this.shirts.set(response.body.data);
         this.loading.shirts = false;
       }
     });
@@ -82,11 +81,11 @@ export class SettingsComponent implements OnInit {
     zip([this.api.getSchools(), this.api.getClasses()]).subscribe(
       ([schoolsResponse, classesResponse]) => {
         if (schoolsResponse.status == 200 && schoolsResponse.body?.success) {
-          this.schools = schoolsResponse.body.data;
+          this.schools.set(schoolsResponse.body.data);
           this.loading.schools = false;
         }
         if (classesResponse.status == 200 && classesResponse.body?.success) {
-          this.classes = classesResponse.body.data;
+          this.classes.set(classesResponse.body.data);
           this.loading.classes = false;
         }
       }
