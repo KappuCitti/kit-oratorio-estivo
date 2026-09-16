@@ -1,14 +1,17 @@
-import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
-import { ApiService } from '../services/api.service';
-import { of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { CanActivateFn, Router } from '@angular/router';
+import { map } from 'rxjs/operators';
+import type { Permission } from '../models/permissions.generated';
+import { SessionService } from '../services/session.service';
 
 /*
  * Il cookie di sessione e' HttpOnly, quindi da JavaScript non e' leggibile:
  * l'unico modo per sapere se la sessione e' valida e' chiederlo al server.
  * La vecchia versione leggeva `user_token` con CookieService e usciva subito se
- * era vuoto — con un cookie HttpOnly quel controllo manderebbe sempre al login.
+ * era vuoto: con un cookie HttpOnly quel controllo manderebbe sempre al login.
+ *
+ * Tutte le guard passano da SessionService, che la richiesta la fa una volta
+ * sola e la condivide.
  */
 
 /**
@@ -16,44 +19,51 @@ import { map, catchError } from 'rxjs/operators';
  * sessione valida. Chi e' gia' autenticato viene mandato alla propria area.
  */
 export const LoginGuard: CanActivateFn = () => {
-  const api = inject(ApiService);
+  const session = inject(SessionService);
   const router = inject(Router);
 
-  return api.getUser().pipe(
-    map((response) => {
-      if (response.status === 200 && response.body?.success) {
-        router.navigate(['/user']);
-        return false;
-      }
-      return true;
-    }),
-    // Nessuna sessione (401) o server irraggiungibile: la pagina di login e'
-    // proprio quello che serve.
-    catchError(() => of(true))
-  );
-};
-
-/**
- * Protegge le pagine che richiedono una sessione.
- *
- * TODO - Non distingue ancora `/user/*` da `/admin/*`: serve un
- * PermissionGuard che legga i permessi da GET /users/self. Finche' manca,
- * qualunque utente autenticato puo' aprire le pagine admin (il server rifiuta
- * comunque le chiamate, ma la UI non dovrebbe mostrarle).
- */
-export const AuthGuard: CanActivateFn = () => {
-  const api = inject(ApiService);
-  const router = inject(Router);
-
-  return api.getUser().pipe(
-    map((response) => {
-      if (response.status === 200 && response.body?.success) return true;
-      router.navigate(['/login']);
-      return false;
-    }),
-    catchError(() => {
-      router.navigate(['/login']);
-      return of(false);
+  return session.load().pipe(
+    map((user) => {
+      if (!user) return true;
+      return router.parseUrl(session.landingPath());
     })
   );
 };
+
+/** Protegge le pagine che richiedono una sessione, senza guardare i permessi. */
+export const AuthGuard: CanActivateFn = () => {
+  const session = inject(SessionService);
+  const router = inject(Router);
+
+  return session
+    .load()
+    .pipe(map((user) => (user ? true : router.parseUrl('/login'))));
+};
+
+/**
+ * Protegge una pagina con gli stessi permessi che il server pretende sulle
+ * rotte che quella pagina chiama.
+ *
+ * Chi non li ha non viene lasciato sulla pagina: le voci di menu
+ * corrispondenti sono gia' nascoste dalla navbar, e chi arriva scrivendo
+ * l'indirizzo a mano viene riportato alla propria pagina iniziale. Il server
+ * rifiuterebbe comunque le chiamate, ma mostrare una pagina che non puo'
+ * funzionare sarebbe solo un modo piu' lento di dire di no.
+ *
+ * I permessi sono del tipo generato dal server: scriverne uno inesistente non
+ * compila.
+ */
+export function permissionGuard(...required: Permission[]): CanActivateFn {
+  return () => {
+    const session = inject(SessionService);
+    const router = inject(Router);
+
+    return session.load().pipe(
+      map((user) => {
+        if (!user) return router.parseUrl('/login');
+        if (session.hasAll(...required)) return true;
+        return router.parseUrl(session.landingPath());
+      })
+    );
+  };
+}

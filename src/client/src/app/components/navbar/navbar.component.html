@@ -15,10 +15,10 @@
     <!-- Contenuto Collapse -->
     <div class="hidden xl:flex xl:items-center xl:space-x-6 w-full xl:w-auto">
       <ul class="list-none pl-0 xl:flex space-y-4 xl:space-y-0 xl:space-x-6">
-        @for ( page of pages(); track page.title){ @if (page.display ) {
+        @for ( page of pages(); track page.title) {
           <li>
             <a
-              [routerLink]="page.disabled || !page.display ? undefined : page.url"
+              [routerLink]="page.disabled ? undefined : page.url"
               class="flex items-center space-x-2 text-primary no-underline"
             [ngClass]="{
               'text-disabled cursor-not-allowed hover:no-underline':
@@ -29,7 +29,7 @@
               <span>{{ page.title }}</span></a
               >
             </li>
-            } }
+            }
           </ul>
         </div>
 
@@ -86,10 +86,10 @@
 
           <div class="flex flex-col space-y-4">
             <ul class="space-y-4 list-none pl-0">
-              @for ( page of pages(); track page.title){ @if (page.display ) {
+              @for ( page of pages(); track page.title) {
                 <li>
                   <a
-                    [routerLink]="page.disabled || !page.display ? undefined : page.url"
+                    [routerLink]="page.disabled ? undefined : page.url"
                     class="flex items-center space-x-2 text-primary no-underline"
           [ngClass]="{
             'text-disabled cursor-not-allowed hover:no-underline':
@@ -100,7 +100,7 @@
                     <span>{{ page.title }}</span></a
                     >
                   </li>
-                  } }
+                  }
                 </ul>
               </div>
             </div>

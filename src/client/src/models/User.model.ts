@@ -1,5 +1,6 @@
 import Address from './Address.model';
 import { FamilyMember } from './Family.model';
+import type { Permission } from './permissions.generated';
 import { Theme } from './Theme.model';
 
 export default interface User extends FamilyMember {
@@ -31,7 +32,10 @@ export interface Role {
 }
 
 export interface RolePermissions extends Role {
-  permissions: string[];
+  // Tipizzati con l'unione generata dal server: confrontare un permesso che
+  // non esiste piu' diventa un errore di compilazione invece di una condizione
+  // sempre falsa che nessuno nota.
+  permissions: Permission[];
 }
 
 // export interface Permission {

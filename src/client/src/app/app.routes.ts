@@ -2,7 +2,7 @@ import { importProvidersFrom } from '@angular/core';
 import { Routes } from '@angular/router';
 import { CalendarModule, CalendarUtils, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
-import { AuthGuard, LoginGuard } from '../guards/Auth.guard';
+import { AuthGuard, LoginGuard, permissionGuard } from '../guards/Auth.guard';
 import { environment } from '../environments/environment';
 
 // Ogni rotta usa `loadComponent`: il codice della pagina viene scaricato solo
@@ -67,7 +67,7 @@ const commonRoutes: Routes = [
       import('./pages/user/people-search/people-search.component').then(
         (m) => m.PeopleSearchComponent
       ),
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, permissionGuard('manage_self_child_users')],
   },
   {
     path: 'user/people/new',
@@ -75,7 +75,7 @@ const commonRoutes: Routes = [
       import('./pages/user/people-create/people-create.component').then(
         (m) => m.PeopleCreateComponent
       ),
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, permissionGuard('manage_self_child_users')],
   },
   // `my` non ha una versione utente: la stessa pagina serve entrambi i ruoli.
   {
@@ -93,39 +93,25 @@ const commonRoutes: Routes = [
       import('./pages/admin/dashboard/dashboard.component').then(
         (m) => m.DashboardComponent
       ),
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, permissionGuard('see_users')],
   },
-  {
-    path: 'admin/people',
-    loadComponent: () =>
-      import('./pages/admin/people-search/people-search.component').then(
-        (m) => m.PeopleSearchComponent
-      ),
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'admin/people/new',
-    loadComponent: () =>
-      import('./pages/admin/people-create/people-create.component').then(
-        (m) => m.PeopleCreateComponent
-      ),
-    canActivate: [AuthGuard],
-  },
-  {
-    path: 'admin/people/:type/:id',
-    loadComponent: () =>
-      import('./pages/admin/people-edit/people-edit.component').then(
-        (m) => m.PeopleEditComponent
-      ),
-    canActivate: [AuthGuard],
-  },
+  // La rubrica di amministrazione (admin/people, admin/people/new e
+  // admin/people/:type/:id) non e' registrata qui di proposito: le sue pagine
+  // chiamano /people, /childs, /parents e POST /family, che sul server non
+  // esistono e non sono mai esistiti. Non c'e' nemmeno un endpoint che possa
+  // sostituirli: GET /users restituisce solo gli utenti gestiti da chi e'
+  // collegato, senza ricerca ne' paginazione.
+  //
+  // I componenti restano nel repository, cosi' il lavoro fatto non si perde,
+  // ma finche' il server non offre un elenco di persone con ricerca queste
+  // rotte porterebbero solo a pagine vuote e a errori di rete.
   {
     path: 'admin/enrollments',
     loadComponent: () =>
       import(
         './pages/admin/enrollments-search/enrollments-search.component'
       ).then((m) => m.EnrollmentsSearchComponent),
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, permissionGuard('see_users')],
   },
   {
     path: 'admin/enrollments/new',
@@ -133,7 +119,7 @@ const commonRoutes: Routes = [
       import(
         './pages/admin/enrollments-create/enrollments-create.component'
       ).then((m) => m.EnrollmentsCreateComponent),
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, permissionGuard('manage_enrollments')],
   },
   {
     path: 'admin/enrollments/:id',
@@ -141,7 +127,7 @@ const commonRoutes: Routes = [
       import('./pages/admin/enrollments-edit/enrollments-edit.component').then(
         (m) => m.EnrollmentsEditComponent
       ),
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, permissionGuard('see_users')],
   },
   {
     path: 'admin/attendances',
@@ -149,7 +135,7 @@ const commonRoutes: Routes = [
       import(
         './pages/admin/attendances-search/attendances-search.component'
       ).then((m) => m.AttendancesSearchComponent),
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, permissionGuard('manage_attendances')],
   },
   {
     path: 'admin/attendances/:id',
@@ -170,7 +156,7 @@ const commonRoutes: Routes = [
       ),
       CalendarUtils,
     ],
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, permissionGuard('manage_attendances')],
   },
   {
     path: 'admin/teams',
@@ -178,7 +164,7 @@ const commonRoutes: Routes = [
       import('./pages/admin/teams-search/teams-search.component').then(
         (m) => m.TeamsSearchComponent
       ),
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, permissionGuard('manage_teams')],
   },
   {
     path: 'admin/settings',
@@ -186,7 +172,7 @@ const commonRoutes: Routes = [
       import('./pages/admin/settings/settings.component').then(
         (m) => m.SettingsComponent
       ),
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, permissionGuard('manage_classes')],
   },
   {
     path: 'admin/my',

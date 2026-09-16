@@ -1,6 +1,6 @@
 import { NgClass } from '@angular/common';
-import { Component, computed, signal, inject } from '@angular/core';
-import { NavigationEnd, Router, RouterLink } from '@angular/router';
+import { Component, computed, inject, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import {
   FontAwesomeModule,
   IconDefinition,
@@ -20,18 +20,20 @@ import {
   faUserGear,
   faUsers,
   faUserPen,
-  faMountainCity,
   faMountainSun,
 } from '@fortawesome/free-solid-svg-icons';
+import type { Permission } from '../../../models/permissions.generated';
 import { ApiService } from '../../../services/api.service';
-import { filter } from 'rxjs';
+import { SessionService } from '../../../services/session.service';
 
 interface Page {
   url: string;
   icon: IconDefinition;
   title: string;
-  display?: boolean; // Don't show the button
-  disabled?: boolean; // Shows a disabled style
+  /** Permesso richiesto; se manca, la voce vale per chiunque sia collegato. */
+  permission?: Permission;
+  /** Funzione non ancora realizzata: la voce si vede ma non e' cliccabile. */
+  disabled?: boolean;
 }
 
 @Component({
@@ -42,6 +44,7 @@ interface Page {
 export class NavbarComponent {
   private api = inject(ApiService);
   private router = inject(Router);
+  private session = inject(SessionService);
 
   faHouse = faHouse;
   faBars = faBars;
@@ -59,109 +62,106 @@ export class NavbarComponent {
   faGears = faGears;
   faCircleUser = faCircleUser;
 
-  // Erano due signal privati piu' due computed che si limitavano a rileggerli:
-  // un signal e' gia' leggibile dal template, quindi il doppio livello non
-  // serviva.
   readonly isMenuOpen = signal(false);
   readonly isDropdownOpen = signal(false);
 
-  readonly isAdmin = signal(false);
-  baseURL = computed(() => (this.isAdmin() ? '/admin' : '/user'));
+  /**
+   * In quale area si trova l'utente.
+   *
+   * Prima veniva dedotto dall'indirizzo corrente (`url.includes('/admin/')`):
+   * bastava scrivere a mano un indirizzo /admin per far comparire l'intero
+   * menu di amministrazione a chiunque. Ora dipende dai permessi che il server
+   * ha restituito, esattamente come le guard delle rotte.
+   */
+  readonly isAdminArea = computed(() => this.session.has('see_users'));
+  readonly baseURL = computed(() => (this.isAdminArea() ? '/admin' : '/user'));
 
-  // TODO - Replace all display with a proper check for the user role
+  /**
+   * Le voci visibili: quelle il cui permesso l'utente ha davvero.
+   *
+   * Il filtro non e' cosmetico. Una voce mostrata a chi non ha il permesso
+   * porta a una pagina che il server rifiuta di riempire, quindi a un errore
+   * al posto di un contenuto.
+   */
+  readonly pages = computed<Page[]>(() => {
+    const base = this.baseURL();
+    const admin = this.isAdminArea();
 
-  pages = computed<Page[]>(() => [
-    // Admin pages
-    {
-      url: `${this.baseURL()}/people`,
-      icon: this.faAddressBook,
-      title: 'Rubrica',
-      display: this.isAdmin() && true,
-      disabled: false,
-    },
-    {
-      // User and admins
-      url: `${this.baseURL()}/enrollments`,
-      icon: this.isAdmin() ? this.faUsers : this.faUserPen,
-      title: 'Iscrizioni',
-      display: true,
-      disabled: false,
-    },
-    {
-      url: `${this.baseURL()}/attendances`,
-      icon: this.faHighlighter,
-      title: 'Presenze',
-      display: this.isAdmin() && true,
-      disabled: false,
-    },
-    {
-      url: `${this.baseURL()}/trips`,
-      icon: this.faMountainSun,
-      title: 'Eventi',
-      display: this.isAdmin() && true,
-      disabled: true,
-    },
-    {
-      url: `${this.baseURL()}/staff`,
-      icon: this.faUserGear,
-      title: 'Staff',
-      display: this.isAdmin() && true,
-      disabled: true,
-    },
-    {
-      url: `${this.baseURL()}/teams`,
-      icon: this.faFlag,
-      title: 'Squadre',
-      display: this.isAdmin() && true,
-      disabled: false,
-    },
-    {
-      url: `${this.baseURL()}/leaderboard`,
-      icon: this.faChartLine,
-      title: 'Classifica',
-      display: this.isAdmin() && true,
-      disabled: true,
-    },
-    {
-      url: `${this.baseURL()}/games`,
-      icon: this.faDragon,
-      title: 'Giochi',
-      display: this.isAdmin() && true,
-      disabled: true,
-    },
-    {
-      url: `${this.baseURL()}/music`,
-      icon: this.faMusic,
-      title: 'Musica',
-      display: this.isAdmin() && true,
-      disabled: true,
-    },
-    {
-      url: `${this.baseURL()}/settings`,
-      icon: this.faGears,
-      title: 'Impostazioni',
-      display: this.isAdmin() && true,
-      disabled: false,
-    },
+    const all: Page[] = [
+      {
+        url: `${base}/enrollments`,
+        icon: admin ? this.faUsers : this.faUserPen,
+        title: 'Iscrizioni',
+        permission: admin ? 'see_users' : undefined,
+      },
+      {
+        url: `${base}/attendances`,
+        icon: this.faHighlighter,
+        title: 'Presenze',
+        permission: 'manage_attendances',
+      },
+      {
+        url: `${base}/teams`,
+        icon: this.faFlag,
+        title: 'Squadre',
+        permission: 'manage_teams',
+      },
+      {
+        url: `${base}/settings`,
+        icon: this.faGears,
+        title: 'Impostazioni',
+        permission: 'manage_classes',
+      },
+      {
+        url: `${base}/people`,
+        icon: this.faUsers,
+        title: 'Famiglia',
+        permission: 'manage_self_child_users',
+      },
 
-    // User pages
-    {
-      url: `${this.baseURL()}/people`,
-      icon: this.faUsers,
-      title: 'Famiglia',
-      display: !this.isAdmin() && true,
-      disabled: false,
-    },
-  ]);
+      // Funzioni dichiarate nel README ma non ancora realizzate: nessuna di
+      // queste rotte esiste, quindi restano non cliccabili.
+      {
+        url: `${base}/trips`,
+        icon: this.faMountainSun,
+        title: 'Eventi',
+        permission: 'manage_events',
+        disabled: true,
+      },
+      {
+        url: `${base}/staff`,
+        icon: this.faUserGear,
+        title: 'Staff',
+        permission: 'manage_users',
+        disabled: true,
+      },
+      {
+        url: `${base}/leaderboard`,
+        icon: this.faChartLine,
+        title: 'Classifica',
+        permission: 'manage_teams',
+        disabled: true,
+      },
+      {
+        url: `${base}/games`,
+        icon: this.faDragon,
+        title: 'Giochi',
+        permission: 'manage_activities',
+        disabled: true,
+      },
+      {
+        url: `${base}/music`,
+        icon: this.faMusic,
+        title: 'Musica',
+        permission: 'manage_activities',
+        disabled: true,
+      },
+    ];
 
-  constructor() {
-    this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe((event: NavigationEnd) => {
-        const url = event.urlAfterRedirects || event.url;
-        this.isAdmin.set(url.includes('/admin/') ? true : false);
-      });
-  }
+    return all.filter(
+      (page) => !page.permission || this.session.has(page.permission)
+    );
+  });
 
   toggleMenu(): void {
     this.isMenuOpen.update((open) => !open);
@@ -173,6 +173,9 @@ export class NavbarComponent {
 
   logout(): void {
     this.api.logout().subscribe(() => {
+      // Senza questo l'utente precedente resterebbe in memoria e le guard
+      // continuerebbero a considerarlo collegato fino al ricaricamento.
+      this.session.clear();
       this.router.navigate(['/login']);
     });
   }
