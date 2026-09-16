@@ -5,11 +5,12 @@ import {
   computed,
   effect,
   inject,
+  DOCUMENT
 } from '@angular/core';
 import { CookiesService } from './cookies.service';
 import { Theme, themes } from '../models/Theme.model';
 import { ApiService } from './api.service';
-import { DOCUMENT } from '@angular/common';
+
 
 @Injectable({
   providedIn: 'root',
