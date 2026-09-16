@@ -8,7 +8,7 @@
     <button
       class="text-xl xl:hidden focus:outline-none text-primary"
       (click)="toggleMenu()"
-    >
+      >
       <fa-icon [icon]="faBars"></fa-icon>
     </button>
 
@@ -16,97 +16,98 @@
     <div class="hidden xl:flex xl:items-center xl:space-x-6 w-full xl:w-auto">
       <ul class="list-none pl-0 xl:flex space-y-4 xl:space-y-0 xl:space-x-6">
         @for ( page of pages(); track page.title){ @if (page.display ) {
-        <li>
-          <a
-            [routerLink]="page.disabled || !page.display ? undefined : page.url"
-            class="flex items-center space-x-2 text-primary no-underline"
+          <li>
+            <a
+              [routerLink]="page.disabled || !page.display ? undefined : page.url"
+              class="flex items-center space-x-2 text-primary no-underline"
             [ngClass]="{
               'text-disabled cursor-not-allowed hover:no-underline':
                 page.disabled,
               'hover:underline': !page.disabled
             }"
-            ><fa-icon [icon]="page.icon"></fa-icon>
-            <span>{{ page.title }}</span></a
-          >
-        </li>
-        } }
-      </ul>
-    </div>
+              ><fa-icon [icon]="page.icon"></fa-icon>
+              <span>{{ page.title }}</span></a
+              >
+            </li>
+            } }
+          </ul>
+        </div>
 
-    <!-- Icona Profilo con Dropdown -->
-    <div class="relative">
-      <button (click)="toggleDropdown()" class="focus:outline-none text-xl">
-        <fa-icon [icon]="faCircleUser"></fa-icon>
-      </button>
-      <div
-        *ngIf="isDropdownOpen()"
-        class="absolute right-0 mt-2 w-48 bg-white rounded shadow-lg"
-      >
-        <a
-          [routerLink]="[baseURL(), 'my']"
-          class="block px-4 py-2 hover:bg-gray-200 text-gray-900 dark:text-gray-900 cursor-pointer rounded no-underline"
-          >Profilo</a
-        >
-        <hr class="border-gray-300" />
-        <a
-          (click)="logout()"
-          class="block px-4 py-2 hover:bg-gray-200 text-gray-900 dark:text-gray-900 cursor-pointer rounded no-underline"
-          >Log out</a
-        >
-      </div>
-    </div>
-  </div>
-</nav>
+        <!-- Icona Profilo con Dropdown -->
+        <div class="relative">
+          <button (click)="toggleDropdown()" class="focus:outline-none text-xl">
+            <fa-icon [icon]="faCircleUser"></fa-icon>
+          </button>
+          @if (isDropdownOpen()) {
+            <div
+              class="absolute right-0 mt-2 w-48 bg-white rounded shadow-lg"
+              >
+              <a
+                [routerLink]="[baseURL(), 'my']"
+                class="block px-4 py-2 hover:bg-gray-200 text-gray-900 dark:text-gray-900 cursor-pointer rounded no-underline"
+                >Profilo</a
+                >
+                <hr class="border-gray-300" />
+                <a
+                  (click)="logout()"
+                  class="block px-4 py-2 hover:bg-gray-200 text-gray-900 dark:text-gray-900 cursor-pointer rounded no-underline"
+                  >Log out</a
+                  >
+                </div>
+              }
+            </div>
+          </div>
+        </nav>
 
-<div
-  class="xl:hidden fixed top-0 left-0 h-full md:w-3/5 w-4/5 bg-auto shadow-lg transition-transform p-6 text-lg z-10"
+        <div
+          class="xl:hidden fixed top-0 left-0 h-full md:w-3/5 w-4/5 bg-auto shadow-lg transition-transform p-6 text-lg z-10"
   [ngClass]="{
     'translate-x-0': isMenuOpen(),
     '-translate-x-full': !isMenuOpen()
   }"
->
-  <div class="flex items-center justify-between">
-    <div>
-      <a
-        [routerLink]="[baseURL()]"
-        class="flex items-center text-primary no-underline"
-      >
-        <fa-icon [icon]="faHouse"></fa-icon>
-        <span class="ps-2">Progetto KOE</span>
-      </a>
-    </div>
-    <div>
-      <button (click)="toggleMenu()">
-        <fa-icon [icon]="faChevronLeft"></fa-icon>
-      </button>
-    </div>
-  </div>
-  <hr class="w-full my-6" />
+          >
+          <div class="flex items-center justify-between">
+            <div>
+              <a
+                [routerLink]="[baseURL()]"
+                class="flex items-center text-primary no-underline"
+                >
+                <fa-icon [icon]="faHouse"></fa-icon>
+                <span class="ps-2">Progetto KOE</span>
+              </a>
+            </div>
+            <div>
+              <button (click)="toggleMenu()">
+                <fa-icon [icon]="faChevronLeft"></fa-icon>
+              </button>
+            </div>
+          </div>
+          <hr class="w-full my-6" />
 
-  <div class="flex flex-col space-y-4">
-    <ul class="space-y-4 list-none pl-0">
-      @for ( page of pages(); track page.title){ @if (page.display ) {
-      <li>
-        <a
-          [routerLink]="page.disabled || !page.display ? undefined : page.url"
-          class="flex items-center space-x-2 text-primary no-underline"
+          <div class="flex flex-col space-y-4">
+            <ul class="space-y-4 list-none pl-0">
+              @for ( page of pages(); track page.title){ @if (page.display ) {
+                <li>
+                  <a
+                    [routerLink]="page.disabled || !page.display ? undefined : page.url"
+                    class="flex items-center space-x-2 text-primary no-underline"
           [ngClass]="{
             'text-disabled cursor-not-allowed hover:no-underline':
               page.disabled,
             'hover:underline': !page.disabled
           }"
-          ><fa-icon [icon]="page.icon"></fa-icon>
-          <span>{{ page.title }}</span></a
-        >
-      </li>
-      } }
-    </ul>
-  </div>
-</div>
+                    ><fa-icon [icon]="page.icon"></fa-icon>
+                    <span>{{ page.title }}</span></a
+                    >
+                  </li>
+                  } }
+                </ul>
+              </div>
+            </div>
 
-@if (isMenuOpen()) {
-<div
-  class="xl:hidden fixed inset-0 bg-black/50 transition-opacity z-0"
-  (click)="toggleMenu()"
-></div>
-}
+            @if (isMenuOpen()) {
+              <div
+                class="xl:hidden fixed inset-0 bg-black/50 transition-opacity z-0"
+                (click)="toggleMenu()"
+              ></div>
+            }

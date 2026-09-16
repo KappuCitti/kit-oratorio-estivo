@@ -24,7 +24,7 @@ import {
   AttendanceSearch,
   EnrollmentAttendanceSearch,
 } from '../../../../models/Attendances.model';
-import { CommonModule } from '@angular/common';
+
 import { RouterLink } from '@angular/router';
 import { EnrollmentSearch } from '../../../../models/Enrollment.model';
 import { zip } from 'rxjs';
@@ -42,10 +42,9 @@ import Week from '../../../../models/Week.model';
     FooterComponent,
     PaginationComponent,
     NavbarComponent,
-    CommonModule,
     FormsModule,
-    RouterLink,
-  ],
+    RouterLink
+],
   templateUrl: './attendances-search.component.html',
 })
 export class AttendancesSearchComponent implements OnInit {
