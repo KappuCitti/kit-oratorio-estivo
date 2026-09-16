@@ -9,7 +9,11 @@ type MessagesObject = LangsObject[Lang];
 export type Message = keyof MessagesObject;
 
 // Check if all languages have the same message keys
-const allLangs = Object.keys(langs).filter((lang) => lang !== 'en');
+// `Object.keys` restituisce `string[]`: senza il cast a `Lang[]` la riga
+// `langs[lang]` piu' sotto indicizza con una stringa qualunque, che con
+// noImplicitAny e' un errore (TS7053). Il tsc del progetto non lo segnalava,
+// ma un altro compilatore sugli stessi sorgenti si'.
+const allLangs = (Object.keys(langs) as Lang[]).filter((lang) => lang !== 'en');
 const enMessages = new Set(Object.keys(langs.en));
 for (const lang of allLangs) {
   const messages = new Set(Object.keys(langs[lang]));
