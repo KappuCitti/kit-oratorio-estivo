@@ -137,79 +137,30 @@ export class ApiService {
 
   // Weeks
   getWeeks(year: number | string) {
-    return this.http.get<Response<Week[]>>(`${this.baseUrl}/weeks`, {
-      params: { year: year.toString() },
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-      responseType: 'json',
-      withCredentials: true,
-      observe: 'response',
-    });
+    return request(api.weeks.$get({ query: { year: Number(year) } }));
   }
 
   // Teams
   getTeams() {
-    return this.http.get<Response<Team[]>>(`${this.baseUrl}/teams`, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-      responseType: 'json',
-      withCredentials: true,
-      observe: 'response',
-    });
+    return request(api.teams.$get());
   }
 
   createTeam(params: TeamCreateRequest) {
-    return this.http.post<Response<number>>(`${this.baseUrl}/teams`, params, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-      responseType: 'json',
-      withCredentials: true,
-      observe: 'response',
-    });
+    return request(api.teams.$post({ json: params }));
   }
 
   updateTeam(team: TeamUpdateRequest) {
-    return this.http.put<Response<null>>(
-      `${this.baseUrl}/teams/${team.id}`,
-      team,
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
+    const { id, ...campi } = team;
+    return request(api.teams[':id'].$put({ param: { id }, json: campi }));
   }
 
-  deleteTeam(id: string | number) {
-    return this.http.delete<Response<null>>(
-      `${this.baseUrl}/teams/${id.toString()}`,
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
+  deleteTeam(id: number) {
+    return request(api.teams[':id'].$delete({ param: { id } }));
   }
 
   // Shirts
   getShirts() {
-    return this.http.get<Response<Shirt[]>>(`${this.baseUrl}/shirts`, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-      responseType: 'json',
-      withCredentials: true,
-      observe: 'response',
-    });
+    return request(api.shirts.$get());
   }
 
   // Families
@@ -452,54 +403,27 @@ export class ApiService {
 
   // Schools and classes
   getSchools(query?: string) {
-    return this.http.get<Response<any>>(`${this.baseUrl}/schools`, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-      responseType: 'json',
-      withCredentials: true,
-      observe: 'response',
-      params: query ? { query } : {},
-    });
+    return request(api.schools.$get({ query: query ? { query } : {} }));
   }
 
   createSchool(school: SchoolCreateRequest) {
-    return this.http.post<Response<number>>(`${this.baseUrl}/schools`, school, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-      responseType: 'json',
-      withCredentials: true,
-      observe: 'response',
-    });
+    return request(api.schools.$post({ json: school }));
   }
 
-  getClasses(query?: string) {
-    return this.http.get<Response<any>>(`${this.baseUrl}/classes`, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-      responseType: 'json',
-      withCredentials: true,
-      observe: 'response',
-      params: query ? { query } : {},
-    });
+  /**
+   * Classi, eventualmente filtrate per scuola.
+   *
+   * Prima il parametro si chiamava `query` ed era una stringa: il server non
+   * lo ha mai accettato, l'unico filtro previsto e' `schoolId`. Nessun
+   * chiamante lo passava, quindi il disallineamento non si era mai visto.
+   */
+  getClasses(schoolId?: number) {
+    return request(api.classes.$get({ query: schoolId ? { schoolId } : {} }));
   }
 
   createClass(classData: ClassCreateRequest) {
     // La rotta e' POST /classes: /schools/classes non esiste sul server.
-    return this.http.post<Response<number>>(
-      `${this.baseUrl}/classes`,
-      classData,
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
+    return request(api.classes.$post({ json: classData }));
   }
 
   // Stats

@@ -76,7 +76,8 @@ export interface TeamCreateRequest {
 }
 
 export interface TeamUpdateRequest {
-  id: number | string;
+  // Era `number | string`: il server accetta solo un numero.
+  id: number;
   name?: string;
   color?: string;
   child?: {
