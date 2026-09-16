@@ -1,136 +1,221 @@
+import { importProvidersFrom } from '@angular/core';
 import { Routes } from '@angular/router';
+import { CalendarModule, CalendarUtils, DateAdapter } from 'angular-calendar';
+import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { AuthGuard, LoginGuard } from '../guards/Auth.guard';
 import { environment } from '../environments/environment';
 
-import { HomeComponent } from './pages/home/home.component';
-import { LoginComponent } from './pages/login/login.component';
-import { NotFoundComponent } from './pages/not-found/not-found.component';
-
-// Admin pages
-import { MyComponent } from './pages/admin/my/my.component';
-import { EnrollmentsSearchComponent } from './pages/admin/enrollments-search/enrollments-search.component';
-import { EnrollmentsEditComponent } from './pages/admin/enrollments-edit/enrollments-edit.component';
-import { DashboardComponent } from './pages/admin/dashboard/dashboard.component';
-import { EnrollmentsCreateComponent as AdminEnrollmentsCreateComponent } from './pages/admin/enrollments-create/enrollments-create.component';
-import { TeamsSearchComponent } from './pages/admin/teams-search/teams-search.component';
-import { PeopleSearchComponent } from './pages/admin/people-search/people-search.component';
-import { PeopleCreateComponent } from './pages/admin/people-create/people-create.component';
-import { StyleguideComponent } from './pages/styleguide/styleguide.component';
-import { PeopleEditComponent } from './pages/admin/people-edit/people-edit.component';
-import { AttendancesSearchComponent } from './pages/admin/attendances-search/attendances-search.component';
-import { AttendancesEditComponent } from './pages/admin/attendances-edit/attendances-edit.component';
-
-// User pages
-import { DashboardComponent as UserDashboardComponent } from './pages/user/dashboard/dashboard.component';
-import { EnrollmentsSearchComponent as UserEnrollmentsSearchComponent } from './pages/user/enrollments-search/enrollments-search.component';
-import { EnrollmentsCreateComponent as UserEnrollmentsCreateComponent } from './pages/user/enrollments-create/enrollments-create.component';
-import { PeopleSearchComponent as UserPeopleSearchComponent } from './pages/user/people-search/people-search.component';
-import { PeopleCreateComponent as UserPeopleCreateComponent } from './pages/user/people-create/people-create.component';
-import { SettingsComponent } from './pages/admin/settings/settings.component';
-import { SignupComponent } from './pages/signup/signup.component';
-
+// Ogni rotta usa `loadComponent`: il codice della pagina viene scaricato solo
+// quando ci si naviga sopra, invece di finire tutto nel bundle iniziale.
+//
+// ATTENZIONE alle pagine che esistono in due versioni, una sotto pages/user e
+// una sotto pages/admin, con lo stesso nome di classe. Prima erano distinte da
+// un alias nell'import (`DashboardComponent as UserDashboardComponent`); ora
+// l'unica cosa che le distingue e' il percorso dentro `import()`. Sbagliare
+// quel percorso non da' nessun errore di compilazione: mostra semplicemente la
+// pagina di amministrazione a un genitore.
 const commonRoutes: Routes = [
   // Page for everyone
-  { path: '', component: HomeComponent },
+  {
+    path: '',
+    loadComponent: () =>
+      import('./pages/home/home.component').then((m) => m.HomeComponent),
+  },
 
   // Page for unlogged in users
-  { path: 'login', component: LoginComponent, canActivate: [LoginGuard] },
-  { path: 'signup', component: SignupComponent, canActivate: [LoginGuard] },
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./pages/login/login.component').then((m) => m.LoginComponent),
+    canActivate: [LoginGuard],
+  },
+  {
+    path: 'signup',
+    loadComponent: () =>
+      import('./pages/signup/signup.component').then((m) => m.SignupComponent),
+    canActivate: [LoginGuard],
+  },
 
   // Page for users
   {
     path: 'user/dashboard',
-    component: UserDashboardComponent,
+    loadComponent: () =>
+      import('./pages/user/dashboard/dashboard.component').then(
+        (m) => m.DashboardComponent
+      ),
     canActivate: [AuthGuard],
   },
   {
     path: 'user/enrollments',
-    component: UserEnrollmentsSearchComponent,
+    loadComponent: () =>
+      import('./pages/user/enrollments-search/enrollments-search.component').then(
+        (m) => m.EnrollmentsSearchComponent
+      ),
     canActivate: [AuthGuard],
   },
   {
     path: 'user/enrollments/new',
-    component: UserEnrollmentsCreateComponent,
+    loadComponent: () =>
+      import('./pages/user/enrollments-create/enrollments-create.component').then(
+        (m) => m.EnrollmentsCreateComponent
+      ),
     canActivate: [AuthGuard],
   },
   {
     path: 'user/people',
-    component: UserPeopleSearchComponent,
+    loadComponent: () =>
+      import('./pages/user/people-search/people-search.component').then(
+        (m) => m.PeopleSearchComponent
+      ),
     canActivate: [AuthGuard],
   },
   {
     path: 'user/people/new',
-    component: UserPeopleCreateComponent,
+    loadComponent: () =>
+      import('./pages/user/people-create/people-create.component').then(
+        (m) => m.PeopleCreateComponent
+      ),
     canActivate: [AuthGuard],
   },
-  { path: 'user/my', component: MyComponent, canActivate: [AuthGuard] },
+  // `my` non ha una versione utente: la stessa pagina serve entrambi i ruoli.
+  {
+    path: 'user/my',
+    loadComponent: () =>
+      import('./pages/admin/my/my.component').then((m) => m.MyComponent),
+    canActivate: [AuthGuard],
+  },
   { path: 'user', redirectTo: 'user/dashboard' },
 
   // Page for admin
   {
     path: 'admin/dashboard',
-    component: DashboardComponent,
+    loadComponent: () =>
+      import('./pages/admin/dashboard/dashboard.component').then(
+        (m) => m.DashboardComponent
+      ),
     canActivate: [AuthGuard],
   },
   {
     path: 'admin/people',
-    component: PeopleSearchComponent,
+    loadComponent: () =>
+      import('./pages/admin/people-search/people-search.component').then(
+        (m) => m.PeopleSearchComponent
+      ),
     canActivate: [AuthGuard],
   },
   {
     path: 'admin/people/new',
-    component: PeopleCreateComponent,
+    loadComponent: () =>
+      import('./pages/admin/people-create/people-create.component').then(
+        (m) => m.PeopleCreateComponent
+      ),
     canActivate: [AuthGuard],
   },
   {
     path: 'admin/people/:type/:id',
-    component: PeopleEditComponent,
+    loadComponent: () =>
+      import('./pages/admin/people-edit/people-edit.component').then(
+        (m) => m.PeopleEditComponent
+      ),
     canActivate: [AuthGuard],
   },
   {
     path: 'admin/enrollments',
-    component: EnrollmentsSearchComponent,
+    loadComponent: () =>
+      import(
+        './pages/admin/enrollments-search/enrollments-search.component'
+      ).then((m) => m.EnrollmentsSearchComponent),
     canActivate: [AuthGuard],
   },
   {
     path: 'admin/enrollments/new',
-    component: AdminEnrollmentsCreateComponent,
+    loadComponent: () =>
+      import(
+        './pages/admin/enrollments-create/enrollments-create.component'
+      ).then((m) => m.EnrollmentsCreateComponent),
     canActivate: [AuthGuard],
   },
   {
     path: 'admin/enrollments/:id',
-    component: EnrollmentsEditComponent,
+    loadComponent: () =>
+      import('./pages/admin/enrollments-edit/enrollments-edit.component').then(
+        (m) => m.EnrollmentsEditComponent
+      ),
     canActivate: [AuthGuard],
   },
   {
     path: 'admin/attendances',
-    component: AttendancesSearchComponent,
+    loadComponent: () =>
+      import(
+        './pages/admin/attendances-search/attendances-search.component'
+      ).then((m) => m.AttendancesSearchComponent),
     canActivate: [AuthGuard],
   },
   {
     path: 'admin/attendances/:id',
-    component: AttendancesEditComponent,
+    loadComponent: () =>
+      import('./pages/admin/attendances-edit/attendances-edit.component').then(
+        (m) => m.AttendancesEditComponent
+      ),
+    // I provider di angular-calendar stanno qui e non in app.config.ts: questa
+    // e' l'unica pagina che usa il calendario, e dichiararli a livello di
+    // applicazione teneva la libreria (con date-fns) nel bundle iniziale di
+    // tutti, login compreso.
+    providers: [
+      importProvidersFrom(
+        CalendarModule.forRoot({
+          provide: DateAdapter,
+          useFactory: adapterFactory,
+        })
+      ),
+      CalendarUtils,
+    ],
     canActivate: [AuthGuard],
   },
   {
     path: 'admin/teams',
-    component: TeamsSearchComponent,
+    loadComponent: () =>
+      import('./pages/admin/teams-search/teams-search.component').then(
+        (m) => m.TeamsSearchComponent
+      ),
     canActivate: [AuthGuard],
   },
   {
     path: 'admin/settings',
-    component: SettingsComponent,
+    loadComponent: () =>
+      import('./pages/admin/settings/settings.component').then(
+        (m) => m.SettingsComponent
+      ),
     canActivate: [AuthGuard],
   },
-  { path: 'admin/my', component: MyComponent, canActivate: [AuthGuard] },
+  {
+    path: 'admin/my',
+    loadComponent: () =>
+      import('./pages/admin/my/my.component').then((m) => m.MyComponent),
+    canActivate: [AuthGuard],
+  },
   { path: 'admin', redirectTo: 'admin/dashboard' },
 
   // otherwise redirect
-  { path: '**', component: NotFoundComponent },
+  {
+    path: '**',
+    loadComponent: () =>
+      import('./pages/not-found/not-found.component').then(
+        (m) => m.NotFoundComponent
+      ),
+  },
 ];
 
 const devRoutes: Routes = !environment.production
-  ? [{ path: 'styleguide', component: StyleguideComponent }]
+  ? [
+      {
+        path: 'styleguide',
+        loadComponent: () =>
+          import('./pages/styleguide/styleguide.component').then(
+            (m) => m.StyleguideComponent
+          ),
+      },
+    ]
   : [];
 
 export const routes: Routes = [...devRoutes, ...commonRoutes];
