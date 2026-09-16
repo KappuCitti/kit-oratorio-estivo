@@ -2,8 +2,8 @@ import { inject, Service } from '@angular/core';
 import { environment } from '../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { PagedResponse, Response } from '../models/Response.model';
-import User from '../models/User.model';
 import { Theme } from '../models/Theme.model';
+import { api, request } from './api-client';
 import Enrollment, { EnrollmentSearch } from '../models/Enrollment.model';
 import {
   PeopleGetRequest,
@@ -40,76 +40,24 @@ export class ApiService {
 
   // User
   login(username: string, password: string) {
-    return this.http.post<Response<any>>(
-      `${this.baseUrl}/user/login`,
-      {
-        username,
-        password,
-      },
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
+    return request(api.user.login.$post({ json: { username, password } }));
   }
 
   logout() {
-    return this.http.post<Response<any>>(
-      `${this.baseUrl}/user/logout`,
-      {},
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
+    return request(api.user.logout.$post());
   }
 
   getUser() {
-    return this.http.get<Response<User>>(`${this.baseUrl}/users/self`, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-      responseType: 'json',
-      withCredentials: true,
-      observe: 'response',
-    });
+    return request(api.users.self.$get());
   }
 
   setUserTheme(theme: Theme) {
-    return this.http.put<Response<any>>(
-      `${this.baseUrl}/user/theme`,
-      { theme },
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
+    return request(api.user.theme.$put({ json: { theme } }));
   }
 
   setUserPassword(oldPassword: string, newPassword: string) {
-    return this.http.put<Response<any>>(
-      `${this.baseUrl}/user/password`,
-      { oldPassword, newPassword },
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
+    return request(
+      api.user.password.$put({ json: { oldPassword, newPassword } })
     );
   }
 

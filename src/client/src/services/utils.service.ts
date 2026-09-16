@@ -1,6 +1,4 @@
-import { HttpResponse } from '@angular/common/http';
 import { Service } from '@angular/core';
-import { Role } from '../models/User.model';
 
 /**
  * Formatta una data come YYYY-MM-DD **nel fuso locale**, che e' il formato
@@ -21,8 +19,20 @@ export function toDateOnly(date: string | Date): string {
 export class UtilsService {
   constructor() {}
 
+  /**
+   * Traduce uno stato HTTP nel messaggio da mostrare all'utente.
+   *
+   * Accetta qualunque oggetto che abbia uno `status`, non piu' il solo
+   * `HttpResponse` di Angular: le chiamate passano ora dal client RPC, che
+   * restituisce `{ status, body }` in caso di successo e lancia un `ApiError`
+   * (che ha anch'esso `status`) in caso di errore.
+   *
+   * TODO - `window.location.href` ricarica l'intera applicazione invece di
+   * navigare. Va sostituito con `router.navigateByUrl` nelle pagine che
+   * passano un percorso di successo.
+   */
   handleResponse(
-    response: HttpResponse<any>,
+    response: { status: number },
     success: string | null
   ): string | null {
     switch (response.status) {

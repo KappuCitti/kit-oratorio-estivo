@@ -1,22 +1,23 @@
-import Address from './Address.model';
-import { FamilyMember } from './Family.model';
-import type { Permission } from './permissions.generated';
-import { Theme } from './Theme.model';
+import type { InferResponseType } from 'hono/client';
+import { api } from '../services/api-client';
 
-export default interface User extends FamilyMember {
-  // id: number;
-  // email: string | null;
-  // name: string;
-  // surname: string;
-  // phone: string | null;
-  role: RolePermissions;
-  // permissions: string[];
-  // gender: gender;
-  // birthDate: string | null;
-  // birthPlace: string | null;
-  address: Address;
-  theme: Theme;
-}
+/**
+ * L'utente collegato, come lo restituisce GET /users/self.
+ *
+ * Non e' piu' scritto a mano: il tipo viene dedotto dal contratto generato dal
+ * server (vedi models/api.generated.d.ts). La versione precedente dichiarava
+ * `theme` come campo obbligatorio, mentre il server non lo restituiva affatto -
+ * ed era per questo che il menu del tema nella pagina profilo restava sempre su
+ * "System". Adesso o il campo c'e' in entrambi, o non compila.
+ */
+type SelfResponse = InferResponseType<typeof api.users.self.$get, 200>;
+
+type Self = Extract<SelfResponse, { success: true }>['data'];
+
+export default interface User extends Self {}
+
+export type Role = Self['role'];
+export type RolePermissions = Self['role'];
 
 export interface UserSimplified {
   id: string;
@@ -24,21 +25,3 @@ export interface UserSimplified {
   surname: string;
   gender: string;
 }
-
-export interface Role {
-  id: number;
-  name: string;
-  displayName: string;
-}
-
-export interface RolePermissions extends Role {
-  // Tipizzati con l'unione generata dal server: confrontare un permesso che
-  // non esiste piu' diventa un errore di compilazione invece di una condizione
-  // sempre falsa che nessuno nota.
-  permissions: Permission[];
-}
-
-// export interface Permission {
-//   id: number;
-//   name: string;
-// }

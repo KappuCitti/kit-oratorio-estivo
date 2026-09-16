@@ -324,6 +324,7 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 				data: {
 					id: string;
 					email: string | null;
+					theme: "Dark" | "Light" | "System";
 					phone: string | null;
 					role: {
 						id: number;

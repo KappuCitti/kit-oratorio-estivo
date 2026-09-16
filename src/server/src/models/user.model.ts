@@ -7,8 +7,13 @@ import { personalInfoTable } from '@/database/schema/personalInfo';
 import { phoneSchema, idSchema, type Prettify } from './common.model';
 import { addressTable } from '@/database/schema/address';
 
+// `theme` resta incluso: questo schema descrive GET /users/self, cioe' i dati
+// dell'utente stesso. Omettendolo, la pagina profilo non poteva mostrare il
+// tema salvato e il suo menu restava sempre su "System", pur esistendo la
+// colonna sul database e la rotta PUT /user/theme per cambiarlo.
+// bareUserSchema invece continua a ometterlo: il tema altrui non serve a nessuno.
 export const fullUserSchema = createSelectSchema(usersTable)
-  .omit({ password: true, roleId: true, theme: true })
+  .omit({ password: true, roleId: true })
   .extend({
     role: createSelectSchema(roleTable).extend({
       permissions: z.array(z.enum(PERMISSIONS)),

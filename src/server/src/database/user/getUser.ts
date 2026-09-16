@@ -14,6 +14,7 @@ function createGetUserQuery(filter: SQL | undefined) {
     .select({
       id: usersTable.id,
       email: usersTable.email,
+      theme: usersTable.theme,
       name: personalInfoTable.name,
       surname: personalInfoTable.surname,
       birthDate: personalInfoTable.birthDate,
@@ -45,6 +46,7 @@ function createGetUserQuery(filter: SQL | undefined) {
     .groupBy(
       usersTable.id,
       usersTable.email,
+      usersTable.theme,
       personalInfoTable.name,
       personalInfoTable.surname,
       personalInfoTable.gender,
