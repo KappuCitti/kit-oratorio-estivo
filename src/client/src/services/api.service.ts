@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { environment } from '../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { PagedResponse, Response } from '../models/Response.model';
@@ -32,9 +32,7 @@ import {
 import { AttendanceSearch } from '../models/Attendances.model';
 import { AttendancesStat } from '../models/Stat.model';
 import { toDateOnly } from './utils.service';
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class ApiService {
   private http = inject(HttpClient);
 

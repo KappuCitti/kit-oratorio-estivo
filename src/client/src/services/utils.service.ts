@@ -1,5 +1,5 @@
 import { HttpResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 import { Role } from '../models/User.model';
 
 /**
@@ -17,9 +17,7 @@ export function toDateOnly(date: string | Date): string {
   return `${d.getFullYear()}-${month}-${day}`;
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class UtilsService {
   constructor() {}
 

@@ -1,20 +1,10 @@
-import {
-  Injectable,
-  Signal,
-  signal,
-  computed,
-  effect,
-  inject,
-  DOCUMENT
-} from '@angular/core';
+import { Signal, signal, computed, effect, inject, DOCUMENT, Service } from '@angular/core';
 import { CookiesService } from './cookies.service';
 import { Theme, themes } from '../models/Theme.model';
 import { ApiService } from './api.service';
 
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class ThemeService {
   private document = inject(DOCUMENT);
   private api = inject(ApiService);

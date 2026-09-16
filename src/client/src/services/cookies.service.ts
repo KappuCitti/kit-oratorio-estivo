@@ -7,12 +7,10 @@
  */
 // src/app/services/cookie.service.ts
 
-import { Injectable, inject } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { CookieService as NgxCookieService } from 'ngx-cookie-service';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class CookiesService {
   private cookieService = inject(NgxCookieService);
 
