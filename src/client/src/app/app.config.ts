@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -8,7 +8,11 @@ import { provideHttpClient, withFetch } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }),
+    // Niente provideZoneChangeDetection: da Angular 21 il funzionamento
+    // zoneless e' il default, e quella chiamata serviva solo a riportare
+    // l'applicazione su Zone.js. Ora che lo stato e' in signal, Angular sa
+    // gia' quando ridisegnare e zone.js non serve piu' (vedi polyfills in
+    // angular.json).
     provideRouter(routes),
     // Prima erano registrati sia provideAnimationsAsync() sia
     // provideAnimations(): il secondo vinceva e annullava il caricamento
