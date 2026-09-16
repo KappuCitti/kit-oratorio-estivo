@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { ApiService } from '../../../../services/api.service';
@@ -52,6 +52,7 @@ import { PaginationComponent } from '../../../components/pagination/pagination.c
     ReactiveFormsModule,
     PaginationComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './enrollments-create.component.html',
 })
 export class EnrollmentsCreateComponent implements OnInit {

@@ -5,6 +5,7 @@ import {
   OnChanges,
   Output,
   SimpleChanges,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import {
   AbstractControl,
@@ -30,6 +31,7 @@ import { UtilsService } from '../../../services/utils.service';
 @Component({
   selector: 'app-team',
   imports: [ReactiveFormsModule, CommonModule, FontAwesomeModule, FormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './team.component.html',
 })
 export class TeamComponent implements OnChanges {

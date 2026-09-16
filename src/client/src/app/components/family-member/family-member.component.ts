@@ -4,6 +4,7 @@ import {
   Input,
   Output,
   SimpleChanges,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { FamilyMember } from '../../../models/Family.model';
 import {
@@ -18,6 +19,7 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 @Component({
   selector: 'app-family-member',
   imports: [FaIconComponent, ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './family-member.component.html',
 })
 export class FamilyMemberComponent {

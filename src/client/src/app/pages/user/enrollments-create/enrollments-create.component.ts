@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import {
@@ -46,6 +46,7 @@ import { PaginationComponent } from '../../../components/pagination/pagination.c
     ReactiveFormsModule,
     PaginationComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './enrollments-create.component.html',
 })
 export class EnrollmentsCreateComponent {

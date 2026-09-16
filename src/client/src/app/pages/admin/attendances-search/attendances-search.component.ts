@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import {
   faArrowRotateLeft,
@@ -45,6 +45,7 @@ import Week from '../../../../models/Week.model';
     FormsModule,
     RouterLink
 ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './attendances-search.component.html',
 })
 export class AttendancesSearchComponent implements OnInit {

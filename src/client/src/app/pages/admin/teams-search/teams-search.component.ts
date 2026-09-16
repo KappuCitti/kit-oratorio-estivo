@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import Team from '../../../../models/Team.model';
@@ -23,6 +23,7 @@ import { UtilsService } from '../../../../services/utils.service';
     FontAwesomeModule,
     ReactiveFormsModule,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './teams-search.component.html',
 })
 export class TeamsSearchComponent implements OnInit {

@@ -4,6 +4,7 @@ import {
   Input,
   OnChanges,
   Output,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import Enrollment, {
   EnrollmentWeekSearch,
@@ -26,6 +27,7 @@ import { zip } from 'rxjs';
 @Component({
   selector: 'app-enrollment',
   imports: [DatePipe, ReactiveFormsModule, FaIconComponent, CommonModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './enrollment.component.html',
 })
 export class EnrollmentComponent implements OnChanges {

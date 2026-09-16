@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { ChildComponent } from '../../../components/child/child.component';
@@ -20,6 +20,7 @@ import { FamilyEnrollmentCreateRequest } from '../../../../models/Request.model'
     FormsModule,
     CommonModule,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './people-create.component.html',
 })
 export class PeopleCreateComponent {

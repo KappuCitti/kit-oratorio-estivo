@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { ApiService } from '../../../../services/api.service';
@@ -53,6 +53,7 @@ interface EnrollmentWeekEnrolled extends Week {
     ReactiveFormsModule,
     RouterLink,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './enrollments-search.component.html',
 })
 export class EnrollmentsSearchComponent implements OnInit {

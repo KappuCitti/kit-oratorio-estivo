@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import {
   faEye,
@@ -38,6 +38,7 @@ type otherTypes = null;
     RouterLink,
     NavbarComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './settings.component.html',
 })
 export class SettingsComponent implements OnInit {

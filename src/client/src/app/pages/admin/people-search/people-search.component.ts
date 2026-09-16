@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import {
@@ -40,6 +40,7 @@ import { UtilsService } from '../../../../services/utils.service';
     PaginationComponent,
     CommonModule,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './people-search.component.html',
 })
 export class PeopleSearchComponent implements OnInit {

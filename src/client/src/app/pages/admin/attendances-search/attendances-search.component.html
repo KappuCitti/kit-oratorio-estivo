@@ -87,10 +87,10 @@
                 [(ngModel)]="data.present"
                 (change)="
                   updateAttendance(
-                    data.attendance?.id,
+                    $safeNavigationMigration(data.attendance?.id),
                     data.user.id,
                     data.present,
-                    data.attendance?.eatsInOratory
+                    $safeNavigationMigration(data.attendance?.eatsInOratory)
                   )
                 "
               />

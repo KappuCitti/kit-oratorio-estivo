@@ -4,6 +4,7 @@ import {
   ModelSignal,
   OnInit,
   Signal,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import Enrollment from '../../../../models/Enrollment.model';
@@ -27,6 +28,7 @@ import { EnrollmentUpdateRequest } from '../../../../models/Request.model';
     ChildComponent,
     ParentComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './enrollments-edit.component.html',
 })
 export class EnrollmentsEditComponent implements OnInit {

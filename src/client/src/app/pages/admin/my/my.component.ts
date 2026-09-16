@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -23,6 +23,7 @@ import { UtilsService } from '../../../../services/utils.service';
     NavbarComponent,
     LoadingComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './my.component.html',
 })
 export class MyComponent implements OnInit {

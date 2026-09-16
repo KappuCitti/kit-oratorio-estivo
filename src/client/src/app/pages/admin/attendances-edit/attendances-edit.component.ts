@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { NavbarComponent } from "../../../components/navbar/navbar.component";
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
@@ -16,6 +16,7 @@ import { addMonths, subMonths } from 'date-fns';
   imports: [NavbarComponent, FooterComponent, FaIconComponent, ReactiveFormsModule, PaginationComponent,
     CalendarModule, DatePipe,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './attendances-edit.component.html',
 })
 export class AttendancesEditComponent implements OnInit {

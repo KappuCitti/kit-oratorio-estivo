@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { ParentComponent } from '../../../components/parent/parent.component';
@@ -20,6 +20,7 @@ import { FamilyMemberComponent } from '../../../components/family-member/family-
     RouterLink,
     FamilyMemberComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './people-search.component.html',
 })
 export class PeopleSearchComponent implements OnInit {

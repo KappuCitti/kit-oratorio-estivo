@@ -5,11 +5,13 @@ import {
   OnChanges,
   OnInit,
   Output,
+  ChangeDetectionStrategy
 } from '@angular/core';
 
 @Component({
   selector: 'app-pagination',
   imports: [],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './pagination.component.html',
 })
 export class PaginationComponent implements OnInit, OnChanges {

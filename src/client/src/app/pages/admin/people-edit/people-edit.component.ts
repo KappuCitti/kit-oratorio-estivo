@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   Child,
@@ -17,6 +17,7 @@ import Enrollment from '../../../../models/Enrollment.model';
 @Component({
   selector: 'app-people-edit',
   imports: [FooterComponent, NavbarComponent, ParentComponent, ChildComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './people-edit.component.html',
 })
 export class PeopleEditComponent implements OnInit {

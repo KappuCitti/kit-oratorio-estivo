@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, OnInit, Signal, signal } from '@angular/core';
+import { Component, computed, OnInit, Signal, signal, ChangeDetectionStrategy } from '@angular/core';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import {
   FontAwesomeModule,
@@ -37,6 +37,7 @@ interface Page {
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [RouterLink, CommonModule, FontAwesomeModule],
 })
 export class NavbarComponent implements OnInit {
