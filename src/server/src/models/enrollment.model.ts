@@ -72,6 +72,45 @@ export const bareEnrollmentSchema = createSelectSchema(enrollmentTable)
 
 export type BareEnrollment = z.infer<typeof bareEnrollmentSchema>;
 
+/**
+ * Dettaglio di una singola iscrizione: la stessa forma di un elemento della
+ * lista, piu' i campi che servono solo in modifica e i genitori che gestiscono
+ * il ragazzo. La rotta GET /enrollments/{id} dichiarava `z.null()` con un TODO,
+ * quindi il contratto non diceva nulla di cosa restituisse.
+ */
+export const enrollmentDetailSchema = bareEnrollmentSchema.extend({
+  year: z.number().int().positive(),
+  parentNotes: z.string().nullable(),
+  managerNotes: z.string().nullable(),
+  shirt: createSelectSchema(shirtSizeTable)
+    .pick({ id: true, sizeName: true })
+    .nullable(),
+  user: createSelectSchema(usersTable)
+    .pick({ id: true })
+    .extend(
+      createSelectSchema(personalInfoTable).pick({
+        name: true,
+        surname: true,
+        gender: true,
+        birthDate: true,
+        birthPlace: true,
+      }).shape
+    ),
+  managers: z.array(
+    createSelectSchema(usersTable)
+      .pick({ id: true, email: true, phone: true })
+      .extend(
+        createSelectSchema(personalInfoTable).pick({
+          name: true,
+          surname: true,
+          gender: true,
+        }).shape
+      )
+  ),
+});
+
+export type EnrollmentDetail = z.infer<typeof enrollmentDetailSchema>;
+
 export const bareQueueEnrollmentSchema = bareEnrollmentSchema
   .omit({
     team: true,

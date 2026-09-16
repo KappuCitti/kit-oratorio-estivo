@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { can } from '@/middlewares/hasPermission';
 import { paramIdSchema } from '@/models/common.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
@@ -8,6 +9,9 @@ export const deleteEnrollmentRouteDef = createRoute({
   tags: ['Enrollment'],
   method: 'delete',
   path: '/enrollments/{id}',
+  // La rotta era senza middleware: chiunque avrebbe potuto cancellare
+  // l'iscrizione di un minore sapendone l'id.
+  middleware: can('manage_enrollments'),
   request: {
     params: paramIdSchema,
   },

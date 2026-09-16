@@ -1,4 +1,5 @@
 import { HttpStatusCodes } from '@/codes';
+import { can } from '@/middlewares/hasPermission';
 import { idSchema, paramIdSchema } from '@/models/common.model';
 import { weekEnrollmentSchema } from '@/models/week.model';
 import {
@@ -12,6 +13,9 @@ export const editEnrollmentRouteDef = createRoute({
   tags: ['Enrollment'],
   method: 'put',
   path: '/enrollments/{id}',
+  // La rotta era senza middleware: chiunque avrebbe potuto modificare
+  // l'iscrizione di un minore sapendone l'id.
+  middleware: can('manage_enrollments'),
   request: {
     params: paramIdSchema,
     body: createRequiredJsonBody(
@@ -51,6 +55,11 @@ export const editEnrollmentRouteDef = createRoute({
       false,
       z.string(),
       'One or more ids are invalid'
+    ),
+    [HttpStatusCodes.NOT_FOUND]: createJsonResBody(
+      false,
+      z.string(),
+      'Enrollment not found'
     ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: createJsonResBody(
       false,

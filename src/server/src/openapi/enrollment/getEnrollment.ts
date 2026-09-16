@@ -1,5 +1,7 @@
 import { HttpStatusCodes } from '@/codes';
+import { can } from '@/middlewares/hasPermission';
 import { paramIdSchema } from '@/models/common.model';
+import { enrollmentDetailSchema } from '@/models/enrollment.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
@@ -8,15 +10,16 @@ export const getEnrollmentInfoRouteDef = createRoute({
   tags: ['Enrollment'],
   method: 'get',
   path: '/enrollments/{id}',
+  // La rotta era senza middleware: chiunque, anche senza sessione, avrebbe
+  // potuto leggere l'iscrizione di un minore sapendone l'id.
+  middleware: can('see_users'),
   request: {
     params: paramIdSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: createJsonResBody(
       true,
-      // fullEnrollmentWithFamilySchema,
-      // TODO: Create type
-      z.null(),
+      enrollmentDetailSchema,
       'Enrollment informations'
     ),
     [HttpStatusCodes.NOT_FOUND]: createJsonResBody(
