@@ -1,19 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { ApiService } from '../../../../services/api.service';
-import { zip } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { AttendancesStat } from '../../../../models/Stat.model';
+import { toDateOnly } from '../../../../services/utils.service';
 
 @Component({
   selector: 'app-dashboard',
   imports: [NavbarComponent, FooterComponent, FontAwesomeModule],
   templateUrl: './dashboard.component.html',
 })
-export class DashboardComponent {
-  // faChevronDown = faChevronDown;
+export class DashboardComponent implements OnInit {
+  // TODO - Nessun endpoint espone il numero totale di utenti in rubrica:
+  // questa casella resta a 0 finche' non viene aggiunto lato server.
   peopleCount: number = 0;
   enrollmentsCount: number = 0;
   attendanceStats: AttendancesStat | null = null;
@@ -22,29 +24,32 @@ export class DashboardComponent {
   constructor(private api: ApiService) {}
 
   ngOnInit(): void {
-    const now = new Date();
-    zip(
-      this.api.getEnrollments({ year: now.getFullYear() }),
-      this.api.getAttendancesStat(now),
-      this.api.getAttendances({ date: now.toISOString().split('T')[0] })
-    ).subscribe({
-      next: ([enrollments, attendances, attendanceCountData]) => {
-        if (enrollments.status == 200 && enrollments.body?.success) {
-          this.enrollmentsCount = enrollments.body.data.count;
-        }
-        if (attendances.status == 200 && attendances.body?.success) {
-          this.attendanceStats = attendances.body.data;
-        }
-        if (
-          attendanceCountData.status == 200 &&
-          attendanceCountData.body?.success
-        ) {
-          this.attendanceCount = attendanceCountData.body.data.length;
-        }
-      },
-      error: (err) => {
-        console.error('Error fetching enrollments:', err);
-      },
+    const today = toDateOnly(new Date());
+
+    // Ogni richiesta ha il proprio catchError: con `zip` (o `forkJoin` nudo) il
+    // fallimento di una sola statistica faceva fallire l'intero stream e la
+    // dashboard restava a zero su tutte le caselle, anche su quelle che il
+    // server aveva gia' restituito correttamente.
+    forkJoin({
+      enrollments: this.api
+        .getEnrollments({ year: new Date().getFullYear() })
+        .pipe(catchError(() => of(null))),
+      stats: this.api
+        .getAttendancesStat(today)
+        .pipe(catchError(() => of(null))),
+      attendances: this.api
+        .getAttendances({ date: today })
+        .pipe(catchError(() => of(null))),
+    }).subscribe(({ enrollments, stats, attendances }) => {
+      if (enrollments?.status === 200 && enrollments.body?.success) {
+        this.enrollmentsCount = enrollments.body.data.count;
+      }
+      if (stats?.status === 200 && stats.body?.success) {
+        this.attendanceStats = stats.body.data;
+      }
+      if (attendances?.status === 200 && attendances.body?.success) {
+        this.attendanceCount = attendances.body.data.length;
+      }
     });
   }
 }
