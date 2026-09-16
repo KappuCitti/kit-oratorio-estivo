@@ -1,11 +1,10 @@
 import {
   Component,
-  EventEmitter,
-  Input,
   OnChanges,
   OnInit,
-  Output,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
+  input,
+  output
 } from '@angular/core';
 
 @Component({
@@ -15,9 +14,9 @@ import {
   templateUrl: './pagination.component.html',
 })
 export class PaginationComponent implements OnInit, OnChanges {
-  @Input() totalItems: number = 10; // Numero totale di elementi
-  @Output() pageChange = new EventEmitter<number>(); // Evento per cambiare pagina
-  @Output() itemsPerPageChange = new EventEmitter<number>(); // Evento per cambiare numero di elementi per pagina
+  readonly totalItems = input<number>(10); // Numero totale di elementi
+  readonly pageChange = output<number>(); // Evento per cambiare pagina
+  readonly itemsPerPageChange = output<number>(); // Evento per cambiare numero di elementi per pagina
 
   itemsPerPage: number = 25;
   currentPage: number = 1;
@@ -31,14 +30,15 @@ export class PaginationComponent implements OnInit, OnChanges {
 
   ngOnChanges(): void {
     console.log('PaginationComponent initialized');
+    const totalItems = this.totalItems();
     console.table({
-      totalItems: this.totalItems,
+      totalItems: totalItems,
       itemsPerPage: this.itemsPerPage,
       currentPage: this.currentPage,
       totalPages: this.totalPages,
     });
 
-    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+    this.totalPages = Math.ceil(totalItems / this.itemsPerPage);
   }
 
   changePage(page: number) {

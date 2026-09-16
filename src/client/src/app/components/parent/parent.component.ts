@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnChanges, ChangeDetectionStrategy, inject, input, model, output } from '@angular/core';
 import {
   FormGroup,
   FormBuilder,
@@ -18,13 +18,12 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 export class ParentComponent implements OnChanges {
   private fb = inject(FormBuilder);
 
-  @Input() parent: Parent | null = null;
-  @Output() parentChange = new EventEmitter<Parent | null>();
-  @Output() isValid = new EventEmitter<boolean>(false);
+  readonly parent = model<Parent | null>(null);
+  readonly isValid = output<boolean>();
 
-  @Input() title: string | null = "Genitore"
-  @Input() editable: boolean = false;
-  @Input() save: Function | null = null;
+  readonly title = input<string | null>('Genitore');
+  readonly editable = input<boolean>(false);
+  readonly save = input<Function | null>(null);
 
   parentForm!: FormGroup;
 
@@ -47,21 +46,23 @@ export class ParentComponent implements OnChanges {
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (this.parent) {
+  ngOnChanges(): void {
+    const parent = this.parent();
+
+    if (parent) {
       this.parentForm.patchValue(
         {
-          name: this.parent?.name,
-          surname: this.parent?.surname,
-          gender: this.parent?.gender,
-          email: this.parent?.email,
-          phoneNumber: this.parent?.phoneNumber,
+          name: parent.name,
+          surname: parent.surname,
+          gender: parent.gender,
+          email: parent.email,
+          phoneNumber: parent.phoneNumber,
         },
         { emitEvent: false }
       );
     }
 
-    if (!this.editable) {
+    if (!this.editable()) {
       this.parentForm.disable();
     } else {
       this.parentForm.enable();
@@ -69,18 +70,17 @@ export class ParentComponent implements OnChanges {
   }
 
   updateParent() {
-    const updateParent: Parent = {
-      ...this.parent,
+    // `set` su un model aggiorna il valore ed emette `parentChange`.
+    this.parent.set({
+      ...this.parent(),
       ...this.parentForm.value,
-    };
-
-    this.parent = updateParent;
-    this.parentChange.emit(updateParent);
+    });
   }
 
   saveParent() {
-    if (this.editable && this.save && this.parentForm.valid) {
-      this.save();
+    const save = this.save();
+    if (this.editable() && save && this.parentForm.valid) {
+      save();
     }
   }
 }

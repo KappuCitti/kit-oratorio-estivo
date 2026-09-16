@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnChanges, ChangeDetectionStrategy, inject, input, model, output } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -31,13 +31,12 @@ export class TeamComponent implements OnChanges {
   private fb = inject(FormBuilder);
   private utils = inject(UtilsService);
 
-  @Input() team: Team | null = null;
-  @Output() teamChange = new EventEmitter<Team | null>();
-  @Output() teamDelete = new EventEmitter<number>();
-  @Output() isValid = new EventEmitter<boolean>(false);
+  readonly team = model<Team | null>(null);
+  readonly teamDelete = output<number>();
+  readonly isValid = output<boolean>();
 
-  @Input() editable: boolean = false;
-  @Input() save: Function | null = null;
+  readonly editable = input<boolean>(false);
+  readonly save = input<Function | null>(null);
 
   teamForm!: FormGroup;
 
@@ -70,8 +69,9 @@ export class TeamComponent implements OnChanges {
   ): ValidationErrors | null {
     const name = form.get('name')?.value;
     const color = form.get('color')?.value;
+    const team = this.team();
 
-    if (name === this.team?.name && color === this.team?.color) {
+    if (name === team?.name && color === team?.color) {
       return { noChanges: true }; // Errore se non ci sono modifiche
     }
 
@@ -79,43 +79,51 @@ export class TeamComponent implements OnChanges {
   }
 
   ngOnChanges(): void {
-    if (this.team) {
+    const team = this.team();
+
+    if (team) {
       this.teamForm.patchValue({
-        name: this.team.name || '',
-        color: this.team.color || '',
+        name: team.name || '',
+        color: team.color || '',
       });
     }
   }
 
   deleteTeam() {
-    if (!this.team) return;
-    this.api.deleteTeam(this.team?.id).subscribe(() => {
-      this.teamDelete.emit(this.team!.id);
+    const team = this.team();
+    if (!team) return;
+
+    this.api.deleteTeam(team.id).subscribe(() => {
+      this.teamDelete.emit(team.id);
       this.closeEditModal();
     });
   }
 
   closeEditModal() {
+    const team = this.team();
+
     this.teamForm.patchValue({
-      name: this.team?.name || '',
-      color: this.team?.color || '',
+      name: team?.name || '',
+      color: team?.color || '',
     });
 
     this.isEditModalOpen = false;
   }
 
   saveTeam() {
-    if (this.teamForm.valid && this.team) {
+    const team = this.team();
+
+    if (this.teamForm.valid && team) {
       this.error = null;
 
       const data: TeamUpdateRequest = {
-        id: this.team.id,
+        id: team.id,
       };
 
-      if (this.teamForm.value.name !== this.team.name) {
+      if (this.teamForm.value.name !== team.name) {
         data.name = this.teamForm.value.name;
       }
-      if (this.teamForm.value.color !== this.team.color) {
+      if (this.teamForm.value.color !== team.color) {
         data.color = this.teamForm.value.color;
       }
 
@@ -123,16 +131,15 @@ export class TeamComponent implements OnChanges {
         this.api.updateTeam(data).subscribe({
           next: (response) => {
             if (response.status == 200) {
-              this.teamChange.emit({
-                id: this.team!.id,
+              // Prima qui si emetteva `teamChange` e in piu' si mutava
+              // l'oggetto `team` sul posto. `set` fa entrambe le cose, e in
+              // piu' produce un nuovo oggetto invece di modificare quello
+              // condiviso con la lista del componente padre.
+              this.team.set({
+                id: team.id,
                 name: this.teamForm.value.name,
                 color: this.teamForm.value.color,
               });
-
-              if (this.team) {
-                this.team.name = this.teamForm.value.name;
-                this.team.color = this.teamForm.value.color;
-              }
 
               this.closeEditModal();
             }

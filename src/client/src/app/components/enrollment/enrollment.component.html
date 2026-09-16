@@ -3,7 +3,7 @@
     <h2>
       {{ getTitle }}
     </h2>
-    @if (editable && save) {
+    @if (editable() && save()) {
     <button
       class="text-md button-secondary h-min"
       [disabled]="!enrollmentForm.valid"

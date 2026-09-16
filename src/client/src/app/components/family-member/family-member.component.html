@@ -1,8 +1,8 @@
 <div id="child">
   <div class="flex justify-between mb-2">
-    @if (title != null) {
-    <h2>{{ title }}</h2>
-    } @if (editable && save) {
+    @if (displayTitle() !== null) {
+    <h2>{{ displayTitle() }}</h2>
+    } @if (editable() && save()) {
     <button
       class="text-md button-secondary h-min"
       [disabled]="!familyMemberForm.valid"

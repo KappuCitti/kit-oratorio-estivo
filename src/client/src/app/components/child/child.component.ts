@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnChanges, ChangeDetectionStrategy, inject, input, model, output } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -18,13 +18,12 @@ import { Child } from '../../../models/Family.model';
 export class ChildComponent implements OnChanges {
   private fb = inject(FormBuilder);
 
-  @Input() child: Child | null = null;
-  @Output() childChange = new EventEmitter<Child | null>();
-  @Output() isValid = new EventEmitter<boolean>(false);
+  readonly child = model<Child | null>(null);
+  readonly isValid = output<boolean>();
 
-  @Input() title: string | null = "Ragazzo";
-  @Input() editable: boolean = false;
-  @Input() save: (() => void) | null = null;
+  readonly title = input<string | null>('Ragazzo');
+  readonly editable = input<boolean>(false);
+  readonly save = input<(() => void) | null>(null);
 
   childForm!: FormGroup;
   addressForm!: FormGroup;
@@ -56,31 +55,33 @@ export class ChildComponent implements OnChanges {
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (this.child) {
+  ngOnChanges(): void {
+    const child = this.child();
+
+    if (child) {
       this.childForm.patchValue(
         {
-          name: this.child?.name,
-          surname: this.child?.surname,
-          gender: this.child?.gender,
-          birthDate: this.child?.birthDate,
-          birthPlace: this.child?.birthPlace,
+          name: child.name,
+          surname: child.surname,
+          gender: child.gender,
+          birthDate: child.birthDate,
+          birthPlace: child.birthPlace,
         },
         { emitEvent: false }
       );
 
       this.addressForm.patchValue(
         {
-          country: this.child?.address?.country ?? '',
-          street: this.child?.address?.street ?? '',
-          city: this.child?.address?.city ?? '',
-          postalCode: this.child?.address?.postalCode ?? '',
+          country: child.address?.country ?? '',
+          street: child.address?.street ?? '',
+          city: child.address?.city ?? '',
+          postalCode: child.address?.postalCode ?? '',
         },
         { emitEvent: false }
       );
     }
 
-    if (!this.editable) {
+    if (!this.editable()) {
       this.childForm.disable();
       this.addressForm.disable();
     } else {
@@ -91,28 +92,30 @@ export class ChildComponent implements OnChanges {
 
   updateChild() {
     if (this.childForm.valid || this.addressForm.valid) {
-      var updatedChild: Child | null = {
-        ...(this.child ?? ({} as Child)),
+      const current = this.child();
+
+      // `set` su un model aggiorna il valore e in piu' emette `childChange`:
+      // sostituisce sia l'assegnazione che l'emit esplicito di prima.
+      this.child.set({
+        ...(current ?? ({} as Child)),
         ...this.childForm.value,
         address: {
-          ...(this.child?.address ?? {}),
+          ...(current?.address ?? {}),
           ...this.addressForm.value,
         },
-      };
-
-      this.child = updatedChild;
-      this.childChange.emit(updatedChild);
+      });
     }
   }
 
   saveChild() {
+    const save = this.save();
     if (
-      this.editable &&
-      this.save &&
+      this.editable() &&
+      save &&
       this.childForm.valid &&
       this.addressForm.valid
     ) {
-      this.save();
+      save();
     }
   }
 }

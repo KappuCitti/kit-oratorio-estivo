@@ -1,4 +1,4 @@
-@if (team) {
+@if (team(); as team) {
 <div
   class="bg-auto py-2 px-3 rounded-lg border-l-8 transition shadow-lg"
   [ngStyle]="{ 'border-left-color': team.color }"
@@ -22,7 +22,7 @@
 }
 
 <!-- Modale modifica squadra -->
-@if (team && isEditModalOpen) {
+@if (team() && isEditModalOpen) {
 <div
   class="fixed inset-0 bg-black/50 transition-opacity flex items-center justify-center z-50"
 >
@@ -75,7 +75,7 @@
     }
   </div>
 </div>
-} @if (team && isDeleteModalOpen) {
+} @if (team() && isDeleteModalOpen) {
 <div
   class="fixed inset-0 bg-black/50 transition-opacity flex items-center justify-center z-0"
 >

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnChanges, ChangeDetectionStrategy, computed, inject, input, model, output } from '@angular/core';
 import Enrollment, {
   EnrollmentWeekSearch,
 } from '../../../models/Enrollment.model';
@@ -27,17 +27,27 @@ export class EnrollmentComponent implements OnChanges {
   private fb = inject(FormBuilder);
   private api = inject(ApiService);
 
-  @Input() enrollment: Enrollment | null = null;
-  @Output() enrollmentChange = new EventEmitter<Enrollment | null>();
-  @Output() isValid = new EventEmitter<boolean>(false);
+  readonly enrollment = model<Enrollment | null>(null);
+  readonly isValid = output<boolean>();
 
-  @Input() editable: boolean = false;
-  @Input() save: Function | null = null;
+  readonly editable = input<boolean>(false);
+  readonly save = input<Function | null>(null);
 
   enrollmentForm!: FormGroup;
   selectedWeeks: EnrollmentWeekSearch[] = [];
 
-  @Input() year: number = new Date().getFullYear();
+  readonly year = input<number>(new Date().getFullYear());
+
+  // L'anno di riferimento e' quello dell'iscrizione quando ce n'e' una (nelle
+  // pagine di modifica), altrimenti quello passato dal padre (nelle pagine di
+  // creazione, dove `enrollment` non e' bindato). Prima era l'input `year`
+  // riscritto dentro loadEnrollment: siccome loadEnrollment gira dentro la
+  // subscribe di getWeeks, la prima chiamata `getWeeks(this.year)` usava
+  // ancora l'anno del padre e caricava le settimane sbagliate. Come
+  // `computed` il valore e' corretto fin dalla prima lettura.
+  protected readonly effectiveYear = computed(
+    () => this.enrollment()?.year || this.year()
+  );
 
   teams: Team[] = [];
   weeks: Week[] = [];
@@ -86,14 +96,16 @@ export class EnrollmentComponent implements OnChanges {
   }
 
   get getTitle(): string {
-    return `${this.editable ? 'Modifica' : 'Dettagli'} iscrizione ${
-      this.editable && this.enrollment != null ? `(${this.year})` : ''
+    return `${this.editable() ? 'Modifica' : 'Dettagli'} iscrizione ${
+      this.editable() && this.enrollment() != null
+        ? `(${this.effectiveYear()})`
+        : ''
     }`;
   }
 
   ngOnChanges() {
     zip([
-      this.api.getWeeks(this.year),
+      this.api.getWeeks(this.effectiveYear()),
       this.api.getTeams(),
       this.api.getShirts(),
     ]).subscribe(([weeks, teams, shirts]) => {
@@ -107,12 +119,12 @@ export class EnrollmentComponent implements OnChanges {
         this.shirts = shirts.body.data;
       }
 
-      if (this.enrollment != null) {
+      if (this.enrollment() != null) {
         this.loadEnrollment();
       }
     });
 
-    if (this.editable) {
+    if (this.editable()) {
       this.enrollmentForm.enable();
     } else {
       this.enrollmentForm.disable();
@@ -122,24 +134,24 @@ export class EnrollmentComponent implements OnChanges {
   }
 
   loadEnrollment() {
-    if (this.enrollment) {
+    const enrollment = this.enrollment();
+
+    if (enrollment) {
       this.selectedWeeks =
-        this.enrollment?.weeks.map((week) => {
+        enrollment.weeks.map((week) => {
           return { weekId: week.id, isPaid: week.isPaid };
         }) || [];
 
-      this.year = this.enrollment?.year || new Date().getFullYear();
-
       this.enrollmentForm.patchValue({
-        schoolType: this.enrollment?.schoolType,
-        className: this.enrollment?.className,
-        section: this.enrollment?.section,
-        dataProcessingConsent: this.enrollment?.dataProcessingConsent,
-        exitAuthorization: this.enrollment?.exitAuthorization,
-        team: this.enrollment?.team?.id || '',
-        shirt: this.enrollment?.shirt?.id || '',
-        parentNotes: this.enrollment?.parentNotes,
-        managerNotes: this.enrollment?.managerNotes,
+        schoolType: enrollment.schoolType,
+        className: enrollment.className,
+        section: enrollment.section,
+        dataProcessingConsent: enrollment.dataProcessingConsent,
+        exitAuthorization: enrollment.exitAuthorization,
+        team: enrollment.team?.id || '',
+        shirt: enrollment.shirt?.id || '',
+        parentNotes: enrollment.parentNotes,
+        managerNotes: enrollment.managerNotes,
       });
     }
   }
@@ -155,7 +167,7 @@ export class EnrollmentComponent implements OnChanges {
     });
 
     const updatedEnrollment: Enrollment = {
-      ...this.enrollment,
+      ...this.enrollment(),
       ...this.enrollmentForm.value,
       team: this.teams.find(
         (team) => team.id == this.enrollmentForm.value.team
@@ -175,14 +187,14 @@ export class EnrollmentComponent implements OnChanges {
           ) || { weekId: week.id, isPaid: false };
           return { ...week, isPaid: selectedWeek.isPaid, weekId: week.id };
         }),
-      year: this.year,
+      year: this.effectiveYear(),
       dataProcessingConsent:
         this.enrollmentForm.value.dataProcessingConsent == true,
       exitAuthorization: this.enrollmentForm.value.exitAuthorization == true,
     };
 
-    this.enrollment = updatedEnrollment;
-    this.enrollmentChange.emit(updatedEnrollment);
+    // `set` su un model aggiorna il valore ed emette `enrollmentChange`.
+    this.enrollment.set(updatedEnrollment);
   }
 
   isWeekEnrolled(id: number | string): boolean {
@@ -219,8 +231,9 @@ export class EnrollmentComponent implements OnChanges {
   }
 
   saveEnrollment() {
-    if (this.editable && this.save && this.enrollmentForm.valid) {
-      this.save();
+    const save = this.save();
+    if (this.editable() && save && this.enrollmentForm.valid) {
+      save();
     }
   }
 }

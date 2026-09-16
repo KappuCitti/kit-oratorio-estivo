@@ -1,5 +1,5 @@
 
-import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 
 @Component({
   selector: 'app-loading',
@@ -8,6 +8,6 @@ import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
   templateUrl: './loading.component.html',
 })
 export class LoadingComponent {
-  @Input() size: 'sm' | 'md' | 'lg' = 'md';
-  @Input() message?: string;
+  readonly size = input<'sm' | 'md' | 'lg'>('md');
+  readonly message = input<string>();
 }

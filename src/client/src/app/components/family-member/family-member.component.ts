@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, SimpleChanges, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, inject, input, model, output } from '@angular/core';
 import { FamilyMember } from '../../../models/Family.model';
 import {
   FormGroup,
@@ -18,13 +18,20 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 export class FamilyMemberComponent {
   private fb = inject(FormBuilder);
 
-  @Input() familyMember: FamilyMember | null = null;
-  @Output() familyMemberChange = new EventEmitter<FamilyMember | null>();
-  @Output() isValid = new EventEmitter<boolean>(false);
+  readonly familyMember = model<FamilyMember | null>(null);
+  readonly isValid = output<boolean>();
 
-  @Input() title: string | null = 'Persona';
-  @Input() editable: boolean = false;
-  @Input() save: Function | null = null;
+  readonly title = input<string | null>('Persona');
+  readonly editable = input<boolean>(false);
+
+  // Il titolo mostrato e' il ruolo del membro quando c'e', altrimenti quello
+  // passato dal padre. Prima era l'input `title` riscritto dentro
+  // ngOnChanges: essendo un valore derivato, `computed` lo esprime senza
+  // scrivere sull'input e senza dipendere dall'ordine dei change detection.
+  protected readonly displayTitle = computed(
+    () => this.familyMember()?.role?.displayName || this.title()
+  );
+  readonly save = input<Function | null>(null);
 
   familyMemberForm!: FormGroup;
 
@@ -51,26 +58,26 @@ export class FamilyMemberComponent {
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (this.familyMember) {
+  ngOnChanges(): void {
+    const familyMember = this.familyMember();
+
+    if (familyMember) {
       this.familyMemberForm.patchValue(
         {
-          name: this.familyMember?.name,
-          surname: this.familyMember?.surname,
-          gender: this.familyMember?.gender,
-          email: this.familyMember?.email,
-          phone: this.familyMember?.phone,
-          birthDate: this.familyMember?.birthDate,
-          birthPlace: this.familyMember?.birthPlace,
-          id: this.familyMember?.id,
+          name: familyMember.name,
+          surname: familyMember.surname,
+          gender: familyMember.gender,
+          email: familyMember.email,
+          phone: familyMember.phone,
+          birthDate: familyMember.birthDate,
+          birthPlace: familyMember.birthPlace,
+          id: familyMember.id,
         },
         { emitEvent: false }
       );
-
-      this.title = this.familyMember.role.displayName || 'Persona';
     }
 
-    if (!this.editable) {
+    if (!this.editable()) {
       this.familyMemberForm.disable();
     } else {
       this.familyMemberForm.enable();
@@ -79,18 +86,17 @@ export class FamilyMemberComponent {
   }
 
   updateFamilyMember() {
-    const updateFamilyMember: FamilyMember = {
-      ...this.familyMember,
+    // `set` su un model aggiorna il valore ed emette `familyMemberChange`.
+    this.familyMember.set({
+      ...this.familyMember(),
       ...this.familyMemberForm.value,
-    };
-
-    this.familyMember = updateFamilyMember;
-    this.familyMemberChange.emit(updateFamilyMember);
+    });
   }
 
   saveFamilyMember() {
-    if (this.editable && this.save && this.familyMemberForm.valid) {
-      this.save();
+    const save = this.save();
+    if (this.editable() && save && this.familyMemberForm.valid) {
+      save();
     }
   }
 }
