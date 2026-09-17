@@ -138,21 +138,21 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 							birthPlace: string;
 							cf: string;
 							phoneNumber: string;
+							role: number;
 							address: {
 								street: string;
 								city: string;
 								postalCode: string;
 								country: string;
 							};
-							role: number;
 						})[];
+						role: number;
 						address: {
 							street: string;
 							city: string;
 							postalCode: string;
 							country: string;
 						};
-						role: number;
 						email?: string | undefined;
 						phoneNumber?: string | undefined;
 					}[];
@@ -185,21 +185,21 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 							birthPlace: string;
 							cf: string;
 							phoneNumber: string;
+							role: number;
 							address: {
 								street: string;
 								city: string;
 								postalCode: string;
 								country: string;
 							};
-							role: number;
 						})[];
+						role: number;
 						address: {
 							street: string;
 							city: string;
 							postalCode: string;
 							country: string;
 						};
-						role: number;
 						email?: string | undefined;
 						phoneNumber?: string | undefined;
 					}[];
@@ -232,21 +232,21 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 							birthPlace: string;
 							cf: string;
 							phoneNumber: string;
+							role: number;
 							address: {
 								street: string;
 								city: string;
 								postalCode: string;
 								country: string;
 							};
-							role: number;
 						})[];
+						role: number;
 						address: {
 							street: string;
 							city: string;
 							postalCode: string;
 							country: string;
 						};
-						role: number;
 						email?: string | undefined;
 						phoneNumber?: string | undefined;
 					}[];
@@ -279,21 +279,21 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 							birthPlace: string;
 							cf: string;
 							phoneNumber: string;
+							role: number;
 							address: {
 								street: string;
 								city: string;
 								postalCode: string;
 								country: string;
 							};
-							role: number;
 						})[];
+						role: number;
 						address: {
 							street: string;
 							city: string;
 							postalCode: string;
 							country: string;
 						};
-						role: number;
 						email?: string | undefined;
 						phoneNumber?: string | undefined;
 					}[];
@@ -457,13 +457,13 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					birthDate: string;
 					birthPlace: string;
 					cf: string;
+					role: string;
 					address: {
 						street: string;
 						city: string;
 						postalCode: string;
 						country: string;
 					};
-					role: string;
 					email?: string | undefined;
 				};
 			};
@@ -483,13 +483,13 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					birthDate: string;
 					birthPlace: string;
 					cf: string;
+					role: string;
 					address: {
 						street: string;
 						city: string;
 						postalCode: string;
 						country: string;
 					};
-					role: string;
 					email?: string | undefined;
 				};
 			};
@@ -509,13 +509,13 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					birthDate: string;
 					birthPlace: string;
 					cf: string;
+					role: string;
 					address: {
 						street: string;
 						city: string;
 						postalCode: string;
 						country: string;
 					};
-					role: string;
 					email?: string | undefined;
 				};
 			};
@@ -535,13 +535,13 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					birthDate: string;
 					birthPlace: string;
 					cf: string;
+					role: string;
 					address: {
 						street: string;
 						city: string;
 						postalCode: string;
 						country: string;
 					};
-					role: string;
 					email?: string | undefined;
 				};
 			};
@@ -561,13 +561,13 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					birthDate: string;
 					birthPlace: string;
 					cf: string;
+					role: string;
 					address: {
 						street: string;
 						city: string;
 						postalCode: string;
 						country: string;
 					};
-					role: string;
 					email?: string | undefined;
 				};
 			};
@@ -720,6 +720,541 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 			output: {
 				success: true;
 				data: null;
+			};
+			outputFormat: "json";
+			status: 200;
+		};
+	};
+} & {
+	"/admin/people": {
+		$get: {
+			input: {
+				query: {
+					query?: string | undefined;
+					roleId?: number | undefined;
+					gender?: "M" | "F" | undefined;
+					page?: number | undefined;
+					size?: number | undefined;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 500;
+		} | {
+			input: {
+				query: {
+					query?: string | undefined;
+					roleId?: number | undefined;
+					gender?: "M" | "F" | undefined;
+					page?: number | undefined;
+					size?: number | undefined;
+				};
+			};
+			output: {
+				success: true;
+				data: {
+					count: number;
+					elements: {
+						id: string;
+						name: string;
+						email: string | null;
+						phone: string | null;
+						surname: string;
+						gender: "M" | "F" | null;
+						birthDate: string | null;
+						role: {
+							id: number;
+							name: string;
+							displayName: string;
+						};
+					}[];
+				};
+			};
+			outputFormat: "json";
+			status: 200;
+		};
+	};
+} & {
+	"/admin/people/:id": {
+		$get: {
+			input: {
+				param: {
+					id: string;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 500;
+		} | {
+			input: {
+				param: {
+					id: string;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 404;
+		} | {
+			input: {
+				param: {
+					id: string;
+				};
+			};
+			output: {
+				success: true;
+				data: {
+					id: string;
+					name: string;
+					email: string | null;
+					phone: string | null;
+					surname: string;
+					gender: "M" | "F" | null;
+					birthDate: string | null;
+					birthPlace: string | null;
+					managers: {
+						id: string;
+						name: string;
+						email: string | null;
+						phone: string | null;
+						surname: string;
+						gender: "M" | "F" | null;
+						birthDate: string | null;
+						birthPlace: string | null;
+						role: {
+							id: number;
+							name: string;
+							displayName: string;
+						};
+					}[];
+					role: {
+						id: number;
+						name: string;
+						displayName: string;
+					};
+					address: {
+						street: string;
+						city: string;
+						postalCode: string;
+						country: string;
+					} | null;
+					managed: {
+						id: string;
+						name: string;
+						email: string | null;
+						phone: string | null;
+						surname: string;
+						gender: "M" | "F" | null;
+						birthDate: string | null;
+						birthPlace: string | null;
+						role: {
+							id: number;
+							name: string;
+							displayName: string;
+						};
+					}[];
+				};
+			};
+			outputFormat: "json";
+			status: 200;
+		};
+	};
+} & {
+	"/admin/people/:id": {
+		$put: {
+			input: {
+				param: {
+					id: string;
+				};
+			} & {
+				json: {
+					name?: string | undefined;
+					email?: string | null | undefined;
+					phone?: string | null | undefined;
+					roleId?: number | undefined;
+					surname?: string | undefined;
+					gender?: "M" | "F" | undefined;
+					birthDate?: string | null | undefined;
+					birthPlace?: string | null | undefined;
+					address?: {
+						street: string;
+						city: string;
+						postalCode: string;
+						country: string;
+					} | null | undefined;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 400;
+		} | {
+			input: {
+				param: {
+					id: string;
+				};
+			} & {
+				json: {
+					name?: string | undefined;
+					email?: string | null | undefined;
+					phone?: string | null | undefined;
+					roleId?: number | undefined;
+					surname?: string | undefined;
+					gender?: "M" | "F" | undefined;
+					birthDate?: string | null | undefined;
+					birthPlace?: string | null | undefined;
+					address?: {
+						street: string;
+						city: string;
+						postalCode: string;
+						country: string;
+					} | null | undefined;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 409;
+		} | {
+			input: {
+				param: {
+					id: string;
+				};
+			} & {
+				json: {
+					name?: string | undefined;
+					email?: string | null | undefined;
+					phone?: string | null | undefined;
+					roleId?: number | undefined;
+					surname?: string | undefined;
+					gender?: "M" | "F" | undefined;
+					birthDate?: string | null | undefined;
+					birthPlace?: string | null | undefined;
+					address?: {
+						street: string;
+						city: string;
+						postalCode: string;
+						country: string;
+					} | null | undefined;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 500;
+		} | {
+			input: {
+				param: {
+					id: string;
+				};
+			} & {
+				json: {
+					name?: string | undefined;
+					email?: string | null | undefined;
+					phone?: string | null | undefined;
+					roleId?: number | undefined;
+					surname?: string | undefined;
+					gender?: "M" | "F" | undefined;
+					birthDate?: string | null | undefined;
+					birthPlace?: string | null | undefined;
+					address?: {
+						street: string;
+						city: string;
+						postalCode: string;
+						country: string;
+					} | null | undefined;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 404;
+		} | {
+			input: {
+				param: {
+					id: string;
+				};
+			} & {
+				json: {
+					name?: string | undefined;
+					email?: string | null | undefined;
+					phone?: string | null | undefined;
+					roleId?: number | undefined;
+					surname?: string | undefined;
+					gender?: "M" | "F" | undefined;
+					birthDate?: string | null | undefined;
+					birthPlace?: string | null | undefined;
+					address?: {
+						street: string;
+						city: string;
+						postalCode: string;
+						country: string;
+					} | null | undefined;
+				};
+			};
+			output: {
+				success: true;
+				data: null;
+			};
+			outputFormat: "json";
+			status: 200;
+		};
+	};
+} & {
+	"/admin/people/:id": {
+		$delete: {
+			input: {
+				param: {
+					id: string;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 409;
+		} | {
+			input: {
+				param: {
+					id: string;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 500;
+		} | {
+			input: {
+				param: {
+					id: string;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 404;
+		} | {
+			input: {
+				param: {
+					id: string;
+				};
+			};
+			output: {
+				success: true;
+				data: null;
+			};
+			outputFormat: "json";
+			status: 200;
+		};
+	};
+} & {
+	"/admin/family": {
+		$post: {
+			input: {
+				json: {
+					managers: {
+						name: string;
+						password: string;
+						roleId: number;
+						surname: string;
+						gender: "M" | "F";
+						cf: string;
+						email?: string | null | undefined;
+						phone?: string | null | undefined;
+						birthDate?: string | null | undefined;
+						birthPlace?: string | null | undefined;
+						address?: {
+							street: string;
+							city: string;
+							postalCode: string;
+							country: string;
+						} | null | undefined;
+					}[];
+					managed: {
+						name: string;
+						password: string;
+						roleId: number;
+						surname: string;
+						gender: "M" | "F";
+						cf: string;
+						email?: string | null | undefined;
+						phone?: string | null | undefined;
+						birthDate?: string | null | undefined;
+						birthPlace?: string | null | undefined;
+						address?: {
+							street: string;
+							city: string;
+							postalCode: string;
+							country: string;
+						} | null | undefined;
+					}[];
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 400;
+		} | {
+			input: {
+				json: {
+					managers: {
+						name: string;
+						password: string;
+						roleId: number;
+						surname: string;
+						gender: "M" | "F";
+						cf: string;
+						email?: string | null | undefined;
+						phone?: string | null | undefined;
+						birthDate?: string | null | undefined;
+						birthPlace?: string | null | undefined;
+						address?: {
+							street: string;
+							city: string;
+							postalCode: string;
+							country: string;
+						} | null | undefined;
+					}[];
+					managed: {
+						name: string;
+						password: string;
+						roleId: number;
+						surname: string;
+						gender: "M" | "F";
+						cf: string;
+						email?: string | null | undefined;
+						phone?: string | null | undefined;
+						birthDate?: string | null | undefined;
+						birthPlace?: string | null | undefined;
+						address?: {
+							street: string;
+							city: string;
+							postalCode: string;
+							country: string;
+						} | null | undefined;
+					}[];
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 409;
+		} | {
+			input: {
+				json: {
+					managers: {
+						name: string;
+						password: string;
+						roleId: number;
+						surname: string;
+						gender: "M" | "F";
+						cf: string;
+						email?: string | null | undefined;
+						phone?: string | null | undefined;
+						birthDate?: string | null | undefined;
+						birthPlace?: string | null | undefined;
+						address?: {
+							street: string;
+							city: string;
+							postalCode: string;
+							country: string;
+						} | null | undefined;
+					}[];
+					managed: {
+						name: string;
+						password: string;
+						roleId: number;
+						surname: string;
+						gender: "M" | "F";
+						cf: string;
+						email?: string | null | undefined;
+						phone?: string | null | undefined;
+						birthDate?: string | null | undefined;
+						birthPlace?: string | null | undefined;
+						address?: {
+							street: string;
+							city: string;
+							postalCode: string;
+							country: string;
+						} | null | undefined;
+					}[];
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 500;
+		} | {
+			input: {
+				json: {
+					managers: {
+						name: string;
+						password: string;
+						roleId: number;
+						surname: string;
+						gender: "M" | "F";
+						cf: string;
+						email?: string | null | undefined;
+						phone?: string | null | undefined;
+						birthDate?: string | null | undefined;
+						birthPlace?: string | null | undefined;
+						address?: {
+							street: string;
+							city: string;
+							postalCode: string;
+							country: string;
+						} | null | undefined;
+					}[];
+					managed: {
+						name: string;
+						password: string;
+						roleId: number;
+						surname: string;
+						gender: "M" | "F";
+						cf: string;
+						email?: string | null | undefined;
+						phone?: string | null | undefined;
+						birthDate?: string | null | undefined;
+						birthPlace?: string | null | undefined;
+						address?: {
+							street: string;
+							city: string;
+							postalCode: string;
+							country: string;
+						} | null | undefined;
+					}[];
+				};
+			};
+			output: {
+				success: true;
+				data: string[];
 			};
 			outputFormat: "json";
 			status: 200;
@@ -1207,6 +1742,30 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 		};
 	};
 }, "/"> & import("hono/types").MergeSchemaPath<{
+	"/roles": {
+		$get: {
+			input: {};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 500;
+		} | {
+			input: {};
+			output: {
+				success: true;
+				data: {
+					id: number;
+					name: string;
+					displayName: string;
+				}[];
+			};
+			outputFormat: "json";
+			status: 200;
+		};
+	};
+}, "/"> & import("hono/types").MergeSchemaPath<{
 	"/": {
 		$get: {
 			input: {};
@@ -1609,14 +2168,14 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 						id: number;
 						name: string;
 					};
-					shirt: {
-						id: number;
-						sizeName: string;
-					} | null;
 					team: {
 						id: number;
 						name: string;
 						color: string;
+					} | null;
+					shirt: {
+						id: number;
+						sizeName: string;
 					} | null;
 					class: {
 						id: number;
@@ -1657,8 +2216,8 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					year: number;
 					parentNotes?: string | null | undefined;
 					managerNotes?: string | null | undefined;
-					shirt?: number | null | undefined;
 					team?: number | null | undefined;
+					shirt?: number | null | undefined;
 				};
 			};
 			output: {
@@ -1686,8 +2245,8 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					year: number;
 					parentNotes?: string | null | undefined;
 					managerNotes?: string | null | undefined;
-					shirt?: number | null | undefined;
 					team?: number | null | undefined;
+					shirt?: number | null | undefined;
 				};
 			};
 			output: {
@@ -1715,8 +2274,8 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					year: number;
 					parentNotes?: string | null | undefined;
 					managerNotes?: string | null | undefined;
-					shirt?: number | null | undefined;
 					team?: number | null | undefined;
+					shirt?: number | null | undefined;
 				};
 			};
 			output: {
@@ -1744,8 +2303,8 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					year: number;
 					parentNotes?: string | null | undefined;
 					managerNotes?: string | null | undefined;
-					shirt?: number | null | undefined;
 					team?: number | null | undefined;
+					shirt?: number | null | undefined;
 				};
 			};
 			output: {
@@ -1794,6 +2353,145 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 			};
 			outputFormat: "json";
 			status: 200;
+		};
+	};
+} & {
+	"/admin/enrollments": {
+		$post: {
+			input: {
+				json: {
+					weeks: {
+						id: number;
+						isPaid: boolean;
+					}[];
+					userId: string;
+					dataProcessingConsent: boolean;
+					classId: number;
+					section: string;
+					imageProcessingConsent?: boolean | undefined;
+					exitAuthorization?: boolean | null | undefined;
+					parentNotes?: string | null | undefined;
+					managerNotes?: string | null | undefined;
+					specialDiet?: string | null | undefined;
+					team?: number | null | undefined;
+					shirt?: number | null | undefined;
+					ignoreRestrictions?: boolean | undefined;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 400;
+		} | {
+			input: {
+				json: {
+					weeks: {
+						id: number;
+						isPaid: boolean;
+					}[];
+					userId: string;
+					dataProcessingConsent: boolean;
+					classId: number;
+					section: string;
+					imageProcessingConsent?: boolean | undefined;
+					exitAuthorization?: boolean | null | undefined;
+					parentNotes?: string | null | undefined;
+					managerNotes?: string | null | undefined;
+					specialDiet?: string | null | undefined;
+					team?: number | null | undefined;
+					shirt?: number | null | undefined;
+					ignoreRestrictions?: boolean | undefined;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 409;
+		} | {
+			input: {
+				json: {
+					weeks: {
+						id: number;
+						isPaid: boolean;
+					}[];
+					userId: string;
+					dataProcessingConsent: boolean;
+					classId: number;
+					section: string;
+					imageProcessingConsent?: boolean | undefined;
+					exitAuthorization?: boolean | null | undefined;
+					parentNotes?: string | null | undefined;
+					managerNotes?: string | null | undefined;
+					specialDiet?: string | null | undefined;
+					team?: number | null | undefined;
+					shirt?: number | null | undefined;
+					ignoreRestrictions?: boolean | undefined;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 500;
+		} | {
+			input: {
+				json: {
+					weeks: {
+						id: number;
+						isPaid: boolean;
+					}[];
+					userId: string;
+					dataProcessingConsent: boolean;
+					classId: number;
+					section: string;
+					imageProcessingConsent?: boolean | undefined;
+					exitAuthorization?: boolean | null | undefined;
+					parentNotes?: string | null | undefined;
+					managerNotes?: string | null | undefined;
+					specialDiet?: string | null | undefined;
+					team?: number | null | undefined;
+					shirt?: number | null | undefined;
+					ignoreRestrictions?: boolean | undefined;
+				};
+			};
+			output: {
+				success: true;
+				data: number;
+			};
+			outputFormat: "json";
+			status: 200;
+		} | {
+			input: {
+				json: {
+					weeks: {
+						id: number;
+						isPaid: boolean;
+					}[];
+					userId: string;
+					dataProcessingConsent: boolean;
+					classId: number;
+					section: string;
+					imageProcessingConsent?: boolean | undefined;
+					exitAuthorization?: boolean | null | undefined;
+					parentNotes?: string | null | undefined;
+					managerNotes?: string | null | undefined;
+					specialDiet?: string | null | undefined;
+					team?: number | null | undefined;
+					shirt?: number | null | undefined;
+					ignoreRestrictions?: boolean | undefined;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 403;
 		};
 	};
 }, "/"> & import("hono/types").MergeSchemaPath<{
