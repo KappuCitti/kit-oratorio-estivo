@@ -5,6 +5,7 @@ import auth from './auth';
 import _class from './class';
 import enrollment from './enrollment';
 import main from './main';
+import role from './role';
 import school from './school';
 import shirt from './shirt';
 import stats from './stats';
@@ -28,6 +29,7 @@ export const v1Router = createRouter()
   .route('/', _class)
   .route('/', enrollment)
   .route('/', main)
+  .route('/', role)
   .route('/', school)
   .route('/', shirt)
   .route('/', stats)
