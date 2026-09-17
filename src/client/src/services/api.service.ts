@@ -1,42 +1,34 @@
-import { inject, Service } from '@angular/core';
-import { environment } from '../environments/environment';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { PagedResponse, Response } from '../models/Response.model';
+import { Service } from '@angular/core';
 import { Theme } from '../models/Theme.model';
 import { api, request } from './api-client';
-import Enrollment, { EnrollmentSearch } from '../models/Enrollment.model';
 import {
-  PeopleGetRequest,
-  EnrollmentCreateRequest,
+  AdminEnrollmentCreateRequest,
+  ClassCreateRequest,
+  EnrollmentApprovalRequest,
   EnrollmentGetRequest,
   EnrollmentUpdateRequest,
-  FamilyEnrollmentCreateRequest,
+  FamilyCreateRequest,
+  PeopleGetRequest,
+  PersonUpdateRequest,
+  QueueEnrollmentCreateRequest,
+  SchoolCreateRequest,
   TeamCreateRequest,
   TeamUpdateRequest,
-  SchoolCreateRequest,
-  ClassCreateRequest,
 } from '../models/Request.model';
-import Week from '../models/Week.model';
-import Team from '../models/Team.model';
-import { Shirt } from '../models/Shirt.model';
-import {
-  Child,
-  ChildResponse,
-  ChildSearch,
-  FamilyMember,
-  Parent,
-  ParentResponse,
-  ParentSearch,
-  PeopleSearch,
-} from '../models/Family.model';
-import { AttendanceSearch } from '../models/Attendances.model';
-import { AttendancesStat } from '../models/Stat.model';
 import { toDateOnly } from './utils.service';
+
+/**
+ * Le chiamate all'API.
+ *
+ * Ogni metodo passa dal client tipizzato generato dal server (vedi
+ * api-client.ts): percorsi, parametri e forma delle risposte non sono scritti
+ * qui. `request()` restituisce un Observable, cosi' i componenti continuano a
+ * usare `.subscribe()`.
+ */
 @Service()
 export class ApiService {
-  private http = inject(HttpClient);
-
-  private baseUrl = environment.server + '/api/v1';
+  // Niente piu' HttpClient ne' baseUrl: l'indirizzo e le credenziali sono
+  // impostati una volta sola in api-client.ts.
 
   // User
   login(username: string, password: string) {
@@ -63,76 +55,45 @@ export class ApiService {
 
   // Enrollments
   getEnrollments(params: EnrollmentGetRequest) {
-    return this.http.get<PagedResponse<EnrollmentSearch>>(
-      `${this.baseUrl}/enrollments`,
-      {
-        params: { ...params },
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
+    return request(api.enrollments.$get({ query: params }));
   }
 
-  getEnrollmentById(id: string | number) {
-    return this.http.get<Response<Enrollment>>(
-      `${this.baseUrl}/enrollments/${id.toString()}`,
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
+  getEnrollmentById(id: number) {
+    return request(api.enrollments[':id'].$get({ param: { id } }));
   }
 
   updateEnrollment(enrollment: EnrollmentUpdateRequest) {
-    return this.http.put<Response<Enrollment>>(
-      `${this.baseUrl}/enrollments/${enrollment.id}`,
-      enrollment,
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
+    const { id, ...campi } = enrollment;
+    return request(
+      api.enrollments[':id'].$put({ param: { id }, json: campi })
     );
   }
 
-  deleteEnrollment(id: string | number) {
-    return this.http.delete<Response<any>>(
-      `${this.baseUrl}/enrollments/${id.toString()}`,
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
+  deleteEnrollment(id: number) {
+    return request(api.enrollments[':id'].$delete({ param: { id } }));
   }
 
-  createEnrollment(enrollment: EnrollmentCreateRequest) {
-    return this.http.post<Response<number>>(
-      `${this.baseUrl}/enrollments`,
-      enrollment,
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
+  /**
+   * Richiesta di iscrizione inviata da un genitore: finisce in coda, non
+   * diventa subito un'iscrizione.
+   *
+   * E' il flusso che il server implementa davvero. Prima il client chiamava
+   * `POST /enrollments`, che invece APPROVA una richiesta gia' in coda e vuole
+   * un `queueId`: il corpo mandato non aveva niente a che vedere con quello
+   * atteso, quindi la chiamata sarebbe stata rifiutata con 422.
+   */
+  createQueueEnrollment(enrollment: QueueEnrollmentCreateRequest) {
+    return request(api.enrollments.queue.$post({ json: enrollment }));
+  }
+
+  /** Le richieste in attesa di approvazione. */
+  getEnrollmentQueue(params: EnrollmentGetRequest) {
+    return request(api.enrollments.queue.$get({ query: params }));
+  }
+
+  /** Approva una richiesta in coda e la trasforma in iscrizione. */
+  approveEnrollment(approval: EnrollmentApprovalRequest) {
+    return request(api.enrollments.$post({ json: approval }));
   }
 
   // Weeks
@@ -164,177 +125,59 @@ export class ApiService {
   }
 
   // Families
+  /** Le persone gestite da chi e' collegato: tipicamente i propri figli. */
   getManagedPeople() {
-    return this.http.get<Response<FamilyMember[]>>(`${this.baseUrl}/users`, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-      responseType: 'json',
-      withCredentials: true,
-      observe: 'response',
-    });
+    return request(api.users.$get());
   }
 
+  // Rubrica (amministrazione)
+  //
+  // Sostituiscono i vecchi metodi verso /people, /childs/* e /parents/*, che
+  // puntavano a rotte mai esistite. Adesso le rotte esistono davvero.
+
+  /**
+   * I ruoli assegnabili.
+   *
+   * Serve alle pagine che creano o modificano una persona: il server vuole un
+   * `roleId`, e senza questo elenco il client dovrebbe inventarsi i numeri.
+   */
+  getRoles() {
+    return request(api.roles.$get());
+  }
+
+  /** Elenco delle persone, con ricerca e paginazione. */
   getPeople(params: PeopleGetRequest) {
-    return this.http.get<PagedResponse<PeopleSearch>>(
-      `${this.baseUrl}/people`,
-      {
-        params: { ...params },
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
+    return request(api.admin.people.$get({ query: params }));
+  }
+
+  /** Dettaglio di una persona, con chi la gestisce e chi gestisce. */
+  getPerson(id: string) {
+    return request(api.admin.people[':id'].$get({ param: { id } }));
+  }
+
+  updatePerson(id: string, data: PersonUpdateRequest) {
+    return request(
+      api.admin.people[':id'].$put({ param: { id }, json: data })
     );
   }
 
-  getChilds(params: PeopleGetRequest) {
-    return this.http.get<PagedResponse<ChildSearch>>(`${this.baseUrl}/childs`, {
-      params: { ...params },
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-      responseType: 'json',
-      withCredentials: true,
-      observe: 'response',
-    });
+  deletePerson(id: string) {
+    return request(api.admin.people[':id'].$delete({ param: { id } }));
   }
 
-  getChildById(id: string | number) {
-    return this.http.get<Response<ChildResponse>>(
-      `${this.baseUrl}/childs/${id.toString()}`,
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
+  /** Crea un nucleo familiare e i legami fra le persone, in una transazione. */
+  createFamily(family: FamilyCreateRequest) {
+    return request(api.admin.family.$post({ json: family }));
   }
 
-  createChild(child: Child) {
-    return this.http.post<Response<number>>(`${this.baseUrl}/childs`, child, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-      responseType: 'json',
-      withCredentials: true,
-      observe: 'response',
-    });
-  }
-
-  updateChild(child: Child) {
-    return this.http.put<Response<null>>(
-      `${this.baseUrl}/childs/${child.id}`,
-      child,
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
-  }
-
-  deleteChild(id: string | number) {
-    return this.http.delete<Response<any>>(
-      `${this.baseUrl}/childs/${id.toString()}`,
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
-  }
-
-  getParents(params: PeopleGetRequest) {
-    return this.http.get<PagedResponse<ParentSearch>>(
-      `${this.baseUrl}/parents`,
-      {
-        params: { ...params },
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
-  }
-
-  getParentById(id: string | number) {
-    return this.http.get<Response<ParentResponse>>(
-      `${this.baseUrl}/parents/${id}`,
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
-  }
-
-  createParent(parent: Parent) {
-    return this.http.post<Response<number>>(`${this.baseUrl}/parents`, parent, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-      responseType: 'json',
-      withCredentials: true,
-      observe: 'response',
-    });
-  }
-
-  updateParent(parent: Parent) {
-    return this.http.put<Response<null>>(
-      `${this.baseUrl}/parents/${parent.id}`,
-      parent,
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
-  }
-
-  deleteParent(id: string | number, deleteChildren: boolean = false) {
-    return this.http.delete<Response<any>>(
-      `${this.baseUrl}/parents/${id.toString()}`,
-      {
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-        }),
-        body: { deleteChildren: deleteChildren },
-        responseType: 'json',
-        withCredentials: true,
-        observe: 'response',
-      }
-    );
-  }
-
-  createFamilyWithEnrollment(family: FamilyEnrollmentCreateRequest) {
-    return this.http.post<Response<number>>(`${this.baseUrl}/family`, family, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-      responseType: 'json',
-      withCredentials: true,
-      observe: 'response',
-    });
+  /**
+   * Crea un'iscrizione direttamente, senza passare dalla coda.
+   *
+   * Con `ignoreRestrictions` si scavalcano la finestra di iscrizione e il
+   * limite di posti: e' l'iscrizione "super" dello sportello.
+   */
+  createEnrollmentAsAdmin(enrollment: AdminEnrollmentCreateRequest) {
+    return request(api.admin.enrollments.$post({ json: enrollment }));
   }
 
   // Attendance

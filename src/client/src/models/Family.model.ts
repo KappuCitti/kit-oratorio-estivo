@@ -1,37 +1,32 @@
+import type { InferResponseType } from 'hono/client';
+import { api } from '../services/api-client';
 import Address from './Address.model';
-import Enrollment from './Enrollment.model';
-import { Role } from './User.model';
-
-export interface Family {
-  child: Child;
-  parents: Parent[];
-}
 
 export type gender = 'M' | 'F' | 'Other';
 
-// TODO - Old
-export interface PeopleSearch {
-  id: number;
-  name: string;
-  surname: gender;
-  gender: string;
-  type?: string;
-}
+type ManagedResponse = InferResponseType<typeof api.users.$get, 200>;
 
-// TODO - New
-export interface FamilyMember {
-  id: string;
-  email: string | null;
-  phone: string | null;
-  role: Role;
-  name: string;
-  surname: string;
-  gender: gender;
-  birthDate: string | null;
-  birthPlace: string | null;
-}
+/**
+ * Una persona gestita da chi e' collegato (tipicamente un figlio), come la
+ * restituisce GET /users.
+ */
+export type FamilyMember = Extract<
+  ManagedResponse,
+  { success: true }
+>['data'][number];
 
-// TODO - Old
+/*
+ * I tipi qui sotto NON descrivono risposte del server: sono le forme dei form
+ * di `app-child` e `app-parent`, cioe' dati che l'utente sta ancora
+ * compilando e che non sono stati inviati da nessuna parte.
+ *
+ * Tutto il resto di questo file e' stato rimosso perche' descriveva lo schema
+ * v1 e rotte mai esistite: `PeopleSearch` (che per giunta dichiarava
+ * `surname: gender`), `ChildSearch`, `ParentSearch`, `ChildResponse`,
+ * `ParentResponse` e `Family`. Servivano alle pagine admin/people-*, tolte
+ * perche' chiamavano /people, /childs e /parents.
+ */
+
 export interface Child {
   id: number;
   name: string;
@@ -42,20 +37,6 @@ export interface Child {
   address: Address;
 }
 
-// TODO - Old
-export interface ChildSearch {
-  id: number;
-  name: string;
-  surname: string;
-  gender: gender;
-  birthDate: string;
-}
-
-export type ChildResponse = Child & {
-  enrollments: Enrollment[];
-  parents: Parent[];
-};
-
 export interface Parent {
   id: number;
   name: string;
@@ -64,12 +45,3 @@ export interface Parent {
   email: string;
   phoneNumber: string;
 }
-
-export interface ParentSearch {
-  id: number;
-  name: string;
-  surname: string;
-  gender: gender;
-}
-
-export type ParentResponse = Parent & { childrens: Child[] };

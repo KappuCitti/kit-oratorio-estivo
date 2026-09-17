@@ -1,72 +1,46 @@
-import { Family, gender } from './Family.model';
-import { Shirt } from './Shirt.model';
-import Team from './Team.model';
-import { UserSimplified } from './User.model';
-import Week from './Week.model';
+import type { InferResponseType } from 'hono/client';
+import { api } from '../services/api-client';
 
-// TODO - New
-export interface EnrollmentSearch {
-  // id: number;
-  // dataProcessingConsent: boolean;
-  // exitAuthorization: boolean;
-  // schoolType: schoolType;
-  // className: className;
-  // section: string;
-  // child: EnrollmentChildearch;
-  // weeks: EnrollmentWeekSearch[];
-  // team: Team;
-  id: number;
-  dataProcessingConsent: boolean;
-  imageProcessingConsent: boolean;
-  exitAuthorization: boolean;
-  section: string;
-  specialDiet: any;
-  user: UserSimplified;
-  weeks: EnrollmentWeekSearch[];
-  team: Team;
-  class: EnrollmentClass;
-  school: EnrollmentSchool;
-}
-export interface EnrollmentChildSearch {
-  id: number;
-  name: string;
-  surname: string;
-  gender: gender;
-}
-export interface EnrollmentWeekSearch {
-  weekId: number | string;
-  isPaid: number | boolean; // TODO - Change to boolean
-}
+/**
+ * Le iscrizioni, come le restituisce il server.
+ *
+ * Non sono piu' scritte a mano. La versione precedente parlava ancora lo
+ * schema v1: `schoolType`, `className` e un oggetto `family` con figlio e
+ * genitori. In v2 l'iscrizione punta a una CLASSE (`class`, che appartiene a
+ * una `school`) e ha una `section`; il ragazzo e' `user` e i genitori si
+ * leggono da `managers` nel dettaglio.
+ */
+type SearchResponse = InferResponseType<typeof api.enrollments.$get, 200>;
 
-export default interface Enrollment {
-  id: number | string;
-  className: className;
-  section: string;
-  dataProcessingConsent: boolean;
-  imageProcessingConsent: boolean;
-  exitAuthorization: boolean;
-  schoolType: schoolType;
-  managerNotes: string;
-  parentNotes: string;
-  year: number;
-  dateOfEnrollment: string;
-  family: Family;
-  shirt: Shirt;
-  team: Team;
-  weeks: EnrollmentWeek[];
-}
+/** Un elemento della lista iscrizioni (GET /enrollments). */
+export type EnrollmentSearch = Extract<
+  SearchResponse,
+  { success: true }
+>['data']['elements'][number];
 
-export interface EnrollmentClass {
-  id: number;
-  name: string;
-}
-export interface EnrollmentSchool {
-  id: number;
-  name: string;
-}
-export interface EnrollmentWeek extends Week {
-  isPaid: boolean;
-}
+type DetailResponse = InferResponseType<
+  (typeof api.enrollments)[':id']['$get'],
+  200
+>;
 
-export type schoolType = string; // 'Primary' | 'Secondary';
-export type className = string; // 'I' | 'II' | 'III' | 'IV' | 'V';
+/** Il dettaglio di una singola iscrizione (GET /enrollments/{id}). */
+type Enrollment = Extract<DetailResponse, { success: true }>['data'];
+
+export default Enrollment;
+
+/** Le settimane selezionate dentro un'iscrizione. */
+export type EnrollmentWeekSearch = EnrollmentSearch['weeks'][number];
+
+export type EnrollmentClass = EnrollmentSearch['class'];
+export type EnrollmentSchool = EnrollmentSearch['school'];
+
+type QueueResponse = InferResponseType<
+  typeof api.enrollments.queue.$get,
+  200
+>;
+
+/** Una richiesta di iscrizione in attesa di approvazione. */
+export type QueueEnrollment = Extract<
+  QueueResponse,
+  { success: true }
+>['data']['elements'][number];
