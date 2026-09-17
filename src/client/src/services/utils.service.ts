@@ -32,14 +32,32 @@ export class UtilsService {
    * passano un percorso di successo.
    */
   handleResponse(
-    response: { status: number },
+    response: { status: number; body?: unknown },
     success: string | null
   ): string | null {
-    switch (response.status) {
-      case 200:
-        if (success) window.location.href = success;
-        return null;
+    if (response.status === 200) {
+      if (success) window.location.href = success;
+      return null;
+    }
 
+    // Il server manda gia' il motivo, tradotto nella lingua della richiesta
+    // (`{ success: false, error: "L'utente e' gia' iscritto quest'anno" }`).
+    // Buttarlo via per mostrare "Conflitto nella richiesta!" rende
+    // indistinguibili errori molto diversi: a iscrizioni chiuse e a persona
+    // gia' iscritta il server risponde entrambe le volte 409, ma il rimedio
+    // e' opposto. I messaggi per stato qui sotto restano come ripiego per
+    // quando il corpo non arriva o non e' nella forma attesa.
+    const body = response.body;
+    if (
+      body &&
+      typeof body === 'object' &&
+      'error' in body &&
+      typeof (body as { error: unknown }).error === 'string'
+    ) {
+      return (body as { error: string }).error;
+    }
+
+    switch (response.status) {
       case 400:
         return 'Richiesta non valida!';
 
