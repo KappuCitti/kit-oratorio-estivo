@@ -1,122 +1,181 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { Router } from '@angular/router';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { Role } from '../../../../models/Person.model';
+import {
+  FamilyCreateRequest,
+  FamilyPersonRequest,
+} from '../../../../models/Request.model';
+import { ApiService } from '../../../../services/api.service';
+import { UtilsService } from '../../../../services/utils.service';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
-import { ChildComponent } from '../../../components/child/child.component';
-import { ParentComponent } from '../../../components/parent/parent.component';
-import { FormsModule } from '@angular/forms';
-import { Child, Parent } from '../../../../models/Family.model';
-import { ApiService } from '../../../../services/api.service';
 
-import { UtilsService } from '../../../../services/utils.service';
-import { FamilyEnrollmentCreateRequest } from '../../../../models/Request.model';
-
+/**
+ * Creazione di un nucleo familiare: chi gestisce e chi viene gestito.
+ *
+ * Il form e' scritto qui invece di riusare `app-parent` e `app-child` perche'
+ * quei componenti raccolgono i campi dello schema v1 (`phoneNumber`, nessun
+ * codice fiscale, nessuna password, nessun ruolo), mentre il server pretende
+ * `cf`, `password` e `roleId` per ogni persona: il codice fiscale e' la chiave
+ * primaria dell'utente e la password gli serve per accedere.
+ *
+ * Il server crea tutto in una transazione e collega ogni gestore a ogni
+ * gestito, quindi o riesce tutto o non viene creato nulla.
+ */
 @Component({
   selector: 'app-people-create',
   imports: [
     FooterComponent,
     NavbarComponent,
-    ChildComponent,
-    ParentComponent,
-    FormsModule
-],
+    ReactiveFormsModule,
+    FaIconComponent,
+  ],
   templateUrl: './people-create.component.html',
 })
-export class PeopleCreateComponent {
+export class PeopleCreateComponent implements OnInit {
   private api = inject(ApiService);
+  private router = inject(Router);
   private utils = inject(UtilsService);
+  private fb = inject(FormBuilder);
 
+  faPlus = faPlus;
+  faTrash = faTrash;
+
+  readonly roles = signal<Role[]>([]);
   readonly error = signal<string | null>(null);
+  readonly saving = signal(false);
 
-  readonly parents = signal<Array<Parent | null>>([null, null]);
-  readonly childs = signal<Array<Child | null>>([null]);
+  familyForm: FormGroup;
 
-  // Prima era un solo array `isValid` in cui i genitori occupavano la prima
-  // meta' e i figli la seconda. Ridurre il numero di figli faceva splice
-  // all'indice sbagliato (senza sommare il numero di genitori), invalidando
-  // le flag dei genitori. Due array separati tolgono del tutto quel calcolo.
-  private readonly parentsValid = signal<boolean[]>([false, false]);
-  private readonly childsValid = signal<boolean[]>([false]);
-
-  readonly isFieldsValid = computed(
-    () =>
-      this.parentsValid().every((valid) => valid) &&
-      this.childsValid().every((valid) => valid)
+  /**
+   * I ruoli proposti per i due gruppi.
+   *
+   * Il server non impone quale ruolo stia da che parte: il legame `manages` e'
+   * quello che conta. La distinzione qui e' solo un aiuto alla compilazione, e
+   * ogni tendina resta libera.
+   */
+  readonly managerRoles = computed(() =>
+    this.roles().filter((role) => role.name !== 'child')
   );
 
-  changeParentsLength(length: number) {
-    this.parents.update((parents) => resize(parents, length, null));
-    this.parentsValid.update((valid) => resize(valid, length, false));
+  constructor() {
+    this.familyForm = this.fb.group({
+      managers: this.fb.array([this.createPersonGroup()]),
+      managed: this.fb.array([this.createPersonGroup()]),
+    });
   }
 
-  changeChildsLength(length: number) {
-    this.childs.update((childs) => resize(childs, length, null));
-    this.childsValid.update((valid) => resize(valid, length, false));
+  ngOnInit() {
+    this.api.getRoles().subscribe({
+      next: (response) => {
+        if (response.body?.success) this.roles.set(response.body.data);
+      },
+      error: (error) => console.error(error),
+    });
   }
 
-  onParentChange(parent: Parent | null, index: number) {
-    this.parents.update((parents) =>
-      parents.map((p, i) => (i === index ? parent : p))
-    );
+  get managers(): FormArray {
+    return this.familyForm.get('managers') as FormArray;
   }
 
-  onIsParentValidChange(isValid: boolean, index: number) {
-    this.parentsValid.update((valid) =>
-      valid.map((v, i) => (i === index ? isValid : v))
-    );
+  get managed(): FormArray {
+    return this.familyForm.get('managed') as FormArray;
   }
 
-  // event when something was edited, passed something and add to array
-  onChildChange(child: Child | null, index: number) {
-    this.childs.update((childs) =>
-      childs.map((c, i) => (i === index ? child : c))
-    );
-    this.childsValid.update((valid) =>
-      valid.map((v, i) =>
-        i === index ? child !== null && child.name !== '' : v
-      )
-    );
+  private createPersonGroup(): FormGroup {
+    return this.fb.group({
+      // Il codice fiscale e' esattamente 16 caratteri: e' l'id dell'utente.
+      cf: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(16),
+          Validators.maxLength(16),
+        ],
+      ],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      name: ['', [Validators.required, Validators.maxLength(255)]],
+      surname: ['', [Validators.required, Validators.maxLength(255)]],
+      gender: ['M', [Validators.required]],
+      roleId: [null, [Validators.required]],
+      email: ['', [Validators.email]],
+      phone: [''],
+      birthDate: [''],
+      birthPlace: [''],
+    });
   }
 
-  onIsChildValidChange(isValid: boolean, index: number) {
-    this.childsValid.update((valid) =>
-      valid.map((v, i) => (i === index ? isValid : v))
-    );
+  addManager() {
+    this.managers.push(this.createPersonGroup());
   }
 
-  onCreateFamily() {
-    if (!this.isFieldsValid()) return;
-    // create family with parents and children
+  removeManager(index: number) {
+    // I gestori possono essere zero: e' il caso di un maggiorenne che si
+    // iscrive da solo. I gestiti no, il server ne pretende almeno uno.
+    this.managers.removeAt(index);
+  }
 
-    const data: FamilyEnrollmentCreateRequest = {
-      childs: this.childs()
-        .filter((child) => child !== null)
-        .map((child) => {
-          return {
-            ...child,
-            enrollments: [],
-          };
-        }),
-      parents: this.parents().filter((parent) => parent !== null),
+  addManaged() {
+    this.managed.push(this.createPersonGroup());
+  }
+
+  removeManaged(index: number) {
+    if (this.managed.length > 1) this.managed.removeAt(index);
+  }
+
+  private toRequest(value: Record<string, any>): FamilyPersonRequest {
+    return {
+      cf: (value['cf'] as string).toUpperCase(),
+      password: value['password'],
+      name: value['name'],
+      surname: value['surname'],
+      gender: value['gender'],
+      roleId: Number(value['roleId']),
+      // I campi facoltativi lasciati vuoti vanno inviati come null: la stringa
+      // vuota non passerebbe i controlli del server (email, min(1)).
+      email: value['email'] || null,
+      phone: value['phone'] || null,
+      birthDate: value['birthDate'] || null,
+      birthPlace: value['birthPlace'] || null,
+    };
+  }
+
+  createFamily() {
+    if (this.familyForm.invalid || this.saving()) return;
+
+    const richiesta: FamilyCreateRequest = {
+      managers: this.managers.value.map((v: Record<string, any>) =>
+        this.toRequest(v)
+      ),
+      managed: this.managed.value.map((v: Record<string, any>) =>
+        this.toRequest(v)
+      ),
     };
 
-    this.api.createFamilyWithEnrollment(data).subscribe({
+    this.saving.set(true);
+    this.error.set(null);
+
+    this.api.createFamily(richiesta).subscribe({
       next: () => {
-        window.location.href = '/admin/people';
+        this.saving.set(false);
+        this.router.navigateByUrl('/admin/people');
       },
       error: (error) => {
         console.error(error);
-        // Prima questa riga assegnava il parametro locale `error` invece del
-        // campo del componente, quindi il riquadro d'errore non compariva mai.
-        this.error.set(this.utils.handleResponse(error, '/admin/people'));
+        this.saving.set(false);
+        // Il server rifiuta con 409 i codici fiscali o le email gia' presenti,
+        // sia fra loro sia rispetto al database: il messaggio va mostrato.
+        this.error.set(this.utils.handleResponse(error, null));
       },
     });
   }
-}
-
-// Porta l'array alla lunghezza richiesta, riempiendo con `fill` se cresce.
-function resize<T>(array: T[], length: number, fill: T): T[] {
-  if (array.length === length) return array;
-  if (array.length > length) return array.slice(0, length);
-
-  return [...array, ...Array(length - array.length).fill(fill)];
 }

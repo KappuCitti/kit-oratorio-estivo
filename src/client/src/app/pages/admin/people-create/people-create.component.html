@@ -1,85 +1,188 @@
 <app-navbar />
-<div class="container min-h-4/5">
+<div class="container">
   <header class="mb-6">
-    <h1>Nuova famiglia</h1>
+    <h1>Nuovo nucleo familiare</h1>
     <p class="text-secondary">
-      Cera una nuova famiglia selezionandone i componenti
+      Le persone vengono create tutte insieme e collegate fra loro: ogni gestore
+      potra' gestire ogni persona gestita
     </p>
   </header>
 
-  <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
-    <div class="flex justify-between mb-2">
-      <h2>Componenti</h2>
-    </div>
-
-    <div class="flex flex-wrap -mx-2">
-      <div class="mb-2 sm:w-1/2 w-full px-2">
-        <label class="block required"
-          >Numero di genitori ({{ parents().length }})</label
-        >
-        <input
-          type="range"
-          class="w-full px-0"
-          min="1"
-          max="2"
-          step="1"
-          [ngModel]="parents().length"
-          (ngModelChange)="changeParentsLength($event)"
+  <form [formGroup]="familyForm">
+    <!-- Gestori -->
+    <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
+      <div class="flex justify-between mb-2">
+        <h2>Gestori</h2>
+        <fa-icon
+          class="text-md button-secondary"
+          [icon]="faPlus"
+          (click)="addManager()"
         />
       </div>
-      <div class="mb-2 sm:w-1/2 w-full px-2">
-        <label class="block required"
-          >Numero di figli ({{ childs().length }})</label
-        >
-        <input
-          type="range"
-          class="w-full px-0"
-          min="1"
-          max="10"
-          step="1"
-          [ngModel]="childs().length"
-          (ngModelChange)="changeChildsLength($event)"
+      <p class="text-secondary mb-4">
+        Tipicamente i genitori. Possono essere nessuno, se la persona gestita e'
+        maggiorenne e si iscrive da sola.
+      </p>
+
+      <div formArrayName="managers">
+        @for (gestore of managers.controls; track $index) {
+        <div class="border-t pt-4 mb-4" [formGroupName]="$index">
+          <div class="flex justify-between mb-2">
+            <h3>Gestore {{ $index + 1 }}</h3>
+            <fa-icon
+              class="text-md button-secondary"
+              [icon]="faTrash"
+              (click)="removeManager($index)"
+            />
+          </div>
+
+          <div class="flex flex-wrap -mx-2">
+            <div class="mb-4 sm:w-1/2 w-full px-2">
+              <label class="block">Codice fiscale</label>
+              <input
+                type="text"
+                class="w-full uppercase"
+                maxlength="16"
+                formControlName="cf"
+              />
+            </div>
+            <div class="mb-4 sm:w-1/2 w-full px-2">
+              <label class="block">Password</label>
+              <input type="password" class="w-full" formControlName="password" />
+            </div>
+            <div class="mb-4 sm:w-1/2 w-full px-2">
+              <label class="block">Nome</label>
+              <input type="text" class="w-full" formControlName="name" />
+            </div>
+            <div class="mb-4 sm:w-1/2 w-full px-2">
+              <label class="block">Cognome</label>
+              <input type="text" class="w-full" formControlName="surname" />
+            </div>
+            <div class="mb-4 sm:w-1/2 w-full px-2">
+              <label class="block">Sesso</label>
+              <select class="w-full" formControlName="gender">
+                <option value="M">Maschio</option>
+                <option value="F">Femmina</option>
+              </select>
+            </div>
+            <div class="mb-4 sm:w-1/2 w-full px-2">
+              <label class="block">Ruolo</label>
+              <select class="w-full" formControlName="roleId">
+                @for (role of managerRoles(); track role.id) {
+                <option [value]="role.id">{{ role.displayName }}</option>
+                }
+              </select>
+            </div>
+            <div class="mb-4 sm:w-1/2 w-full px-2">
+              <label class="block">Email</label>
+              <input type="email" class="w-full" formControlName="email" />
+            </div>
+            <div class="mb-4 sm:w-1/2 w-full px-2">
+              <label class="block">Telefono</label>
+              <input type="tel" class="w-full" formControlName="phone" />
+            </div>
+          </div>
+        </div>
+        } @if (managers.length == 0) {
+        <span class="text-secondary">Nessun gestore</span>
+        }
+      </div>
+    </div>
+
+    <!-- Gestiti -->
+    <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
+      <div class="flex justify-between mb-2">
+        <h2>Persone gestite</h2>
+        <fa-icon
+          class="text-md button-secondary"
+          [icon]="faPlus"
+          (click)="addManaged()"
         />
       </div>
-    </div>
-  </div>
+      <p class="text-secondary mb-4">
+        Tipicamente i ragazzi. Ne serve almeno uno.
+      </p>
 
-  <div class="w-full bg-auto p-4 rounded-lg shadow-lg mb-6">
-    @for (p of parents(); track idx; let idx = $index) {
-    <app-parent (parentChange)="onParentChange($event, idx)"
-      [editable]="true"
-      (isValid)="onIsParentValidChange($event, idx)"
-     />
-    <div class="my-8"></div>
-    } @for (c of childs(); track idx; let idx = $index) {
-    <app-child (childChange)="onChildChange($event, idx)"
-      [editable]="true"
-      (isValid)="onIsChildValidChange($event, idx)"
-     />
-    <div
-      [class]="{ 'my-6': idx == childs().length, 'my-8': idx != childs().length }"
-    ></div>
-    }
+      <div formArrayName="managed">
+        @for (gestito of managed.controls; track $index) {
+        <div class="border-t pt-4 mb-4" [formGroupName]="$index">
+          <div class="flex justify-between mb-2">
+            <h3>Persona {{ $index + 1 }}</h3>
+            @if (managed.length > 1) {
+            <fa-icon
+              class="text-md button-secondary"
+              [icon]="faTrash"
+              (click)="removeManaged($index)"
+            />
+            }
+          </div>
 
-    <div class="flex justify-end">
-      <button
-        class="button-primary"
-        [disabled]="!isFieldsValid()"
-        (click)="onCreateFamily()"
-      >
-        Crea
-      </button>
-    </div>
-
-    @if (error(); as error) {
-    <div class="flex justify-center items-center">
-      <div
-        class="bg-neon-error p-3 rounded-lg shadow-lg w-full max-w-md text-center"
-      >
-        {{ error }}
+          <div class="flex flex-wrap -mx-2">
+            <div class="mb-4 sm:w-1/2 w-full px-2">
+              <label class="block">Codice fiscale</label>
+              <input
+                type="text"
+                class="w-full uppercase"
+                maxlength="16"
+                formControlName="cf"
+              />
+            </div>
+            <div class="mb-4 sm:w-1/2 w-full px-2">
+              <label class="block">Password</label>
+              <input type="password" class="w-full" formControlName="password" />
+            </div>
+            <div class="mb-4 sm:w-1/2 w-full px-2">
+              <label class="block">Nome</label>
+              <input type="text" class="w-full" formControlName="name" />
+            </div>
+            <div class="mb-4 sm:w-1/2 w-full px-2">
+              <label class="block">Cognome</label>
+              <input type="text" class="w-full" formControlName="surname" />
+            </div>
+            <div class="mb-4 sm:w-1/2 w-full px-2">
+              <label class="block">Sesso</label>
+              <select class="w-full" formControlName="gender">
+                <option value="M">Maschio</option>
+                <option value="F">Femmina</option>
+              </select>
+            </div>
+            <div class="mb-4 sm:w-1/2 w-full px-2">
+              <label class="block">Ruolo</label>
+              <select class="w-full" formControlName="roleId">
+                @for (role of roles(); track role.id) {
+                <option [value]="role.id">{{ role.displayName }}</option>
+                }
+              </select>
+            </div>
+            <div class="mb-4 sm:w-1/2 w-full px-2">
+              <label class="block">Data di nascita</label>
+              <input type="date" class="w-full" formControlName="birthDate" />
+            </div>
+            <div class="mb-4 sm:w-1/2 w-full px-2">
+              <label class="block">Luogo di nascita</label>
+              <input type="text" class="w-full" formControlName="birthPlace" />
+            </div>
+          </div>
+        </div>
+        }
       </div>
     </div>
-    }
+  </form>
+
+  <div class="flex justify-end mb-6">
+    <button
+      class="px-4 py-2 button-primary"
+      [disabled]="saving() || familyForm.invalid"
+      (click)="createFamily()"
+    >
+      Crea nucleo familiare
+    </button>
   </div>
+
+  @if (error(); as messaggio) {
+  <div class="bg-neon-error p-3 rounded-lg shadow-lg mb-6 text-center">
+    {{ messaggio }}
+  </div>
+  }
 </div>
 <app-footer />

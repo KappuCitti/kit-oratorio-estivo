@@ -2,30 +2,156 @@
 <div class="container">
   <header class="mb-6">
     <h1>Modifica persona</h1>
-    <p class="text-secondary">Modifica la persona visualizzata</p>
+    @if (person(); as persona) {
+    <p class="text-secondary">
+      {{ persona.name }} {{ persona.surname }} - {{ persona.id }}
+    </p>
+    }
   </header>
 
-  <!-- Tabella iscrizioni -->
+  @if (loading()) {
+  <div class="flex justify-center items-center h-20">
+    <span class="text-secondary">Caricamento...</span>
+  </div>
+  } @else {
+
+  <!-- Dati anagrafici -->
   <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
-    @if (!loading()) { @if (person(); as person) {
-       @if (type == 'parent' && isParent(person)) {
-        <app-parent [parent]="person" [editable]="true" [save]="save" (parentChange)="onPersonEdited($event)" />
+    <div class="flex justify-between mb-4">
+      <h2>Dati anagrafici</h2>
+      <fa-icon
+        class="text-md button-secondary"
+        [icon]="faFloppyDisk"
+        (click)="save()"
+      />
+    </div>
 
-        @for (child of person.childrens; track child.id) {
-          <div class="my-8"></div>
-          <app-child [child]="child" [editable]="false" />
-      }
-       } @else if (type == 'child' && isChild(person)) {
-        <app-child [child]="person" [editable]="true" [save]="save" (childChange)="onPersonEdited($event)" />
+    <form [formGroup]="personForm">
+      <div class="flex flex-wrap -mx-2">
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block">Nome</label>
+          <input type="text" class="w-full" formControlName="name" />
+        </div>
 
-        @for (parent of person.parents; track parent.id) {
-            <div class="my-8"></div>
-            <app-parent [parent]="parent" [editable]="false" />
-        }
-       }
-    } }
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block">Cognome</label>
+          <input type="text" class="w-full" formControlName="surname" />
+        </div>
+
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block">Sesso</label>
+          <select class="w-full" formControlName="gender">
+            <option value="">Non indicato</option>
+            <option value="M">Maschio</option>
+            <option value="F">Femmina</option>
+          </select>
+        </div>
+
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block">Ruolo</label>
+          <select class="w-full" formControlName="roleId">
+            @for (role of roles(); track role.id) {
+            <option [value]="role.id">{{ role.displayName }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block">Data di nascita</label>
+          <input type="date" class="w-full" formControlName="birthDate" />
+        </div>
+
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block">Luogo di nascita</label>
+          <input type="text" class="w-full" formControlName="birthPlace" />
+        </div>
+
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block">Email</label>
+          <input type="email" class="w-full" formControlName="email" />
+        </div>
+
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block">Telefono</label>
+          <input type="tel" class="w-full" formControlName="phone" />
+        </div>
+      </div>
+    </form>
+
+    <div class="flex justify-end">
+      <button
+        class="px-4 py-2 button-primary"
+        [disabled]="saving() || personForm.invalid"
+        (click)="save()"
+      >
+        Salva
+      </button>
+    </div>
   </div>
 
-</div>
+  <!-- Legami familiari -->
+  @if (person(); as persona) {
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
+    <h2 class="mb-2">Legami</h2>
+    <p class="text-secondary mb-4">
+      Chi puo' gestire questa persona e chi viene gestito da lei. I legami si
+      creano insieme al nucleo familiare e da qui non si modificano.
+    </p>
 
+    <div class="flex flex-wrap -mx-2">
+      <div class="sm:w-1/2 w-full px-2 mb-4">
+        <h3 class="mb-2">Gestita da</h3>
+        @if (persona.managers.length == 0) {
+        <span class="text-secondary">Nessuno</span>
+        } @else {
+        <ul>
+          @for (manager of persona.managers; track manager.id) {
+          <li>
+            <a
+              class="hover:underline underline-offset-2"
+              [routerLink]="['/admin/people', manager.id]"
+            >
+              {{ manager.name }} {{ manager.surname }}
+              <span class="text-secondary">({{ manager.role.displayName }})</span>
+            </a>
+          </li>
+          }
+        </ul>
+        }
+      </div>
+
+      <div class="sm:w-1/2 w-full px-2 mb-4">
+        <h3 class="mb-2">Gestisce</h3>
+        @if (persona.managed.length == 0) {
+        <span class="text-secondary">Nessuno</span>
+        } @else {
+        <ul>
+          @for (managed of persona.managed; track managed.id) {
+          <li>
+            <a
+              class="hover:underline underline-offset-2"
+              [routerLink]="['/admin/people', managed.id]"
+            >
+              {{ managed.name }} {{ managed.surname }}
+              <span class="text-secondary">({{ managed.role.displayName }})</span>
+            </a>
+          </li>
+          }
+        </ul>
+        }
+      </div>
+    </div>
+  </div>
+  } }
+
+  @if (saved()) {
+  <div class="bg-neon-success p-3 rounded-lg shadow-lg mb-6 text-center">
+    Modifiche salvate
+  </div>
+  } @if (error(); as messaggio) {
+  <div class="bg-neon-error p-3 rounded-lg shadow-lg mb-6 text-center">
+    {{ messaggio }}
+  </div>
+  }
+</div>
 <app-footer />

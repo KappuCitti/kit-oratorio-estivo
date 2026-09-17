@@ -9,52 +9,47 @@
   <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
     <div class="flex justify-between mb-2">
       <h2>Filtro</h2>
-      <fa-icon class="text-md button-secondary"
+      <fa-icon
+        class="text-md button-secondary"
         [icon]="faArrowRotateLeft"
         (click)="onResetSearch()"
-       />
+      />
     </div>
 
     <form [formGroup]="searchForm">
       <div class="flex flex-wrap -mx-2">
-        <div class="mb-4 w-full px-2">
-          <label class="block">Nome o cognome</label>
+        <div class="mb-4 sm:w-2/3 w-full px-2">
+          <label class="block">Nome, cognome o codice fiscale</label>
           <input type="text" class="w-full" formControlName="query" />
         </div>
 
-        <div class="mb-2 sm:w-1/2 w-full px-2">
+        <!--
+          Il filtro per ruolo non c'e': il server lo accetta come `roleId`, ma
+          non esiste un endpoint che elenchi i ruoli, quindi non si potrebbe
+          riempire la tendina senza inventarsi gli identificativi. Il ruolo
+          resta comunque visibile in tabella.
+        -->
+        <div class="mb-2 sm:w-1/3 w-full px-2">
           <label class="block">Sesso</label>
           <select class="w-full" formControlName="gender">
-            <option value="">
-              <span class="text-secondary"></span>
-            </option>
+            <option value="">Tutti</option>
             <option value="M">Maschio</option>
             <option value="F">Femmina</option>
-          </select>
-        </div>
-
-        <div class="mb-2 sm:w-1/2 w-full px-2">
-          <label class="block">Ruolo</label>
-          <select class="w-full" formControlName="type">
-            <option value="">
-              <span class="text-secondary"></span>
-            </option>
-            <option value="Parent">Genitore</option>
-            <option value="Child">Ragazzo</option>
           </select>
         </div>
       </div>
     </form>
   </div>
 
-  <!-- Tabella iscrizioni -->
+  <!-- Tabella persone -->
   <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
     <div class="flex justify-between mb-4">
       <h2>Risultati</h2>
-      <fa-icon class="text-md button-secondary"
+      <fa-icon
+        class="text-md button-secondary"
         [icon]="faPlus"
         [routerLink]="['/admin/people/new']"
-       />
+      />
     </div>
 
     <table class="w-full text-left">
@@ -68,7 +63,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (person of people(); track person.id + '' + person.surname) {
+        @for (person of people(); track person.id) {
         <tr>
           <td>{{ person.surname }}</td>
           <td>{{ person.name }}</td>
@@ -82,25 +77,14 @@
           >
             {{ person.gender == "F" ? "Femmina" : "Maschio" }}
           </td>
-          <td
-            class="text-center cursor-pointer hover:underline underline-offset-2"
-            (click)="
-              searchForm.controls['type'].setValue(
-                person.type ?? searchForm.get('type')?.value
-              )
-            "
-          >
+          <td class="text-center">
             <fa-icon [icon]="getPersonIcon(person)" />
             {{ getPersonType(person) }}
           </td>
           <td class="space-x-0 sm:space-x-3 space-y-1 text-center text-sm">
             <button
               class="button-primary"
-              [routerLink]="[
-                '/admin/people',
-                getRawPersonType(person).toLocaleLowerCase(),
-                person.id
-              ]"
+              [routerLink]="['/admin/people', person.id]"
             >
               <fa-icon [icon]="faPen" />
             </button>
@@ -119,10 +103,11 @@
     </div>
     }
 
-    <app-pagination [totalItems]="elements()"
+    <app-pagination
+      [totalItems]="elements()"
       (pageChange)="onPageChange($event)"
       (itemsPerPageChange)="onSizeChange($event)"
-     />
+    />
   </div>
 </div>
 
@@ -135,7 +120,7 @@
     <div class="bg-auto p-4 rounded-lg shadow-lg max-w-md w-full">
       <h2 class="text-xl font-semibold mb-2">Conferma eliminazione</h2>
       <p class="mb-4">
-        Sei sicuro di voler eliminare il/la {{ getPersonType(peopleToDelete) }}
+        Sei sicuro di voler eliminare
         <b>{{ peopleToDelete.name }} {{ peopleToDelete.surname }}</b
         >?
       </p>

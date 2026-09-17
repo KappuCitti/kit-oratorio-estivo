@@ -1,6 +1,11 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { FooterComponent } from '../../../components/footer/footer.component';
-import { NavbarComponent } from '../../../components/navbar/navbar.component';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import {
   FaIconComponent,
   IconDefinition,
@@ -15,20 +20,21 @@ import {
   faPlus,
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
+import { PersonListItem } from '../../../../models/Person.model';
+import { PeopleGetRequest } from '../../../../models/Request.model';
 import { ApiService } from '../../../../services/api.service';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { UtilsService } from '../../../../services/utils.service';
+import { FooterComponent } from '../../../components/footer/footer.component';
+import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { PaginationComponent } from '../../../components/pagination/pagination.component';
 
-import { PeopleSearch } from '../../../../models/Family.model';
-import { PeopleGetRequest } from '../../../../models/Request.model';
-import { UtilsService } from '../../../../services/utils.service';
-
+/**
+ * La rubrica: cerca, apre e cancella le persone registrate.
+ *
+ * Usa GET /admin/people, che accetta ricerca, filtro per sesso e per ruolo, e
+ * paginazione. Prima chiamava /people, /childs e /parents, che sul server non
+ * sono mai esistiti: la pagina si apriva sempre vuota.
+ */
 @Component({
   selector: 'app-people-search',
   imports: [
@@ -37,8 +43,8 @@ import { UtilsService } from '../../../../services/utils.service';
     FaIconComponent,
     ReactiveFormsModule,
     RouterLink,
-    PaginationComponent
-],
+    PaginationComponent,
+  ],
   templateUrl: './people-search.component.html',
 })
 export class PeopleSearchComponent implements OnInit {
@@ -48,9 +54,9 @@ export class PeopleSearchComponent implements OnInit {
 
   searchForm: FormGroup;
 
-  readonly people = signal<PeopleSearch[]>([]);
+  readonly people = signal<PersonListItem[]>([]);
 
-  readonly peopleToDelete = signal<PeopleSearch | null>(null);
+  readonly peopleToDelete = signal<PersonListItem | null>(null);
   readonly isDeleteModalOpen = signal(false);
   readonly errorDelete = signal<string | null>(null);
 
@@ -71,13 +77,10 @@ export class PeopleSearchComponent implements OnInit {
     this.searchForm = this.fb.group({
       query: ['', [Validators.minLength(2), Validators.maxLength(100)]],
       gender: [''],
-      type: [''],
     });
 
     this.searchForm.valueChanges.subscribe(() => {
-      if (this.searchForm.valid) {
-        this.loadPeople();
-      }
+      if (this.searchForm.valid) this.loadPeople();
     });
   }
 
@@ -86,87 +89,48 @@ export class PeopleSearchComponent implements OnInit {
   }
 
   onResetSearch() {
-    this.searchForm.reset();
+    this.searchForm.reset({ query: '', gender: '' });
   }
 
   loadPeople() {
-    let params: PeopleGetRequest = {
+    const params: PeopleGetRequest = {
       page: this.page,
       size: this.size,
     };
 
-    if (this.searchForm.get('query')?.value) {
-      params.query = this.searchForm.get('query')?.value;
-    }
+    const query = this.searchForm.get('query')?.value;
+    if (query) params.query = query;
 
-    if (this.searchForm.get('gender')?.value) {
-      params.gender = this.searchForm.get('gender')?.value;
-    }
+    // Il server accetta solo 'M' o 'F': il valore vuoto della select significa
+    // "nessun filtro" e non va inviato.
+    const gender = this.searchForm.get('gender')?.value;
+    if (gender === 'M' || gender === 'F') params.gender = gender;
 
-    switch (this.searchForm.get('type')?.value) {
-      case 'Child':
-        this.api.getChilds(params).subscribe((response) => {
-          if (response.status == 200 && response.body?.success) {
-            this.people.set(response.body.data.elements as PeopleSearch[]);
-            this.elements.set(response.body.data.count);
-          }
-        });
-        break;
-      case 'Parent':
-        this.api.getParents(params).subscribe((response) => {
-          if (response.status == 200 && response.body?.success) {
-            this.people.set(response.body.data.elements as PeopleSearch[]);
-            this.elements.set(response.body.data.count);
-          }
-        });
-        break;
-      default:
-        this.api.getPeople(params).subscribe((response) => {
-          if (response.status == 200 && response.body?.success) {
-            this.people.set(response.body.data.elements as PeopleSearch[]);
-            this.elements.set(response.body.data.count);
-          }
-        });
-    }
+    this.api.getPeople(params).subscribe({
+      next: (response) => {
+        if (response.body?.success) {
+          this.people.set(response.body.data.elements);
+          this.elements.set(response.body.data.count);
+        }
+      },
+      error: (error) => console.error(error),
+    });
   }
 
-  getPersonType(person: PeopleSearch): string {
-    const type: string = this.searchForm.get('type')?.value;
-
-    if (person.type == 'Parent' || type == 'Parent') {
-      return 'Genitore';
-    } else if (person.type == 'Child' || type == 'Child') {
-      return person.gender == 'M' ? 'Ragazzo' : 'Ragazza';
-    }
-    return 'Persona';
+  /** Il ruolo mostrato e' quello che dice il server, non piu' dedotto. */
+  getPersonType(person: PersonListItem): string {
+    return person.role.displayName;
   }
 
-  getRawPersonType(person: PeopleSearch): string {
-    const type: string = this.searchForm.get('type')?.value;
-
-    if (person.type == 'Parent' || type == 'Parent') {
-      return 'Parent';
-    } else if (person.type == 'Child' || type == 'Child') {
-      return 'Child';
-    }
-    return type;
+  getPersonIcon(person: PersonListItem): IconDefinition {
+    const isChild = person.role.name === 'child';
+    if (isChild) return person.gender === 'M' ? faChild : faChildDress;
+    return person.gender === 'M' ? faPerson : faPersonDress;
   }
 
-  getPersonIcon(person: PeopleSearch): IconDefinition {
-    const type: string = this.searchForm.get('type')?.value;
-
-    if (person.type == 'Parent' || type == 'Parent') {
-      return person.gender == 'M' ? faPerson : faPersonDress;
-    } else if (person.type == 'Child' || type == 'Child') {
-      return person.gender == 'M' ? faChild : faChildDress;
-    }
-    return faPerson;
-  }
-
-  openDeleteModal(p: PeopleSearch) {
+  openDeleteModal(p: PersonListItem) {
     this.peopleToDelete.set(p);
     this.isDeleteModalOpen.set(true);
-
     this.errorDelete.set(null);
   }
 
@@ -176,46 +140,28 @@ export class PeopleSearchComponent implements OnInit {
   }
 
   deletePerson() {
-    const type = this.searchForm.get('type')?.value;
+    const persona = this.peopleToDelete();
+    if (!persona) return;
 
-    const peopleToDelete = this.peopleToDelete();
-
-    if (!peopleToDelete) return;
-    if (peopleToDelete.type == 'Parent' || type == 'Parent') {
-      this.api.deleteParent(peopleToDelete.id).subscribe({
-        next: (response) => {
-          if (response.status == 200) {
-            this.loadPeople();
-            this.closeDeleteModal();
-          }
-        },
-        error: (error) => {
-          console.error(error);
-          this.errorDelete.set(this.utils.handleResponse(error, null));
-        },
-      });
-    } else if (peopleToDelete.type == 'Child' || type == 'Child') {
-      this.api.deleteChild(peopleToDelete.id).subscribe({
-        next: (response) => {
-          if (response.status == 200) {
-            this.loadPeople();
-            this.closeDeleteModal();
-          }
-        },
-        error: (error) => {
-          console.error(error);
-          this.errorDelete.set(this.utils.handleResponse(error, null));
-        },
-      });
-    } else {
-      this.errorDelete.set('Ruolo non trovato');
-    }
+    this.api.deletePerson(persona.id).subscribe({
+      next: () => {
+        this.loadPeople();
+        this.closeDeleteModal();
+      },
+      error: (error) => {
+        console.error(error);
+        // Il server rifiuta con 409 chi e' l'unico a gestire un minore: il
+        // messaggio va mostrato, altrimenti la modale resta li' senza spiegare.
+        this.errorDelete.set(this.utils.handleResponse(error, null));
+      },
+    });
   }
 
   onPageChange(page: number) {
     this.page = page;
     this.loadPeople();
   }
+
   onSizeChange(size: number) {
     this.size = size;
     this.loadPeople();
