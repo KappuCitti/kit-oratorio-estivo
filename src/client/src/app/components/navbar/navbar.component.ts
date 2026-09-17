@@ -112,11 +112,16 @@ export class NavbarComponent {
         title: 'Impostazioni',
         permission: 'manage_classes',
       },
+      // La stessa voce serve due pagine diverse: la rubrica di tutte le
+      // persone per i responsabili, il proprio nucleo familiare per i
+      // genitori. Cambia quindi anche il permesso richiesto, perche' un
+      // genitore non ha `see_users` e un responsabile non ha necessariamente
+      // `manage_self_child_users`.
       {
         url: `${base}/people`,
         icon: this.faUsers,
-        title: 'Famiglia',
-        permission: 'manage_self_child_users',
+        title: admin ? 'Rubrica' : 'Famiglia',
+        permission: admin ? 'see_users' : 'manage_self_child_users',
       },
 
       // Funzioni dichiarate nel README ma non ancora realizzate: nessuna di

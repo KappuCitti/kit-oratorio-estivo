@@ -95,16 +95,34 @@ const commonRoutes: Routes = [
       ),
     canActivate: [AuthGuard, permissionGuard('see_users')],
   },
-  // La rubrica di amministrazione (admin/people, admin/people/new e
-  // admin/people/:type/:id) non e' registrata qui di proposito: le sue pagine
-  // chiamano /people, /childs, /parents e POST /family, che sul server non
-  // esistono e non sono mai esistiti. Non c'e' nemmeno un endpoint che possa
-  // sostituirli: GET /users restituisce solo gli utenti gestiti da chi e'
-  // collegato, senza ricerca ne' paginazione.
-  //
-  // I componenti restano nel repository, cosi' il lavoro fatto non si perde,
-  // ma finche' il server non offre un elenco di persone con ricerca queste
-  // rotte porterebbero solo a pagine vuote e a errori di rete.
+  // La rubrica di amministrazione. `admin/people/new` va dichiarata PRIMA di
+  // `admin/people/:id`, altrimenti "new" verrebbe letto come identificativo di
+  // una persona.
+  {
+    path: 'admin/people',
+    loadComponent: () =>
+      import('./pages/admin/people-search/people-search.component').then(
+        (m) => m.PeopleSearchComponent
+      ),
+    canActivate: [AuthGuard, permissionGuard('see_users')],
+  },
+  {
+    path: 'admin/people/new',
+    loadComponent: () =>
+      import('./pages/admin/people-create/people-create.component').then(
+        (m) => m.PeopleCreateComponent
+      ),
+    canActivate: [AuthGuard, permissionGuard('manage_users')],
+  },
+  {
+    // L'identificativo e' il codice fiscale, non un numero.
+    path: 'admin/people/:id',
+    loadComponent: () =>
+      import('./pages/admin/people-edit/people-edit.component').then(
+        (m) => m.PeopleEditComponent
+      ),
+    canActivate: [AuthGuard, permissionGuard('manage_users')],
+  },
   {
     path: 'admin/enrollments',
     loadComponent: () =>
@@ -114,6 +132,8 @@ const commonRoutes: Routes = [
     canActivate: [AuthGuard, permissionGuard('see_users')],
   },
   {
+    // Va prima di `admin/enrollments/:id`, altrimenti "new" verrebbe letto
+    // come identificativo di un'iscrizione.
     path: 'admin/enrollments/new',
     loadComponent: () =>
       import(

@@ -1,7 +1,12 @@
-import { Component, OnChanges, computed, inject, input, model, output, signal } from '@angular/core';
-import Enrollment, {
-  EnrollmentWeekSearch,
-} from '../../../models/Enrollment.model';
+import {
+  Component,
+  OnChanges,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import {
   FormBuilder,
@@ -11,11 +16,38 @@ import {
 } from '@angular/forms';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
+import { zip } from 'rxjs';
+import Enrollment, {
+  EnrollmentWeekSearch,
+} from '../../../models/Enrollment.model';
+import { School, SchoolClass } from '../../../models/School.model';
+import { Shirt } from '../../../models/Shirt.model';
 import Team from '../../../models/Team.model';
 import Week from '../../../models/Week.model';
-import { Shirt } from '../../../models/Shirt.model';
 import { ApiService } from '../../../services/api.service';
-import { zip } from 'rxjs';
+import { SessionService } from '../../../services/session.service';
+
+/**
+ * I valori raccolti dal form, nella forma in cui servono a chi lo usa.
+ *
+ * Prima il componente emetteva un oggetto `Enrollment` intero, costruito
+ * mescolando i valori del form con l'iscrizione ricevuta: in creazione quella
+ * iscrizione non c'e', quindi emetteva un oggetto incompleto spacciato per
+ * completo, e ogni pagina lo riconvertiva a modo suo. Emettere i valori del
+ * form dice la verita' su cosa il componente sa davvero.
+ */
+export interface EnrollmentFormValue {
+  schoolId: number | null;
+  classId: number | null;
+  section: string;
+  dataProcessingConsent: boolean;
+  exitAuthorization: boolean;
+  team: number | null;
+  shirt: number | null;
+  weeks: EnrollmentWeekSearch[];
+  parentNotes: string | null;
+  managerNotes: string | null;
+}
 
 @Component({
   selector: 'app-enrollment',
@@ -25,8 +57,24 @@ import { zip } from 'rxjs';
 export class EnrollmentComponent implements OnChanges {
   private fb = inject(FormBuilder);
   private api = inject(ApiService);
+  private session = inject(SessionService);
 
-  readonly enrollment = model<Enrollment | null>(null);
+  /**
+   * Chi puo' decidere se il ragazzo esce da solo.
+   *
+   * Il server rifiuta con 403 chi invia `exitAuthorization` senza il permesso
+   * `give_exit_authorization` - e lo rifiuta anche quando lo invia a `false`,
+   * perche' la sola presenza del campo e' una decisione. I genitori non hanno
+   * quel permesso: e' una scelta che spetta ai responsabili. La casella quindi
+   * non si mostra a chi non potrebbe usarla, com'e' per il resto dell'interfaccia.
+   */
+  readonly canGiveExitAuthorization = computed(() =>
+    this.session.has('give_exit_authorization')
+  );
+
+  /** L'iscrizione da mostrare, quando se ne sta modificando una esistente. */
+  readonly enrollment = input<Enrollment | null>(null);
+  readonly enrollmentChange = output<EnrollmentFormValue>();
   readonly isValid = output<boolean>();
 
   readonly editable = input<boolean>(false);
@@ -37,13 +85,9 @@ export class EnrollmentComponent implements OnChanges {
 
   readonly year = input<number>(new Date().getFullYear());
 
-  // L'anno di riferimento e' quello dell'iscrizione quando ce n'e' una (nelle
-  // pagine di modifica), altrimenti quello passato dal padre (nelle pagine di
-  // creazione, dove `enrollment` non e' bindato). Prima era l'input `year`
-  // riscritto dentro loadEnrollment: siccome loadEnrollment gira dentro la
-  // subscribe di getWeeks, la prima chiamata `getWeeks(this.year)` usava
-  // ancora l'anno del padre e caricava le settimane sbagliate. Come
-  // `computed` il valore e' corretto fin dalla prima lettura.
+  // L'anno di riferimento e' quello dell'iscrizione quando ce n'e' una,
+  // altrimenti quello passato dal padre. Come computed e' corretto fin dalla
+  // prima lettura, anche prima che loadEnrollment abbia girato.
   protected readonly effectiveYear = computed(
     () => this.enrollment()?.year || this.year()
   );
@@ -51,19 +95,30 @@ export class EnrollmentComponent implements OnChanges {
   readonly teams = signal<Team[]>([]);
   readonly weeks = signal<Week[]>([]);
   readonly shirts = signal<Shirt[]>([]);
+  readonly schools = signal<School[]>([]);
+
+  /** La scuola scelta nel form, per filtrare le classi. */
+  private readonly selectedSchoolId = signal<number | null>(null);
+
+  /**
+   * Le classi della scuola scelta.
+   *
+   * Prima scuola e classe erano due elenchi fissi nel template
+   * (Primary/Secondary e I..V): erano i valori dello schema v1. In v2 le scuole
+   * e le classi stanno sul database, e l'iscrizione punta a una classe.
+   */
+  readonly classes = computed<SchoolClass[]>(() => {
+    const schoolId = this.selectedSchoolId();
+    if (!schoolId) return [];
+    return this.schools().find((s) => s.id == schoolId)?.classes ?? [];
+  });
 
   faFloppyDisk = faFloppyDisk;
 
   constructor() {
     this.enrollmentForm = this.fb.group({
-      schoolType: [
-        '',
-        [Validators.required, Validators.pattern(/^(Secondary|Primary)$/)],
-      ],
-      className: [
-        '',
-        [Validators.required, Validators.pattern(/^(I|II|III|IV|V)$/)],
-      ],
+      schoolId: [null, [Validators.required]],
+      classId: [null, [Validators.required]],
       section: [
         '',
         [
@@ -72,26 +127,40 @@ export class EnrollmentComponent implements OnChanges {
           Validators.maxLength(1),
         ],
       ],
-      dataProcessingConsent: [
-        true,
-        [Validators.required, Validators.pattern(/^(true|false)$/)],
-      ],
-      exitAuthorization: [
-        true,
-        [Validators.required, Validators.pattern(/^(true|false)$/)],
-      ],
-      team: ['', []],
-      shirt: ['', []],
+      dataProcessingConsent: [true, [Validators.required]],
+      exitAuthorization: [true, [Validators.required]],
+      team: [null, []],
+      shirt: [null, []],
       parentNotes: ['', [Validators.maxLength(255)]],
       managerNotes: ['', [Validators.maxLength(255)]],
     });
 
-    this.enrollmentForm.valueChanges.subscribe(() => {
-      if (this.enrollmentForm.valid) {
-        this.updateEnrollment();
+    this.enrollmentForm.valueChanges.subscribe((value) => {
+      // Cambiando scuola la classe scelta prima non ha piu' senso.
+      const schoolId = value.schoolId ? Number(value.schoolId) : null;
+      if (schoolId !== this.selectedSchoolId()) {
+        this.selectedSchoolId.set(schoolId);
+        this.enrollmentForm.patchValue({ classId: null }, { emitEvent: false });
       }
-      this.isValid.emit(this.enrollmentForm.valid);
+
+      if (this.enrollmentForm.valid) this.emitValue();
+      this.emitValidity();
     });
+  }
+
+  /**
+   * Un'iscrizione non e' valida senza almeno una settimana.
+   *
+   * Le settimane non sono un controllo del form (stanno in un signal a parte),
+   * quindi `enrollmentForm.valid` le ignora: prima si poteva arrivare a
+   * confermare senza averne scelta nessuna, e il server rispondeva 422 con un
+   * messaggio generico. Il server pretende `weeks` con almeno un elemento sia
+   * per la coda sia per l'iscrizione da sportello.
+   */
+  private emitValidity() {
+    this.isValid.emit(
+      this.enrollmentForm.valid && this.selectedWeeks().length > 0
+    );
   }
 
   get getTitle(): string {
@@ -107,7 +176,8 @@ export class EnrollmentComponent implements OnChanges {
       this.api.getWeeks(this.effectiveYear()),
       this.api.getTeams(),
       this.api.getShirts(),
-    ]).subscribe(([weeks, teams, shirts]) => {
+      this.api.getSchools(),
+    ]).subscribe(([weeks, teams, shirts, schools]) => {
       if (weeks.status === 200 && weeks.body?.success) {
         this.weeks.set(weeks.body.data);
       }
@@ -116,6 +186,9 @@ export class EnrollmentComponent implements OnChanges {
       }
       if (shirts.status === 200 && shirts.body?.success) {
         this.shirts.set(shirts.body.data);
+      }
+      if (schools.status === 200 && schools.body?.success) {
+        this.schools.set(schools.body.data);
       }
 
       if (this.enrollment() != null) {
@@ -129,102 +202,73 @@ export class EnrollmentComponent implements OnChanges {
       this.enrollmentForm.disable();
     }
 
-    this.isValid.emit(this.enrollmentForm.valid);
+    this.emitValidity();
   }
 
   loadEnrollment() {
     const enrollment = this.enrollment();
+    if (!enrollment) return;
 
-    if (enrollment) {
-      this.selectedWeeks.set(
-        enrollment.weeks.map((week) => {
-          return { weekId: week.id, isPaid: week.isPaid };
-        }) || []
-      );
+    this.selectedWeeks.set(
+      enrollment.weeks.map((week) => ({
+        weekId: week.weekId,
+        isPaid: week.isPaid,
+      }))
+    );
 
-      this.enrollmentForm.patchValue({
-        schoolType: enrollment.schoolType,
-        className: enrollment.className,
-        section: enrollment.section,
-        dataProcessingConsent: enrollment.dataProcessingConsent,
-        exitAuthorization: enrollment.exitAuthorization,
-        team: enrollment.team?.id || '',
-        shirt: enrollment.shirt?.id || '',
-        parentNotes: enrollment.parentNotes,
-        managerNotes: enrollment.managerNotes,
-      });
-    }
-  }
+    this.selectedSchoolId.set(enrollment.school.id);
 
-  updateEnrollment() {
-    console.table({
-      dataProcessingConsent: this.enrollmentForm.value.dataProcessingConsent,
-      typeOfDataProcessingConsent:
-        typeof this.enrollmentForm.value.dataProcessingConsent,
-      exitAuthorization: this.enrollmentForm.value.exitAuthorization,
-      typeOfExitAuthorization:
-        typeof this.enrollmentForm.value.exitAuthorization,
+    this.enrollmentForm.patchValue({
+      schoolId: enrollment.school.id,
+      classId: enrollment.class.id,
+      section: enrollment.section,
+      dataProcessingConsent: enrollment.dataProcessingConsent,
+      exitAuthorization: enrollment.exitAuthorization,
+      team: enrollment.team?.id ?? null,
+      shirt: enrollment.shirt?.id ?? null,
+      parentNotes: enrollment.parentNotes,
+      managerNotes: enrollment.managerNotes,
     });
 
-    const updatedEnrollment: Enrollment = {
-      ...this.enrollment(),
-      ...this.enrollmentForm.value,
-      team: this.teams().find(
-        (team) => team.id == this.enrollmentForm.value.team
-      ),
-      shirt: this.shirts().find(
-        (shirt) => shirt.id == this.enrollmentForm.value.shirt
-      ),
-      weeks: this.weeks()
-        .filter((week) =>
-          this.selectedWeeks().some(
-            (selectedWeek) => selectedWeek.weekId === week.id
-          )
-        )
-        .map((week) => {
-          const selectedWeek = this.selectedWeeks().find(
-            (selectedWeek) => selectedWeek.weekId === week.id
-          ) || { weekId: week.id, isPaid: false };
-          return { ...week, isPaid: selectedWeek.isPaid, weekId: week.id };
-        }),
-      year: this.effectiveYear(),
-      dataProcessingConsent:
-        this.enrollmentForm.value.dataProcessingConsent == true,
-      exitAuthorization: this.enrollmentForm.value.exitAuthorization == true,
-    };
-
-    // `set` su un model aggiorna il valore ed emette `enrollmentChange`.
-    this.enrollment.set(updatedEnrollment);
+    this.emitValidity();
   }
 
-  isWeekEnrolled(id: number | string): boolean {
+  private emitValue() {
+    const form = this.enrollmentForm.value;
+
+    this.enrollmentChange.emit({
+      schoolId: form.schoolId ? Number(form.schoolId) : null,
+      classId: form.classId ? Number(form.classId) : null,
+      section: form.section,
+      dataProcessingConsent: form.dataProcessingConsent == true,
+      exitAuthorization: form.exitAuthorization == true,
+      team: form.team ? Number(form.team) : null,
+      shirt: form.shirt ? Number(form.shirt) : null,
+      weeks: this.selectedWeeks(),
+      parentNotes: form.parentNotes || null,
+      managerNotes: form.managerNotes || null,
+    });
+  }
+
+  isWeekEnrolled(id: number): boolean {
     return this.selectedWeeks().some((week) => week.weekId == id);
   }
 
-  isWeekPaid(id: number | string): boolean {
+  isWeekPaid(id: number): boolean {
     return this.selectedWeeks().some((week) => week.weekId == id && week.isPaid);
   }
 
-  toggleWeekSelection(
-    id: number | string,
-    event: Event,
-    type: 'e' | 'p'
-  ): void {
+  toggleWeekSelection(id: number, event: Event, type: 'e' | 'p'): void {
     const checked = (event.target as HTMLInputElement).checked;
 
-    // Aggiornamento immutabile: prima si usavano push/splice e l'assegnazione
-    // di isPaid sull'elemento, che mutavano l'array sul posto. Un signal
-    // notifica solo se il riferimento cambia, quindi serve un array nuovo.
+    // Aggiornamento immutabile: un signal notifica solo se cambia il
+    // riferimento dell'array.
     this.selectedWeeks.update((weeks) => {
       const index = weeks.findIndex((w) => w.weekId == id);
 
       if (type === 'e') {
-        if (checked && index == -1) {
-          return [...weeks, { weekId: id, isPaid: false }];
-        }
-        if (!checked && index != -1) {
-          return weeks.filter((_, i) => i !== index);
-        }
+        if (checked && index == -1) return [...weeks, { weekId: id, isPaid: false }];
+        if (!checked && index != -1) return weeks.filter((_, i) => i !== index);
         return weeks;
       }
 
@@ -235,7 +279,11 @@ export class EnrollmentComponent implements OnChanges {
       );
     });
 
-    this.updateEnrollment();
+    this.emitValue();
+    // Togliere l'ultima settimana rende l'iscrizione non piu' valida, e
+    // aggiungerne una puo' renderla valida: la validita' va rivalutata a ogni
+    // cambio, non solo quando cambia il form.
+    this.emitValidity();
   }
 
   saveEnrollment() {

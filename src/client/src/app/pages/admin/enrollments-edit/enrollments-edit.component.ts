@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import type { EnrollmentFormValue } from '../../../components/enrollment/enrollment.component';
 import Enrollment from '../../../../models/Enrollment.model';
 import { UtilsService } from '../../../../services/utils.service';
 import { EnrollmentComponent } from '../../../components/enrollment/enrollment.component';
@@ -7,9 +8,8 @@ import { NavbarComponent } from '../../../components/navbar/navbar.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { ApiService } from '../../../../services/api.service';
 import { LoadingComponent } from '../../../components/loading/loading.component';
-import { ChildComponent } from '../../../components/child/child.component';
-import { ParentComponent } from '../../../components/parent/parent.component';
 import { EnrollmentUpdateRequest } from '../../../../models/Request.model';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-enrollments-edit',
@@ -18,27 +18,30 @@ import { EnrollmentUpdateRequest } from '../../../../models/Request.model';
     NavbarComponent,
     FooterComponent,
     LoadingComponent,
-    ChildComponent,
-    ParentComponent,
+    DatePipe,
   ],
   templateUrl: './enrollments-edit.component.html',
 })
 export class EnrollmentsEditComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private utils = inject(UtilsService);
   private api = inject(ApiService);
 
-  id: string | null = null;
+  id: number | null = null;
   readonly loading = signal(true);
   readonly enrollment = signal<Enrollment | null>(null);
   readonly error = signal<string | null>(null);
 
-  updatedEnrollment: Enrollment | null = null;
+  /** I valori correnti del form, emessi da app-enrollment. */
+  private modifiche: EnrollmentFormValue | null = null;
 
   ngOnInit() {
-    this.id = this.route.snapshot.paramMap.get('id');
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.id = Number.isInteger(id) && id > 0 ? id : null;
+
     if (!this.id) {
-      window.location.href = '/admin/enrollments';
+      this.router.navigateByUrl('/admin/enrollments');
     } else {
       this.api.getEnrollmentById(this.id).subscribe({
         next: (response) => {
@@ -57,49 +60,51 @@ export class EnrollmentsEditComponent implements OnInit {
     }
   }
 
-  onEnrollmentChange(event: Enrollment | null) {
-    this.updatedEnrollment = event;
+  onEnrollmentChange(value: EnrollmentFormValue) {
+    this.modifiche = value;
   }
 
   saveEnrollment = () => {
-    console.table({
-      dataProcessingConsent: this.updatedEnrollment?.dataProcessingConsent,
-      exitAuthorization: this.updatedEnrollment?.exitAuthorization,
+    const id = this.id;
+    const modifiche = this.modifiche;
+    const corrente = this.enrollment();
+
+    // schoolId e classId sono obbligatori nel form: se mancano, il form non e'
+    // valido e il pulsante di salvataggio non e' nemmeno attivo.
+    if (!id || !corrente || !modifiche?.schoolId || !modifiche?.classId) return;
+
+    const params: EnrollmentUpdateRequest = {
+      id,
+      schoolId: modifiche.schoolId,
+      classId: modifiche.classId,
+      section: modifiche.section,
+      year: corrente.year,
+      team: modifiche.team,
+      shirt: modifiche.shirt,
+      dataProcessingConsent: modifiche.dataProcessingConsent,
+      exitAuthorization: modifiche.exitAuthorization,
+      // Il server vuole `id` della settimana, non `weekId`.
+      weeks: modifiche.weeks.map((week) => ({
+        id: week.weekId,
+        isPaid: week.isPaid,
+      })),
+      parentNotes: modifiche.parentNotes,
+      managerNotes: modifiche.managerNotes,
+    };
+
+    this.api.updateEnrollment(params).subscribe({
+      next: () => {
+        this.error.set(null);
+        // Si rilegge dal server invece di ricostruire l'iscrizione a mano: cosi'
+        // quello che si vede e' quello che e' stato davvero salvato.
+        this.api.getEnrollmentById(id).subscribe((response) => {
+          if (response.body?.success) this.enrollment.set(response.body.data);
+        });
+      },
+      error: (error) => {
+        console.log(error);
+        this.error.set(this.utils.handleResponse(error, null));
+      },
     });
-
-    if (
-      this.enrollment() &&
-      this.updatedEnrollment &&
-      this.updatedEnrollment.id
-    ) {
-      const params: EnrollmentUpdateRequest = {
-        id: this.updatedEnrollment?.id,
-        schoolType: this.updatedEnrollment?.schoolType,
-        className: this.updatedEnrollment?.className,
-        section: this.updatedEnrollment?.section,
-        year: this.updatedEnrollment?.year,
-        team: this.updatedEnrollment?.team?.id || null,
-        shirt: this.updatedEnrollment?.shirt?.id || null,
-        dataProcessingConsent: this.updatedEnrollment?.dataProcessingConsent,
-        exitAuthorization: this.updatedEnrollment?.exitAuthorization,
-        weeks: this.updatedEnrollment?.weeks.map((week) => ({
-          id: week.id,
-          isPaid: week.isPaid,
-        })),
-        parentNotes: this.updatedEnrollment?.parentNotes || null,
-        managerNotes: this.updatedEnrollment?.managerNotes || null,
-      };
-
-      this.api.updateEnrollment(params).subscribe({
-        next: (response) => {
-          if (response.status === 200)
-            this.enrollment.set(this.updatedEnrollment);
-        },
-        error: (error) => {
-          console.log(error);
-          this.error.set(this.utils.handleResponse(error, null));
-        },
-      });
-    }
   };
 }

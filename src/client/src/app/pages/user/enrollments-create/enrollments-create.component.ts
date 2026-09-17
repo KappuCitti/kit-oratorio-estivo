@@ -1,62 +1,58 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { NavbarComponent } from '../../../components/navbar/navbar.component';
-import { FooterComponent } from '../../../components/footer/footer.component';
+import { DatePipe } from '@angular/common';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
-  FormGroup,
-  FormBuilder,
-  Validators,
-  FormsModule,
-  ReactiveFormsModule,
-} from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import {
+  faCalendar,
+  faClipboardCheck,
+  faIdCardClip,
   faInfo,
   faUsers,
-  faCalendar,
-  faIdCardClip,
-  faClipboardCheck,
 } from '@fortawesome/free-solid-svg-icons';
-import Enrollment from '../../../../models/Enrollment.model';
-import { ChildSearch, Child, Parent } from '../../../../models/Family.model';
-import { EnrollmentCreateRequest } from '../../../../models/Request.model';
+import { FooterComponent } from '../../../components/footer/footer.component';
+import { NavbarComponent } from '../../../components/navbar/navbar.component';
+import {
+  EnrollmentComponent,
+  type EnrollmentFormValue,
+} from '../../../components/enrollment/enrollment.component';
+import { FamilyMember } from '../../../../models/Family.model';
+import { QueueEnrollmentCreateRequest } from '../../../../models/Request.model';
 import { ApiService } from '../../../../services/api.service';
+import { SessionService } from '../../../../services/session.service';
 import { UtilsService } from '../../../../services/utils.service';
-import { NgClass, DatePipe } from '@angular/common';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { EnrollmentComponent } from '../../../components/enrollment/enrollment.component';
-import { PaginationComponent } from '../../../components/pagination/pagination.component';
 
 /**
- * Steps description:
- * 0: Choose year
- * 1: Choose existing child
- * 2: Create enrollment
- * 3: Confirm data
+ * Richiesta di iscrizione inviata da un genitore.
+ *
+ * Passi: si sceglie uno dei propri figli, si compila l'iscrizione, si conferma.
+ *
+ * La richiesta finisce in CODA (POST /enrollments/queue) e diventa
+ * un'iscrizione solo quando un responsabile la approva. E' il flusso che il
+ * server implementa: prima questa pagina chiamava POST /enrollments, che invece
+ * APPROVA una richiesta gia' in coda e si aspetta un `queueId`. Il corpo che
+ * mandava non aveva niente a che vedere con quello atteso.
+ *
+ * L'elenco dei figli arriva da GET /users, che restituisce le persone gestite
+ * da chi e' collegato. Prima si chiamava `/childs`, che non e' mai esistito, e
+ * la pagina aveva ricerca e paginazione per una lista che e' lunga quanto la
+ * propria famiglia.
  */
-
 @Component({
   selector: 'app-enrollments-create',
   imports: [
     NavbarComponent,
     FooterComponent,
-    FormsModule,
     FontAwesomeModule,
     EnrollmentComponent,
-    ReactiveFormsModule,
-    PaginationComponent,
     DatePipe,
-    NgClass
-],
+  ],
   templateUrl: './enrollments-create.component.html',
 })
 export class EnrollmentsCreateComponent implements OnInit {
   private api = inject(ApiService);
-  private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private utils = inject(UtilsService);
-  private fb = inject(FormBuilder);
-
-  // TODO - Create enrollment form
-  // This page will show to child's parents to create an enrollment for their child
+  private session = inject(SessionService);
 
   faInfo = faInfo;
   faUsers = faUsers;
@@ -67,82 +63,24 @@ export class EnrollmentsCreateComponent implements OnInit {
   readonly step = signal(0);
   readonly maxStep = signal(0);
 
-  readonly elements = signal(0);
-  page: number = 1;
-  size: number = 25;
-
-  searchForm: FormGroup;
-  readonly childs = signal<ChildSearch[]>([]);
-
-  readonly child = signal<Child | null>(null);
-  readonly enrollment = signal<EnrollmentCreateRequest>(
-    {} as EnrollmentCreateRequest
-  );
-
-  isChildValid: boolean = false;
-  isParentOneValid: boolean = false;
-  isParentTwoValid: boolean = false;
-  isEnrollmentValid: boolean = false;
+  readonly childs = signal<FamilyMember[]>([]);
+  readonly selectedChildId = signal<string | null>(null);
+  readonly formValue = signal<EnrollmentFormValue | null>(null);
+  readonly isEnrollmentValid = signal(false);
 
   readonly error = signal<string | null>(null);
   readonly loading = signal(true);
+  readonly submitting = signal(false);
 
-  constructor() {
-    this.searchForm = this.fb.group({
-      query: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.pattern(/^[a-zA-Z0-9\s]*$/),
-        ],
-      ],
-    });
-
-    this.searchForm.valueChanges.subscribe(() => {
-      if (this.searchForm.valid || this.searchForm.value.query.length == 0) {
-        this.loadChilds();
-      }
-    });
-  }
+  readonly selectedChild = computed(() =>
+    this.childs().find((c) => c.id === this.selectedChildId())
+  );
 
   ngOnInit() {
-    this.route.queryParams.subscribe((params) => {
-      // TODO - Validate child id if it belongs to current session family
-      const id = params['child'];
-      const year = params['year'];
-
-      console.table({ id, year });
-
-      this.loadChilds();
-      if (year) {
-        if (this.checkIfYearIsValid(year)) this.patchEnrollment({ year });
-      } else {
-        this.patchEnrollment({ year: new Date().getFullYear() });
-      }
-      this.maxStep.set(1);
-
-      // Child id is valid only if year is selected
-      if (id && this.enrollment().year) {
-        this.patchEnrollment({ child: id });
-        this.step.set(2);
-      }
-    });
-  }
-
-  loadChilds() {
-    this.loading.set(true);
-    this.api.getChilds({ query: this.searchForm.value.query }).subscribe({
+    this.api.getManagedPeople().subscribe({
       next: (response) => {
-        if (response.status === 200 && response.body?.success) {
-          this.childs.set(response.body.data.elements);
-          this.elements.set(response.body.data.count);
-
-          this.step.set(2);
-          this.maxStep.set(2);
-
-          this.loading.set(false);
-        }
+        if (response.body?.success) this.childs.set(response.body.data);
+        this.loading.set(false);
       },
       error: (error) => {
         console.error(error);
@@ -152,122 +90,81 @@ export class EnrollmentsCreateComponent implements OnInit {
     });
   }
 
-  // `enrollment` e' un signal: va sostituito, non modificato sul posto.
-  private patchEnrollment(changes: Partial<EnrollmentCreateRequest>) {
-    this.enrollment.update((enrollment) => ({ ...enrollment, ...changes }));
+  onSelectedChildChange(id: string) {
+    this.selectedChildId.set(id);
+    this.maxStep.set(1);
   }
 
-  getChildInfo(): string {
-    const child = this.child();
-    if (child) {
-      return `${child.name} ${child.surname}`;
-    }
-
-    const selected = this.childs().filter(
-      (c) => c.id == this.enrollment().child
-    )[0];
-    return selected ? `${selected.name} ${selected.surname}` : '';
-  }
-
-  checkIfYearIsValid(year: number) {
-    return year && year > 1980;
-  }
-
-  onSelectedChildChange(id: string | number) {
-    this.patchEnrollment({ child: parseInt(id.toString()) });
-    this.maxStep.set(2);
-  }
-
-  onYearChange(year: number) {
-    if (this.checkIfYearIsValid(year)) {
-      this.patchEnrollment({ year });
-      this.maxStep.set(1);
-    }
-  }
-
-  onEnrollmentChange(enrollment: Enrollment | null) {
-    const current = this.enrollment();
-
-    this.enrollment.set({
-      child: current.child
-        ? parseInt(current.child.toString())
-        : enrollment!.family.child.id,
-      team: enrollment!.team?.id || null,
-      shirt: enrollment!.shirt?.id || null,
-      weeks: enrollment!.weeks.map((week) => ({
-        id: week.id,
-        isPaid: week.isPaid,
-      })),
-      dataProcessingConsent: enrollment!.dataProcessingConsent,
-      exitAuthorization: enrollment!.exitAuthorization,
-      schoolType: enrollment!.schoolType,
-      className: enrollment!.className,
-      section: enrollment!.section,
-      year: enrollment!.year,
-      parentNotes: enrollment!.parentNotes || null,
-      managerNotes: enrollment!.managerNotes || null,
-    });
+  onEnrollmentChange(value: EnrollmentFormValue) {
+    this.formValue.set(value);
   }
 
   onIsEnrollmentValidChange(valid: boolean) {
-    this.isEnrollmentValid = valid;
-    this.maxStep.set(valid ? 3 : 2);
-  }
-
-  onPageChange(page: number) {
-    this.page = page;
-    this.loadChilds();
-  }
-  onSizeChange(size: number) {
-    this.size = size;
-    this.loadChilds();
+    this.isEnrollmentValid.set(valid);
+    this.maxStep.set(valid ? 2 : 1);
   }
 
   setStep(step: number) {
-    if (this.step() == 0) {
-      this.maxStep.set(0);
-      this.step.set(0);
-      return;
-    }
-    if (step <= this.maxStep()) {
-      this.step.set(step);
-    }
+    if (step <= this.maxStep()) this.step.set(step);
   }
 
   nextStep() {
-    const step = this.step();
-
-    if (step == 0) {
-      this.step.set(1);
-    } else if (step == 1) {
-      this.step.set(2);
-    } else if (step == 2) {
-      this.setStep(3);
-    }
+    if (this.step() < this.maxStep()) this.step.update((s) => s + 1);
   }
 
   previousStep() {
-    const step = this.step();
-
-    if (step == 3) {
-      this.step.set(2);
-    } else if (step == 2) {
-      this.step.set(1);
-    } else if (step == 1) {
-      this.maxStep.set(0);
-      this.step.set(0);
-    }
+    if (this.step() > 0) this.step.update((s) => s - 1);
   }
 
+  /** Riepilogo mostrato all'ultimo passo. */
+  readonly riepilogo = computed(() => {
+    const value = this.formValue();
+    if (!value) return null;
+    return {
+      settimane: value.weeks.length,
+      sezione: value.section,
+      classe: value.classId,
+    };
+  });
+
   createEnrollment() {
-    this.api.createEnrollment(this.enrollment()).subscribe({
-      next: (response) => {
-        if (response.status === 200 && response.body?.success) {
-          window.location.href = '/admin/enrollments';
-        }
+    const child = this.selectedChildId();
+    const value = this.formValue();
+
+    if (!child || !value?.classId || this.submitting()) return;
+
+    const richiesta: QueueEnrollmentCreateRequest = {
+      user: child,
+      classId: value.classId,
+      section: value.section,
+      // La coda accetta i soli id delle settimane: chi paga cosa lo decide il
+      // responsabile in fase di approvazione, non il genitore.
+      weeks: value.weeks.map((week) => week.weekId),
+      dataProcessingConsent: value.dataProcessingConsent,
+      // Il consenso alle immagini non e' ancora chiesto dal form: il server lo
+      // pretende, quindi per ora si invia come non concesso.
+      imageProcessingConsent: false,
+      shirt: value.shirt,
+      parentNotes: value.parentNotes,
+    };
+
+    // `exitAuthorization` si invia SOLO se l'utente ha il permesso di
+    // deciderlo. Il server rifiuta con 403 chi lo manda senza quel permesso, e
+    // lo rifiuta anche se lo manda a `false`: la sola presenza del campo e' una
+    // decisione, e per un genitore non e' una decisione sua.
+    if (this.session.has('give_exit_authorization')) {
+      richiesta.exitAuthorization = value.exitAuthorization;
+    }
+
+    this.submitting.set(true);
+    this.api.createQueueEnrollment(richiesta).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.router.navigateByUrl(this.session.landingPath());
       },
       error: (error) => {
         console.error(error);
+        this.submitting.set(false);
         this.error.set(this.utils.handleResponse(error, null));
       },
     });

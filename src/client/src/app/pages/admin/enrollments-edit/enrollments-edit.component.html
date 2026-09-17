@@ -1,26 +1,57 @@
 <app-navbar />
 <div class="container min-h-4/5 flex flex-col justify-center items-center">
   <div class="w-full bg-auto p-4 rounded-lg shadow-lg mb-6">
-    @if (!loading() && !error()) {
-    <app-enrollment [enrollment]="enrollment()"
+    @if (!loading() && !error()) { @if (enrollment(); as enrollment) {
+    <app-enrollment
+      [enrollment]="enrollment"
       [editable]="true"
       [save]="saveEnrollment"
       (enrollmentChange)="onEnrollmentChange($event)"
-     />
+    />
+
     <div class="my-8"></div>
-    <app-child [child]="enrollment()?.family?.child || null"
-      [editable]="false"
-     />
+
+    <!-- Prima qui c'erano <app-child> e <app-parent> alimentati da
+         `enrollment.family.child` e `enrollment.family.parents`, che nello
+         schema v2 non esistono: l'iscritto e' `user` e chi lo gestisce sta in
+         `managers`. Quei componenti sono form per dati che qui non si possono
+         modificare, quindi i dati si mostrano e basta. -->
+    <div>
+      <h2 class="mb-2">Iscritto</h2>
+      <p class="mb-0">
+        <strong>{{ enrollment.user.name }} {{ enrollment.user.surname }}</strong>
+      </p>
+      <p class="text-secondary">
+        Codice fiscale: {{ enrollment.user.id }} @if
+        (enrollment.user.birthDate) { · Nato il
+        {{ enrollment.user.birthDate | date : "dd/MM/yyyy" }} } @if
+        (enrollment.user.birthPlace) { a {{ enrollment.user.birthPlace }} }
+      </p>
+    </div>
+
     <div class="my-8"></div>
-    <app-parent [parent]="enrollment()?.family?.parents?.[0] || null"
-      [editable]="false"
-     />
-    <div class="my-8"></div>
-    <app-parent [parent]="enrollment()?.family?.parents?.[1] || null"
-      [editable]="false"
-     />
+
+    <div>
+      <h2 class="mb-2">Chi lo gestisce</h2>
+      @if (enrollment.managers.length === 0) {
+      <p class="text-secondary">Nessuno.</p>
+      } @else {
+      <ul class="list-none ps-0 space-y-2">
+        @for (manager of enrollment.managers; track manager.id) {
+        <li>
+          <strong>{{ manager.name }} {{ manager.surname }}</strong>
+          <span class="text-secondary">
+            @if (manager.email) { · {{ manager.email }} } @if (manager.phone) {
+            · {{ manager.phone }} }
+          </span>
+        </li>
+        }
+      </ul>
+      }
+    </div>
+
     <div class="mt-6"></div>
-    } @else if (error(); as error) {
+    } } @else if (error(); as error) {
     <div class="flex justify-center items-center">
       <div
         class="bg-neon-error p-3 rounded-lg shadow-lg w-full max-w-md text-center"

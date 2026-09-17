@@ -21,22 +21,25 @@
 
     <form [formGroup]="enrollmentForm">
       <div class="flex flex-wrap -mx-2">
+        <!-- Scuole e classi arrivano dal server: prima erano due elenchi fissi
+             (Primary/Secondary e I..V), cioe' i valori dello schema v1. -->
         <div class="mb-4 sm:w-2/4 w-full px-2">
-          <label class="block required">Tipo scuola</label>
-          <select class="w-full" formControlName="schoolType">
-            <option value="Primary">Elementari</option>
-            <option value="Secondary">Medie</option>
+          <label class="block required">Scuola</label>
+          <select class="w-full" formControlName="schoolId">
+            <option [ngValue]="null">Seleziona una scuola</option>
+            @for (school of schools(); track school.id) {
+            <option [ngValue]="school.id">{{ school.name }}</option>
+            }
           </select>
         </div>
 
         <div class="mb-4 sm:w-1/4 w-full px-2">
           <label class="block required">Classe</label>
-          <select class="w-full" formControlName="className">
-            <option value="I">I</option>
-            <option value="II">II</option>
-            <option value="III">III</option>
-            <option value="IV">IV</option>
-            <option value="V">V</option>
+          <select class="w-full" formControlName="classId">
+            <option [ngValue]="null">Seleziona una classe</option>
+            @for (class of classes(); track class.id) {
+            <option [ngValue]="class.id">{{ class.name }}</option>
+            }
           </select>
         </div>
 
@@ -56,6 +59,9 @@
               : "No, non presto il consenso"
           }}</span>
         </div>
+        <!-- L'uscita autonoma la decidono i responsabili: chi non ha il
+             permesso non vede la casella, e il campo non viene inviato. -->
+        @if (canGiveExitAuthorization()) {
         <div class="mb-4 sm:w-1/2 w-full px-2">
           <label class="block required">Consenso alle uscite</label>
           <input type="checkbox" class="" formControlName="exitAuthorization" />
@@ -65,6 +71,7 @@
               : "No, non presto il consenso"
           }}</span>
         </div>
+        }
 
         <div class="mb-4 sm:w-1/2 w-full px-2">
           <label class="block">Squadra</label>
