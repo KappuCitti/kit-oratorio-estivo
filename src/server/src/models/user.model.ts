@@ -2,7 +2,7 @@ import { roleTable } from '@/database/schema/role';
 import { usersTable } from '@/database/schema/user';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import { PERMISSIONS } from './permissions.model';
+import { AREAS, PERMISSIONS } from './permissions.model';
 import { personalInfoTable } from '@/database/schema/personalInfo';
 import { phoneSchema, idSchema, type Prettify } from './common.model';
 import { addressTable } from '@/database/schema/address';
@@ -18,6 +18,8 @@ export const fullUserSchema = createSelectSchema(usersTable)
     role: createSelectSchema(roleTable).extend({
       permissions: z.array(z.enum(PERMISSIONS)),
     }),
+    // Le aree in cui l'utente puo' entrare: vedi database/user/getUserAreas.
+    areas: z.array(z.enum(AREAS)),
   })
   .and(
     createSelectSchema(personalInfoTable)

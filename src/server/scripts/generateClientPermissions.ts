@@ -17,7 +17,12 @@
  */
 import { Glob } from 'bun';
 import { dirname, join, relative, resolve } from 'node:path';
-import { PERMISSIONS, type Permission } from '../src/models/permissions.model';
+import {
+  AREAS,
+  PERMISSIONS,
+  PERMISSION_AREAS,
+  type Permission,
+} from '../src/models/permissions.model';
 
 const SERVER_ROOT = resolve(import.meta.dir, '..');
 const OPENAPI_DIR = join(SERVER_ROOT, 'src', 'openapi');
@@ -114,6 +119,25 @@ ${permissions.map((p) => `  '${p}',`).join('\n')}
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
+
+export const AREAS = [${AREAS.map((a) => `'${a}'`).join(', ')}] as const;
+
+export type Area = (typeof AREAS)[number];
+
+/**
+ * In quale area vale ciascun permesso: su /user solo quelli dell'area utente,
+ * su /admin solo quelli dell'area admin. Vedi PERMISSION_AREAS sul server.
+ */
+export const PERMISSION_AREAS = {
+${permissions
+  .map(
+    (p) =>
+      `  ${p}: [${(PERMISSION_AREAS[p] as readonly string[])
+        .map((a) => `'${a}'`)
+        .join(', ')}],`
+  )
+  .join('\n')}
+} as const satisfies Record<Permission, readonly Area[]>;
 
 /**
  * Il permesso che il server richiede su ciascuna rotta protetta.
