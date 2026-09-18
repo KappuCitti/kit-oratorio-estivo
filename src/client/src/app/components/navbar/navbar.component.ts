@@ -30,8 +30,11 @@ interface Page {
   url: string;
   icon: IconDefinition;
   title: string;
-  /** Permesso richiesto; se manca, la voce vale per chiunque sia collegato. */
-  permission?: Permission;
+  /**
+   * Permesso richiesto nell'area corrente; con una lista ne basta uno. Se
+   * manca, la voce vale per chiunque sia collegato.
+   */
+  permission?: Permission | Permission[];
   /** Funzione non ancora realizzata: la voce si vede ma non e' cliccabile. */
   disabled?: boolean;
 }
@@ -66,14 +69,16 @@ export class NavbarComponent {
   readonly isDropdownOpen = signal(false);
 
   /**
-   * In quale area si trova l'utente.
+   * In quale area si trova l'utente: quella della pagina aperta.
    *
-   * Prima veniva dedotto dall'indirizzo corrente (`url.includes('/admin/')`):
-   * bastava scrivere a mano un indirizzo /admin per far comparire l'intero
-   * menu di amministrazione a chiunque. Ora dipende dai permessi che il server
-   * ha restituito, esattamente come le guard delle rotte.
+   * Per un po' e' stata dedotta dai permessi (`see_users`), e cosi' chi e'
+   * responsabile e anche genitore vedeva il menu di amministrazione anche su
+   * /user. Ora segue l'indirizzo, ma senza il vecchio difetto di quando lo
+   * faceva gia': SessionService non concede permessi in un'area in cui
+   * l'utente non puo' entrare, quindi scrivere a mano un indirizzo /admin non
+   * fa comparire nessuna voce (e la guard riporta comunque indietro).
    */
-  readonly isAdminArea = computed(() => this.session.has('see_users'));
+  readonly isAdminArea = computed(() => this.session.area() === 'admin');
   readonly baseURL = computed(() => (this.isAdminArea() ? '/admin' : '/user'));
 
   /**
@@ -92,7 +97,10 @@ export class NavbarComponent {
         url: `${base}/enrollments`,
         icon: admin ? this.faUsers : this.faUserPen,
         title: 'Iscrizioni',
-        permission: admin ? 'see_users' : 'manage_self_child_users',
+        // Il genitore vede le iscrizioni dei figli, il ragazzo la propria.
+        permission: admin
+          ? 'see_users'
+          : ['manage_self_child_users', 'be_enrolled'],
       },
       {
         url: `${base}/attendances`,
@@ -163,9 +171,13 @@ export class NavbarComponent {
       },
     ];
 
-    return all.filter(
-      (page) => !page.permission || this.session.has(page.permission)
-    );
+    return all.filter((page) => {
+      if (!page.permission) return true;
+      const richiesti = Array.isArray(page.permission)
+        ? page.permission
+        : [page.permission];
+      return this.session.hasAny(...richiesti);
+    });
   });
 
   toggleMenu(): void {

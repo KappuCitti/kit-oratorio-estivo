@@ -6,9 +6,11 @@
       <h5 class="mb-3">Link Rapidi</h5>
       <ul class="space-y-2 list-none pl-0">
         <li><a routerLink="/">Home</a></li>
+        @if (switchLink(); as link) {
         <li>
-          <a routerLink="/admin/dashboard">Dashboard admin</a>
+          <a [routerLink]="link.url">{{ link.label }}</a>
         </li>
+        }
       </ul>
     </div>
 

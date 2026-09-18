@@ -2,7 +2,12 @@ import { importProvidersFrom } from '@angular/core';
 import { Routes } from '@angular/router';
 import { CalendarModule, CalendarUtils, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
-import { AuthGuard, LoginGuard, permissionGuard } from '../guards/Auth.guard';
+import {
+  AuthGuard,
+  LoginGuard,
+  anyPermissionGuard,
+  permissionGuard,
+} from '../guards/Auth.guard';
 import { environment } from '../environments/environment';
 
 // Ogni rotta usa `loadComponent`: il codice della pagina viene scaricato solo
@@ -51,10 +56,12 @@ const commonRoutes: Routes = [
       import('./pages/user/enrollments-search/enrollments-search.component').then(
         (m) => m.EnrollmentsSearchComponent
       ),
-    // Le rotte che la pagina chiama (GET /users/enrollments, e per la nuova
-    // iscrizione POST /enrollments/queue) richiedono questo permesso: senza,
-    // un ragazzo con il proprio account apriva pagine che il server rifiutava.
-    canActivate: [AuthGuard, permissionGuard('manage_self_child_users')],
+    // Il genitore vede le iscrizioni dei figli (GET /users/enrollments), il
+    // ragazzo la propria (GET /users/self/enrollments): basta uno dei due.
+    canActivate: [
+      AuthGuard,
+      anyPermissionGuard('manage_self_child_users', 'be_enrolled'),
+    ],
   },
   {
     path: 'user/enrollments/new',
@@ -62,6 +69,7 @@ const commonRoutes: Routes = [
       import('./pages/user/enrollments-create/enrollments-create.component').then(
         (m) => m.EnrollmentsCreateComponent
       ),
+    // POST /enrollments/queue: solo chi gestisce dei ragazzi.
     canActivate: [AuthGuard, permissionGuard('manage_self_child_users')],
   },
   {
