@@ -34,7 +34,8 @@ export const getEnrollmentQueueListRouteDef = createRoute({
       true,
       z.object({
         elements: z.array(bareQueueEnrollmentSchema),
-        count: z.number().int().positive(),
+        // Era `.positive()`: una coda vuota (count 0) violava il contratto.
+        count: z.number().int().nonnegative(),
       }),
       'List of enrollments'
     ),

@@ -111,13 +111,21 @@ export const enrollmentDetailSchema = bareEnrollmentSchema.extend({
 
 export type EnrollmentDetail = z.infer<typeof enrollmentDetailSchema>;
 
+/**
+ * Una richiesta in coda, come la vede chi deve approvarla.
+ *
+ * Porta la sezione e le note del genitore, che servono a decidere, e
+ * l'uscita autonoma: in coda puo' essere nulla, perche' i genitori non hanno
+ * il permesso di sceglierla e la decide il responsabile all'approvazione.
+ */
 export const bareQueueEnrollmentSchema = bareEnrollmentSchema
   .omit({
     team: true,
-    section: true,
     exitAuthorization: true,
   })
   .extend({
+    exitAuthorization: z.boolean().nullable(),
+    parentNotes: z.string().nullable(),
     weeks: z.array(
       createSelectSchema(enrollmentWeeksTable).omit({
         enrollmentId: true,

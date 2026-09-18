@@ -1,7 +1,7 @@
 import { HttpStatusCodes } from '@/codes';
 import { db } from '..';
 import { enrollmentQueueTable } from '../schema/enrollmentQueue';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { teamTable } from '../schema/team';
 import { enrollmentTable } from '../schema/enrollment';
 import type { WeekEnrollment } from '@/models/week.model';
@@ -36,14 +36,32 @@ export async function approveEnrollment(
   if (!weeksValid)
     throw new DatabaseError(HttpStatusCodes.BAD_REQUEST, 'invalid_weeks');
   return await db.transaction(async (tx) => {
+    // Filtrava su `enrollmentTable.id`, cioe' su una colonna di un'altra
+    // tabella: la query generata cercava `enrollments`.`id` dentro
+    // `enrollment_queue`, quindi nessuna richiesta poteva essere approvata.
     const queue = await tx.query.enrollmentQueue.findFirst({
-      where: eq(enrollmentTable.id, queueId),
+      where: eq(enrollmentQueueTable.id, queueId),
       columns: { id: false },
     });
     if (!queue) {
       throw new DatabaseError(
         HttpStatusCodes.NOT_FOUND,
         'enrollment_queue_not_found'
+      );
+    }
+
+    // Fra l'invio e l'approvazione la stessa persona puo' essere stata
+    // iscritta allo sportello: approvare darebbe una seconda iscrizione.
+    const alreadyEnrolled = !!(await tx.query.enrollments.findFirst({
+      where: and(
+        eq(enrollmentTable.userId, queue.userId),
+        eq(enrollmentTable.year, queue.year)
+      ),
+    }));
+    if (alreadyEnrolled) {
+      throw new DatabaseError(
+        HttpStatusCodes.CONFLICT,
+        'user_already_enrolled'
       );
     }
     const queueWeeks = await tx.query.enrollmentQueueWeeks.findMany({
