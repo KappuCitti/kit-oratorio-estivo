@@ -10,6 +10,8 @@ import changeThemeController from '@/controllers/user/changeTheme';
 import getSelfInfoController from '@/controllers/user/getSelfInfo';
 import addManagedUserController from '@/controllers/user/managed/addManagedUser';
 import getManagedUsersController from '@/controllers/user/managed/getManagedUsers';
+import setShowPaymentsController from '@/controllers/user/managed/setShowPayments';
+import { setShowPaymentsRouteDef } from '@/openapi/user/setShowPayments';
 import { changePasswordRouteDef } from '@/openapi/user/changePassword';
 import { changeUserThemeRouteDef } from '@/openapi/user/changeTheme';
 import { createUserRouteDef } from '@/openapi/user/createUser';
@@ -34,6 +36,7 @@ export default createRouter()
   .openapi(registerManagedUserRouteDef, addManagedUserController)
   .openapi(getManagedUserListRouteDef, getManagedUsersController)
   .openapi(createUserRouteDef, createUserController)
+  .openapi(setShowPaymentsRouteDef, setShowPaymentsController)
   // Rubrica: elenco con ricerca, dettaglio con le relazioni, modifica,
   // eliminazione e creazione di un nucleo familiare. Prima il client chiamava
   // /people, /childs, /parents e POST /family, che non sono mai esistiti.

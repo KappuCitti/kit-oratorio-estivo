@@ -5,7 +5,9 @@ import { enrollmentTable } from '../schema/enrollment';
 import { enrollmentQueueTable } from '../schema/enrollmentQueue';
 import { enrollmentQueueWeeksTable } from '../schema/enrollmentQueueWeek';
 import { enrollmentWeeksTable } from '../schema/enrollmentWeek';
+import { personalInfoTable } from '../schema/personalInfo';
 import { schoolTable } from '../schema/school';
+import { usersTable } from '../schema/user';
 import { getManagedUsers } from '../user/managed/getManagedUsers';
 
 export type ManagedEnrollmentStatus = 'enrolled' | 'pending' | 'none';
@@ -23,7 +25,45 @@ export type ManagedEnrollmentStatus = 'enrolled' | 'pending' | 'none';
  * senso solo per le iscrizioni confermate: per una richiesta `isPaid` e' null.
  */
 export async function getManagedEnrollments(userId: string, year: number) {
-  const people = await getManagedUsers(userId);
+  return await getEnrollmentStatuses(await getManagedUsers(userId), year);
+}
+
+/**
+ * Lo stato di iscrizione di chi e' collegato: la vista del ragazzo.
+ *
+ * Se chi lo gestisce non gli mostra i pagamenti, `isPaid` torna null: il
+ * filtro sta qui e non nell'interfaccia, altrimenti l'informazione resterebbe
+ * leggibile nella risposta.
+ */
+export async function getOwnEnrollment(userId: string, year: number) {
+  const [persona] = await db
+    .select({
+      id: usersTable.id,
+      name: personalInfoTable.name,
+      surname: personalInfoTable.surname,
+      gender: personalInfoTable.gender,
+      showPayments: usersTable.showPayments,
+    })
+    .from(usersTable)
+    .innerJoin(personalInfoTable, eq(usersTable.id, personalInfoTable.id))
+    .where(eq(usersTable.id, userId));
+
+  const [stato] = await getEnrollmentStatuses([persona], year);
+  if (persona.showPayments) return stato;
+  return {
+    ...stato,
+    weeks: stato.weeks.map((w) => ({ weekId: w.weekId, isPaid: null })),
+  };
+}
+
+type Person = {
+  id: string;
+  name: string;
+  surname: string;
+  gender: 'M' | 'F' | null;
+};
+
+async function getEnrollmentStatuses(people: Person[], year: number) {
   if (people.length === 0) return [];
   const ids = people.map((p) => p.id);
 

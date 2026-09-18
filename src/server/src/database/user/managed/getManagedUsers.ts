@@ -17,6 +17,9 @@ export async function getManagedUsers(userId: string) {
       birthDate: personalInfoTable.birthDate,
       birthPlace: personalInfoTable.birthPlace,
       gender: personalInfoTable.gender,
+      // Serve alla pagina della famiglia: il genitore decide per ogni ragazzo
+      // se mostrargli prezzi e pagamenti.
+      showPayments: usersTable.showPayments,
       role: {
         id: aliased(roleTable.id, 'roleId'),
         name: aliased(roleTable.name, 'roleName'),

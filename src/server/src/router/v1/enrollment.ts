@@ -8,7 +8,11 @@ import getEnrollmentController from '@/controllers/enrollment/getEnrollment';
 import getEnrollmentsController from '@/controllers/enrollment/getEnrollmentList';
 import getEnrollmentQueuesController from '@/controllers/enrollment/getEnrollmentQueueList';
 import getManagedEnrollmentsController from '@/controllers/enrollment/getManagedEnrollments';
-import { getManagedEnrollmentsRouteDef } from '@/openapi/enrollment/getManagedEnrollments';
+import getOwnEnrollmentController from '@/controllers/enrollment/getOwnEnrollment';
+import {
+  getManagedEnrollmentsRouteDef,
+  getOwnEnrollmentRouteDef,
+} from '@/openapi/enrollment/getManagedEnrollments';
 import { approveEnrollmentRouteDef } from '@/openapi/enrollment/approveEnrollment';
 import { createEnrollmentAsAdminRouteDef } from '@/openapi/enrollment/createEnrollmentAsAdmin';
 import { createQueueEnrollmentRouteDef } from '@/openapi/enrollment/createEnrollmentInQueue';
@@ -28,6 +32,8 @@ export default createRouter()
   .openapi(deleteQueueEnrollmentRouteDef, deleteQueueEnrollmentController)
   // La vista del genitore: lo stato delle proprie persone.
   .openapi(getManagedEnrollmentsRouteDef, getManagedEnrollmentsController)
+  // La vista del ragazzo: la propria iscrizione.
+  .openapi(getOwnEnrollmentRouteDef, getOwnEnrollmentController)
   // Le tre rotte sotto erano definite in openapi/ ma non registrate e senza
   // controller: il client le chiamava e riceveva 404. Sono quelle che servono a
   // leggere, modificare e cancellare un'iscrizione.

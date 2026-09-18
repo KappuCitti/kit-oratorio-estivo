@@ -52,3 +52,33 @@ export const getManagedEnrollmentsRouteDef = createRoute({
 });
 
 export type GetManagedEnrollmentsRoute = typeof getManagedEnrollmentsRouteDef;
+
+/**
+ * L'iscrizione di chi e' collegato: la vista del ragazzo. Non espone nulla dei
+ * genitori, e lo stato dei pagamenti solo se chi lo gestisce lo consente.
+ */
+export const getOwnEnrollmentRouteDef = createRoute({
+  tags: ['Enrollment'],
+  method: 'get',
+  path: '/users/self/enrollments',
+  middleware: can('be_enrolled'),
+  request: {
+    query: z.object({
+      year: z.coerce.number().int().positive(),
+    }),
+  },
+  responses: {
+    [HttpStatusCodes.OK]: createJsonResBody(
+      true,
+      managedEnrollmentSchema,
+      'Enrollment status of the logged user'
+    ),
+    [HttpStatusCodes.INTERNAL_SERVER_ERROR]: createJsonResBody(
+      false,
+      z.string(),
+      'Error while talking to database'
+    ),
+  },
+});
+
+export type GetOwnEnrollmentRoute = typeof getOwnEnrollmentRouteDef;

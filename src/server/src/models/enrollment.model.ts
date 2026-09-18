@@ -1,4 +1,3 @@
-import { addressTable } from '@/database/schema/address';
 import { classTable } from '@/database/schema/class';
 import { enrollmentTable } from '@/database/schema/enrollment';
 import { enrollmentWeeksTable } from '@/database/schema/enrollmentWeek';
@@ -51,6 +50,7 @@ export const bareEnrollmentSchema = createSelectSchema(enrollmentTable)
         roleId: true,
         email: true,
         phone: true,
+        showPayments: true,
       })
       .and(
         createSelectSchema(personalInfoTable).omit({
