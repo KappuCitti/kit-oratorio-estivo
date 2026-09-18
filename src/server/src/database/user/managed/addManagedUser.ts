@@ -12,6 +12,9 @@ import { getRoleIdIfCan } from '@/database/role/roleHasPermission';
 import { hashPassword } from '@/utils/password';
 import { DatabaseError } from '@/errors/database';
 
+/** Ruolo assegnato a chi viene aggiunto da un genitore al proprio nucleo. */
+export const MANAGED_USER_ROLE = 'child';
+
 export async function addManagedUser(
   token: string,
   cf: string,
@@ -25,13 +28,17 @@ export async function addManagedUser(
   city: string,
   postalCode: string,
   country: string,
-  role: string,
   email?: string
 ) {
   const user = await getUserFromToken(token);
   dbLogger.debug('Found user: %s', user.id);
   dbLogger.debug('Getting user role');
-  const roleId = await getRoleIdIfCan(role, 'be_enrolled');
+  // Il ruolo non arriva piu' dal body. Prima il genitore lo sceglieva per nome
+  // e l'unica difesa era che il ruolo avesse `be_enrolled`: la sicurezza
+  // dipendeva da come erano seedati i dati, lo stesso problema gia' chiuso
+  // sulla registrazione pubblica. Chi viene aggiunto da un genitore e' un
+  // ragazzo da iscrivere.
+  const roleId = await getRoleIdIfCan(MANAGED_USER_ROLE, 'be_enrolled');
   if (!roleId)
     throw new DatabaseError(HttpStatusCodes.FORBIDDEN, 'role_cant_be_enrolled');
   if (email) {

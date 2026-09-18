@@ -16,7 +16,6 @@ const addManagedUserController: RouteController<
     birthPlace,
     gender,
     address,
-    role,
     email,
   } = await c.req.valid('json');
   const token = getCookie(c, 'user_token') as string;
@@ -33,7 +32,6 @@ const addManagedUserController: RouteController<
     address.city,
     address.postalCode,
     address.country,
-    role,
     email
   );
   return httpSuccessResponse(c, null);

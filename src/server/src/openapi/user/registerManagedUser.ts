@@ -28,7 +28,7 @@ export const registerManagedUserRouteDef = createRoute({
           postalCode: z.string().min(2).max(255),
           country: z.string().min(2).max(255),
         }),
-        role: z.string().min(2).max(255),
+        // `role` non si accetta piu': lo decide il server (vedi addManagedUser).
       }),
       'Info of the user to register'
     ),
