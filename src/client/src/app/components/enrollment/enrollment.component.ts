@@ -72,6 +72,39 @@ export class EnrollmentComponent implements OnChanges {
     this.session.has('give_exit_authorization')
   );
 
+  /**
+   * I responsabili vedono e segnano i pagamenti e il conteggio dei posti. Il
+   * genitore no: la sua richiesta non porta lo stato dei pagamenti (lo decide
+   * chi la approva), quindi le caselle sarebbero state ignorate.
+   */
+  readonly canManageEnrollments = computed(() =>
+    this.session.has('manage_enrollments')
+  );
+
+  /** Il prezzo arriva solo a chi puo' vederlo (null altrimenti). */
+  readonly showPrices = computed(() =>
+    this.weeks().some((w) => w.price !== null)
+  );
+
+  /** Le settimane scelte che hanno gia' esaurito i posti. */
+  readonly selectedFullWeeks = computed(() =>
+    this.weeks().filter(
+      (w) => w.isFull && this.selectedWeeks().some((s) => s.weekId === w.id)
+    )
+  );
+
+  /**
+   * Una settimana piena che non accetta richieste oltre il limite non si puo'
+   * scegliere: il server le rifiuterebbe. Resta selezionabile se e' gia' parte
+   * dell'iscrizione (modifica), e sempre per i responsabili, che possono
+   * forzare l'iscrizione allo sportello.
+   */
+  isWeekBlocked(week: Week): boolean {
+    if (this.canManageEnrollments()) return false;
+    if (this.isWeekEnrolled(week.id)) return false;
+    return week.isFull && !week.allowOverbooking;
+  }
+
   /** L'iscrizione da mostrare, quando se ne sta modificando una esistente. */
   readonly enrollment = input<Enrollment | null>(null);
   readonly enrollmentChange = output<EnrollmentFormValue>();

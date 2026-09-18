@@ -113,23 +113,53 @@
           <th>#</th>
           <th>Data di inizio</th>
           <th>Data di fine</th>
+          @if (showPrices()) {
+          <th class="text-end">Prezzo</th>
+          } @if (canManageEnrollments()) {
+          <th class="text-center">Posti</th>
+          }
           <th class="text-center">Iscritto</th>
-          <th class="text-center">Stato pagamento</th>
+          @if (canManageEnrollments()) {
+          <th class="text-center">Pagata</th>
+          }
         </tr>
       </thead>
       <tbody>
         @if (weeks().length > 0) { @for (week of weeks(); track week.id) {
         <tr>
           <td>{{ weeks().indexOf(week) + 1 }}</td>
-          <td>{{ week.startDate | date }}</td>
+          <td>
+            {{ week.startDate | date }} @if (week.isFull) {
+            <span class="rounded-lg px-2 py-1 text-sm bg-neon-warning ms-1"
+              >Posti esauriti</span
+            >
+            }
+          </td>
           <td>{{ week.endDate | date }}</td>
+          @if (showPrices()) {
+          <td class="text-end">{{ week.price }} €</td>
+          } @if (canManageEnrollments()) {
+          <td
+            class="text-center"
+            [class.text-error]="week.isFull"
+            [title]="
+              week.allowOverbooking
+                ? 'Oltre il limite le richieste sono accettate con avviso'
+                : 'Oltre il limite le richieste sono rifiutate'
+            "
+          >
+            {{ week.enrolledCount }} / {{ week.maxEnrollments }}
+          </td>
+          }
           <td class="text-center">
             <input
               type="checkbox"
               [checked]="isWeekEnrolled(week.id)"
+              [disabled]="isWeekBlocked(week)"
               (change)="toggleWeekSelection(week.id, $event, 'e')"
             />
           </td>
+          @if (canManageEnrollments()) {
           <td class="text-center">
             <input
               type="checkbox"
@@ -138,9 +168,26 @@
               [disabled]="!isWeekEnrolled(week.id)"
             />
           </td>
+          }
         </tr>
         } }
       </tbody>
     </table>
+
+    @if (selectedFullWeeks().length > 0) {
+    <div class="bg-neon-warning p-3 rounded-lg mt-4">
+      @if (canManageEnrollments()) { Stai iscrivendo a
+      {{ selectedFullWeeks().length === 1 ? "una settimana" : "settimane" }}
+      che ha{{ selectedFullWeeks().length === 1 ? "" : "nno" }} già raggiunto
+      il limite di posti. } @else {
+      {{
+        selectedFullWeeks().length === 1
+          ? "Una delle settimane scelte ha"
+          : "Alcune delle settimane scelte hanno"
+      }}
+      esaurito i posti: la richiesta andrà comunque in coda, ma potrebbe non
+      essere accettata. }
+    </div>
+    }
   </details>
 </div>

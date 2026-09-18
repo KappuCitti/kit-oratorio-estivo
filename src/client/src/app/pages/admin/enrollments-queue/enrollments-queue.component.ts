@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -164,11 +164,20 @@ export class EnrollmentsQueueComponent implements OnInit {
     });
   }
 
-  /** Le settimane dell'anno, in ordine, con l'indicazione di quelle richieste. */
+  /** Numero della settimana nell'anno (il server le restituisce in ordine di data). */
   weekLabel(weekId: number): string {
-    const ordinate = [...this.weeks()].sort((a, b) => a.id - b.id);
-    const index = ordinate.findIndex((w) => w.id === weekId);
+    const index = this.weeks().findIndex((w) => w.id === weekId);
     return index === -1 ? `#${weekId}` : `${index + 1}`;
+  }
+
+  /** Le settimane dell'anno che hanno raggiunto il limite di posti. */
+  readonly fullWeeks = computed(() => this.weeks().filter((w) => w.isFull));
+
+  /** Le settimane piene comprese in una richiesta. */
+  requestFullWeeks(request: QueueEnrollment): Week[] {
+    return this.fullWeeks().filter((w) =>
+      request.weeks.some((r) => r.weekId === w.id)
+    );
   }
 
   weekOf(weekId: number): Week | undefined {

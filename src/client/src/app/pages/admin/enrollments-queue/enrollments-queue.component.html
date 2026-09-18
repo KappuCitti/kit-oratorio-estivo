@@ -42,6 +42,19 @@
   <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
     <h2 class="mb-4">In attesa ({{ elements() }})</h2>
 
+    @if (fullWeeks().length > 0) {
+    <div class="bg-neon-error p-3 rounded-lg mb-4">
+      {{
+        fullWeeks().length === 1
+          ? "Una settimana ha"
+          : fullWeeks().length + " settimane hanno"
+      }}
+      già raggiunto il limite di posti: le richieste che le contengono sono
+      segnate con <strong>!</strong>. Approvarle porta la settimana oltre il
+      limite.
+    </div>
+    }
+
     <table class="w-full text-left">
       <thead>
         <tr>
@@ -67,11 +80,17 @@
           <td class="text-center space-x-2">
             @for (week of request.weeks; track week.weekId) {
             <span
-              class="rounded-lg px-2 py-1 bg-neon-warning"
+              class="rounded-lg px-2 py-1"
+              [class]="
+                weekOf(week.weekId)?.isFull ? 'bg-neon-error' : 'bg-neon-auto'
+              "
               title="{{ weekOf(week.weekId)?.startDate | date : 'dd/MM/yyyy' }} - {{
                 weekOf(week.weekId)?.endDate | date : 'dd/MM/yyyy'
-              }}"
-              >{{ weekLabel(week.weekId) }}</span
+              }} - iscritti {{ weekOf(week.weekId)?.enrolledCount }} / {{
+                weekOf(week.weekId)?.maxEnrollments
+              }}{{ weekOf(week.weekId)?.isFull ? ' - SETTIMANA PIENA' : '' }}"
+              >{{ weekLabel(week.weekId) }}@if (weekOf(week.weekId)?.isFull)
+              {!}</span
             >
             }
           </td>
@@ -135,6 +154,13 @@
         {{ request.section }}
       </p>
 
+      @if (requestFullWeeks(request).length > 0) {
+      <div class="bg-neon-error p-3 rounded-lg mb-4">
+        La richiesta comprende settimane che hanno già raggiunto il limite di
+        posti. Approvandola le porti oltre il limite.
+      </div>
+      }
+
       <h3 class="mb-2">Settimane richieste</h3>
       <p class="text-secondary text-sm mb-2">
         Segna quelle gia' pagate.
@@ -151,8 +177,13 @@
             Settimana {{ weekLabel(week.weekId) }}
             <span class="text-secondary">
               ({{ weekOf(week.weekId)?.startDate | date : 'dd/MM' }} -
-              {{ weekOf(week.weekId)?.endDate | date : 'dd/MM' }})
+              {{ weekOf(week.weekId)?.endDate | date : 'dd/MM' }}, iscritti
+              {{ weekOf(week.weekId)?.enrolledCount }} /
+              {{ weekOf(week.weekId)?.maxEnrollments }})
             </span>
+            @if (weekOf(week.weekId)?.isFull) {
+            <span class="text-error text-sm">piena</span>
+            }
           </span>
         </li>
         }
