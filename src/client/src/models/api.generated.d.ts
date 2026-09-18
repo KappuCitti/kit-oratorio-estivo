@@ -50,10 +50,13 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					id: number;
 					startDate: string;
 					endDate: string;
-					price: string;
+					price: string | null;
 					maxEnrollments: number;
 					registrationOpenDate: string;
 					registrationCloseDate: string;
+					allowOverbooking: boolean;
+					isFull: boolean;
+					enrolledCount: number | null;
 				}[];
 			};
 			outputFormat: "json";
@@ -71,6 +74,7 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					maxEnrollments: number;
 					registrationOpenDate: string;
 					registrationCloseDate: string;
+					allowOverbooking?: boolean | undefined;
 				};
 			};
 			output: {
@@ -88,6 +92,7 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					maxEnrollments: number;
 					registrationOpenDate: string;
 					registrationCloseDate: string;
+					allowOverbooking?: boolean | undefined;
 				};
 			};
 			output: {
@@ -105,11 +110,84 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					maxEnrollments: number;
 					registrationOpenDate: string;
 					registrationCloseDate: string;
+					allowOverbooking?: boolean | undefined;
 				};
 			};
 			output: {
 				success: true;
 				data: number;
+			};
+			outputFormat: "json";
+			status: 200;
+		};
+	};
+} & {
+	"/weeks/:id": {
+		$put: {
+			input: {
+				param: {
+					id: number;
+				};
+			} & {
+				json: {
+					maxEnrollments?: number | undefined;
+					allowOverbooking?: boolean | undefined;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 400;
+		} | {
+			input: {
+				param: {
+					id: number;
+				};
+			} & {
+				json: {
+					maxEnrollments?: number | undefined;
+					allowOverbooking?: boolean | undefined;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 500;
+		} | {
+			input: {
+				param: {
+					id: number;
+				};
+			} & {
+				json: {
+					maxEnrollments?: number | undefined;
+					allowOverbooking?: boolean | undefined;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 404;
+		} | {
+			input: {
+				param: {
+					id: number;
+				};
+			} & {
+				json: {
+					maxEnrollments?: number | undefined;
+					allowOverbooking?: boolean | undefined;
+				};
+			};
+			output: {
+				success: true;
+				data: null;
 			};
 			outputFormat: "json";
 			status: 200;
@@ -326,12 +404,14 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					email: string | null;
 					theme: "Dark" | "Light" | "System";
 					phone: string | null;
+					showPayments: boolean;
 					role: {
 						id: number;
 						name: string;
 						displayName: string;
 						permissions: ("be_enrolled" | "be_managed" | "be_selected" | "give_exit_authorization" | "login" | "manage_activities" | "manage_attendances" | "manage_classes" | "manage_enrollments" | "manage_events" | "manage_personal_info" | "manage_roles" | "manage_self_child_users" | "manage_teams" | "manage_users" | "manage_weeks" | "register" | "register_child_users" | "see_activities" | "see_classes" | "see_personal_info" | "see_stats" | "see_users")[];
 					};
+					areas: ("user" | "admin")[];
 					name: string;
 					surname: string;
 					gender: "M" | "F" | null;
@@ -592,6 +672,7 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					id: string;
 					email: string | null;
 					phone: string | null;
+					showPayments: boolean;
 					role: {
 						id: number;
 						name: string;
@@ -718,6 +799,58 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 			};
 			outputFormat: "json";
 			status: 200;
+		};
+	};
+} & {
+	"/users/:id/payments-visibility": {
+		$put: {
+			input: {
+				param: {
+					id: string;
+				};
+			} & {
+				json: {
+					showPayments: boolean;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 500;
+		} | {
+			input: {
+				param: {
+					id: string;
+				};
+			} & {
+				json: {
+					showPayments: boolean;
+				};
+			};
+			output: {
+				success: true;
+				data: null;
+			};
+			outputFormat: "json";
+			status: 200;
+		} | {
+			input: {
+				param: {
+					id: string;
+				};
+			} & {
+				json: {
+					showPayments: boolean;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 403;
 		};
 	};
 } & {
@@ -2190,6 +2323,55 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 						name: string;
 					} | null;
 				}[];
+			};
+			outputFormat: "json";
+			status: 200;
+		};
+	};
+} & {
+	"/users/self/enrollments": {
+		$get: {
+			input: {
+				query: {
+					year: number;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 500;
+		} | {
+			input: {
+				query: {
+					year: number;
+				};
+			};
+			output: {
+				success: true;
+				data: {
+					weeks: {
+						weekId: number;
+						isPaid: boolean | null;
+					}[];
+					status: "none" | "enrolled" | "pending";
+					user: {
+						id: string;
+						name: string;
+						surname: string;
+						gender: "M" | "F" | null;
+					};
+					section: string | null;
+					school: {
+						id: number;
+						name: string;
+					} | null;
+					class: {
+						id: number;
+						name: string;
+					} | null;
+				};
 			};
 			outputFormat: "json";
 			status: 200;
