@@ -9,7 +9,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import {
   faArrowRotateLeft,
   faCamera,
@@ -211,16 +211,10 @@ export class EnrollmentsSearchComponent implements OnInit {
       .map((week, index) => {
         const enrolled = weeks.find((w) => w.weekId === week.id);
         return {
-          id: week.id,
+          ...week,
           index: index + 1,
           enrolled: enrolled != undefined,
           isPaid: !!enrolled?.isPaid,
-          startDate: week.startDate,
-          endDate: week.endDate,
-          price: week.price,
-          maxEnrollments: week.maxEnrollments,
-          registrationOpenDate: week.registrationOpenDate,
-          registrationCloseDate: week.registrationCloseDate,
         };
       });
   }

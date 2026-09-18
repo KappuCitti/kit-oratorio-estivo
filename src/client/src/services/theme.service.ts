@@ -1,4 +1,4 @@
-import { Signal, signal, computed, effect, inject, DOCUMENT, Service } from '@angular/core';
+import { Signal, signal, computed, effect, inject, Service } from '@angular/core';
 import { CookiesService } from './cookies.service';
 import { Theme, themes } from '../models/Theme.model';
 import { ApiService } from './api.service';
@@ -6,7 +6,6 @@ import { ApiService } from './api.service';
 
 @Service()
 export class ThemeService {
-  private document = inject(DOCUMENT);
   private api = inject(ApiService);
   private cookiesService = inject(CookiesService);
 
