@@ -457,7 +457,6 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					birthDate: string;
 					birthPlace: string;
 					cf: string;
-					role: string;
 					address: {
 						street: string;
 						city: string;
@@ -483,7 +482,6 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					birthDate: string;
 					birthPlace: string;
 					cf: string;
-					role: string;
 					address: {
 						street: string;
 						city: string;
@@ -509,7 +507,6 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					birthDate: string;
 					birthPlace: string;
 					cf: string;
-					role: string;
 					address: {
 						street: string;
 						city: string;
@@ -535,7 +532,6 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					birthDate: string;
 					birthPlace: string;
 					cf: string;
-					role: string;
 					address: {
 						street: string;
 						city: string;
@@ -561,7 +557,6 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 					birthDate: string;
 					birthPlace: string;
 					cf: string;
-					role: string;
 					address: {
 						street: string;
 						city: string;
@@ -2092,6 +2087,9 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 						};
 						dataProcessingConsent: boolean;
 						imageProcessingConsent: boolean;
+						exitAuthorization: boolean | null;
+						section: string;
+						parentNotes: string | null;
 						specialDiet: string | null;
 						school: {
 							id: number;
@@ -2103,6 +2101,95 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 						};
 					}[];
 				};
+			};
+			outputFormat: "json";
+			status: 200;
+		};
+	};
+} & {
+	"/enrollments/queue/:id": {
+		$delete: {
+			input: {
+				param: {
+					id: number;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 500;
+		} | {
+			input: {
+				param: {
+					id: number;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 404;
+		} | {
+			input: {
+				param: {
+					id: number;
+				};
+			};
+			output: {
+				success: true;
+				data: null;
+			};
+			outputFormat: "json";
+			status: 200;
+		};
+	};
+} & {
+	"/users/enrollments": {
+		$get: {
+			input: {
+				query: {
+					year: number;
+				};
+			};
+			output: {
+				success: false;
+				error: string;
+			};
+			outputFormat: "json";
+			status: 500;
+		} | {
+			input: {
+				query: {
+					year: number;
+				};
+			};
+			output: {
+				success: true;
+				data: {
+					weeks: {
+						weekId: number;
+						isPaid: boolean | null;
+					}[];
+					status: "none" | "enrolled" | "pending";
+					user: {
+						id: string;
+						name: string;
+						surname: string;
+						gender: "M" | "F" | null;
+					};
+					section: string | null;
+					school: {
+						id: number;
+						name: string;
+					} | null;
+					class: {
+						id: number;
+						name: string;
+					} | null;
+				}[];
 			};
 			outputFormat: "json";
 			status: 200;

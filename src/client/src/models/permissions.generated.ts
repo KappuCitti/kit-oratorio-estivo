@@ -76,6 +76,7 @@ export const ROUTE_PERMISSIONS = {
   'PUT /enrollments/{id}': 'manage_enrollments',
   'GET /enrollments/queue': 'manage_enrollments',
   'POST /enrollments/queue': 'manage_self_child_users',
+  'DELETE /enrollments/queue/{id}': 'manage_enrollments',
   'GET /roles': 'see_users',
   'GET /schools': 'see_classes',
   'POST /schools': 'manage_classes',
@@ -88,6 +89,7 @@ export const ROUTE_PERMISSIONS = {
   'PUT /teams/{id}': 'manage_teams',
   'GET /users': 'manage_self_child_users',
   'POST /users': 'register_child_users',
+  'GET /users/enrollments': 'manage_self_child_users',
   'POST /weeks': 'manage_weeks',
 } as const satisfies Record<string, Permission>;
 
