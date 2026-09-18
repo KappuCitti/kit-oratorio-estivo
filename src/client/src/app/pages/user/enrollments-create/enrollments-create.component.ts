@@ -160,7 +160,9 @@ export class EnrollmentsCreateComponent implements OnInit {
     this.api.createQueueEnrollment(richiesta).subscribe({
       next: () => {
         this.submitting.set(false);
-        this.router.navigateByUrl(this.session.landingPath());
+        // Nella pagina delle iscrizioni la richiesta appena inviata compare
+        // come "In attesa di approvazione": e' la conferma che e' arrivata.
+        this.router.navigateByUrl('/user/enrollments');
       },
       error: (error) => {
         console.error(error);

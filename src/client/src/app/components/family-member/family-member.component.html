@@ -1,7 +1,12 @@
 <div id="child">
   <div class="flex justify-between mb-2">
     @if (displayTitle() !== null) {
-    <h2>{{ displayTitle() }}</h2>
+    <h2>
+      {{ displayTitle() }}
+      @if (roleName(); as ruolo) {
+      <span class="text-secondary text-base font-normal">({{ ruolo }})</span>
+      }
+    </h2>
     } @if (editable() && save()) {
     <button
       class="text-md button-secondary h-min"

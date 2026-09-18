@@ -5,37 +5,61 @@
     <h1 class="mb-6 text-center text-2xl sm:text-3xl font-bold">
       Crea un account
     </h1>
-    <app-parent [editable]="true"
-      (parentChange)="onParentChange($event)"
-      (isValid)="onIsParentValidChange($event)"
-     />
-    <form [formGroup]="form" (ngSubmit)="signup()" class="mt-4">
+
+    <form [formGroup]="form" (ngSubmit)="signup()">
       <div class="flex flex-wrap -mx-2">
         <div class="mb-4 sm:w-1/2 w-full px-2">
-          <label class="block required">Password</label>
+          <label class="block required">Nome</label>
+          <input type="text" class="w-full" formControlName="name" />
+        </div>
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block required">Cognome</label>
+          <input type="text" class="w-full" formControlName="surname" />
+        </div>
+
+        <div class="mb-4 w-full px-2">
+          <label class="block required">Codice fiscale</label>
           <input
-            type="password"
-            class="w-full input"
-            formControlName="confirmPasswordOne"
+            type="text"
+            class="w-full uppercase"
+            maxlength="16"
+            formControlName="cf"
           />
+          <p class="text-secondary text-sm">Ti servirà per accedere.</p>
         </div>
 
         <div class="mb-4 sm:w-1/2 w-full px-2">
-          <label for="confirmPassword" class="block required"
-            >Conferma Password</label
-          >
+          <label class="block required">Telefono</label>
+          <input type="tel" class="w-full" formControlName="phoneNumber" />
+        </div>
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block">Email</label>
+          <input type="email" class="w-full" formControlName="email" />
+        </div>
+
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block required">Password</label>
+          <input type="password" class="w-full" formControlName="password" />
+          <p class="text-secondary text-sm">Almeno 8 caratteri.</p>
+        </div>
+        <div class="mb-4 sm:w-1/2 w-full px-2">
+          <label class="block required">Conferma password</label>
           <input
             type="password"
-            class="w-full input"
-            formControlName="confirmPasswordTwo"
+            class="w-full"
+            formControlName="confirmPassword"
           />
+          @if (form.hasError('passwordsMismatch') &&
+          form.get('confirmPassword')?.dirty) {
+          <p class="text-error text-sm">Le password non coincidono.</p>
+          }
         </div>
       </div>
 
       <button
         type="submit"
         class="w-full button-primary transition"
-        [disabled]="!form.valid"
+        [disabled]="!form.valid || submitting()"
       >
         Registrati
       </button>

@@ -1,13 +1,75 @@
 <app-navbar />
 <div class="container min-h-4/5">
   <header class="mb-6">
-    <h1>Ciao, Lorem Ipsum</h1>
-    <p class="text-secondary">
-      Lorem Ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-    </p>
+    <h1>Ciao, {{ session.user()?.name }}</h1>
+    <p class="text-secondary">Oratorio estivo {{ year }}</p>
   </header>
 
-  <div class="bg-auto p-4 rounded-lg shadow-lg mb-8"></div>
+  @if (isParent()) {
+  <div class="flex flex-wrap -mx-2 mb-2">
+    <div class="sm:w-1/4 w-1/2 px-2 mb-4">
+      <div class="bg-auto p-4 rounded-lg shadow-lg text-center">
+        <p class="text-3xl font-bold">{{ people().length }}</p>
+        <p class="text-secondary">Ragazzi</p>
+      </div>
+    </div>
+    <div class="sm:w-1/4 w-1/2 px-2 mb-4">
+      <div class="bg-auto p-4 rounded-lg shadow-lg text-center">
+        <p class="text-3xl font-bold">{{ enrolled() }}</p>
+        <p class="text-secondary">Iscritti</p>
+      </div>
+    </div>
+    <div class="sm:w-1/4 w-1/2 px-2 mb-4">
+      <div class="bg-auto p-4 rounded-lg shadow-lg text-center">
+        <p class="text-3xl font-bold">{{ pending() }}</p>
+        <p class="text-secondary">In attesa</p>
+      </div>
+    </div>
+    <div class="sm:w-1/4 w-1/2 px-2 mb-4">
+      <div class="bg-auto p-4 rounded-lg shadow-lg text-center">
+        <p class="text-3xl font-bold">{{ unpaidWeeks() }}</p>
+        <p class="text-secondary">Settimane da pagare</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-8">
+    <h2 class="mb-4">Cosa puoi fare</h2>
+    @if (loaded() && people().length === 0) {
+    <p class="mb-4">
+      Per iniziare aggiungi i tuoi ragazzi: poi potrai iscriverli.
+    </p>
+    } @else if (notEnrolled() > 0) {
+    <p class="mb-4">
+      {{ notEnrolled() === 1 ? "Un ragazzo non è" : notEnrolled() + " ragazzi non sono" }}
+      ancora iscritt{{ notEnrolled() === 1 ? "o" : "i" }} quest'anno.
+    </p>
+    } @if (pending() > 0) {
+    <p class="mb-4 text-secondary">
+      Le richieste in attesa devono essere approvate dai responsabili
+      dell'oratorio.
+    </p>
+    }
+    <div class="flex flex-wrap gap-3">
+      @if (notEnrolled() > 0) {
+      <a class="button-primary" [routerLink]="['/user/enrollments/new']"
+        >Nuova iscrizione</a
+      >
+      }
+      <a class="button-secondary" [routerLink]="['/user/enrollments']"
+        >Le mie iscrizioni</a
+      >
+      <a class="button-secondary" [routerLink]="['/user/people']">Famiglia</a>
+    </div>
+  </div>
+  } @else {
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-8">
+    <p>
+      Da qui puoi gestire il tuo profilo.
+      <a [routerLink]="['/user/my']">Vai al profilo</a>
+    </p>
+  </div>
+  }
 </div>
 
 <app-footer />

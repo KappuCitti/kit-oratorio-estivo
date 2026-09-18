@@ -27,8 +27,16 @@ export class FamilyMemberComponent {
   // passato dal padre. Prima era l'input `title` riscritto dentro
   // ngOnChanges: essendo un valore derivato, `computed` lo esprime senza
   // scrivere sull'input e senza dipendere dall'ordine dei change detection.
-  protected readonly displayTitle = computed(
-    () => this.familyMember()?.role?.displayName || this.title()
+  //
+  // Il titolo e' il nome della persona: con il solo ruolo due figli
+  // comparivano entrambi come "Figlio", indistinguibili finche' non si apriva
+  // l'anagrafica. Il ruolo resta accanto, come dettaglio.
+  protected readonly displayTitle = computed(() => {
+    const persona = this.familyMember();
+    return persona ? `${persona.name} ${persona.surname}` : this.title();
+  });
+  protected readonly roleName = computed(
+    () => this.familyMember()?.role?.displayName ?? null
   );
   readonly save = input<Function | null>(null);
 
