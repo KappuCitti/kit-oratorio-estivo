@@ -92,7 +92,7 @@ export class NavbarComponent {
         url: `${base}/enrollments`,
         icon: admin ? this.faUsers : this.faUserPen,
         title: 'Iscrizioni',
-        permission: admin ? 'see_users' : undefined,
+        permission: admin ? 'see_users' : 'manage_self_child_users',
       },
       {
         url: `${base}/attendances`,

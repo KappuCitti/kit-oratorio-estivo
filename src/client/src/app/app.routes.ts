@@ -51,7 +51,10 @@ const commonRoutes: Routes = [
       import('./pages/user/enrollments-search/enrollments-search.component').then(
         (m) => m.EnrollmentsSearchComponent
       ),
-    canActivate: [AuthGuard],
+    // Le rotte che la pagina chiama (GET /users/enrollments, e per la nuova
+    // iscrizione POST /enrollments/queue) richiedono questo permesso: senza,
+    // un ragazzo con il proprio account apriva pagine che il server rifiutava.
+    canActivate: [AuthGuard, permissionGuard('manage_self_child_users')],
   },
   {
     path: 'user/enrollments/new',
@@ -59,7 +62,7 @@ const commonRoutes: Routes = [
       import('./pages/user/enrollments-create/enrollments-create.component').then(
         (m) => m.EnrollmentsCreateComponent
       ),
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, permissionGuard('manage_self_child_users')],
   },
   {
     path: 'user/people',
@@ -130,6 +133,15 @@ const commonRoutes: Routes = [
         './pages/admin/enrollments-search/enrollments-search.component'
       ).then((m) => m.EnrollmentsSearchComponent),
     canActivate: [AuthGuard, permissionGuard('see_users')],
+  },
+  {
+    // Come "new", va prima di `admin/enrollments/:id`.
+    path: 'admin/enrollments/queue',
+    loadComponent: () =>
+      import(
+        './pages/admin/enrollments-queue/enrollments-queue.component'
+      ).then((m) => m.EnrollmentsQueueComponent),
+    canActivate: [AuthGuard, permissionGuard('manage_enrollments')],
   },
   {
     // Va prima di `admin/enrollments/:id`, altrimenti "new" verrebbe letto

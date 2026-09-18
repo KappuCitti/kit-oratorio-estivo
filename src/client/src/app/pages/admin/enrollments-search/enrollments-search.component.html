@@ -1,10 +1,18 @@
 <app-navbar />
 <div class="container">
-  <header class="mb-6">
-    <h1>Iscrizioni</h1>
-    <p class="text-secondary">
-      Cerca, modifica ed aggiungi le iscrizioni dei ragazzi
-    </p>
+  <header class="mb-6 flex items-center justify-between">
+    <div>
+      <h1>Iscrizioni</h1>
+      <p class="text-secondary">
+        Cerca, modifica ed aggiungi le iscrizioni dei ragazzi
+      </p>
+    </div>
+    @if (canManageEnrollments()) {
+    <a class="button-primary" [routerLink]="['/admin/enrollments/queue']">
+      <fa-icon [icon]="faInbox" />
+      Richieste in attesa
+    </a>
+    }
   </header>
 
   <!-- Campo di ricerca -->

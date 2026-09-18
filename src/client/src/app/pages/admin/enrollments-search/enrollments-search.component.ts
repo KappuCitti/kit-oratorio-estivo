@@ -16,6 +16,7 @@ import {
   faDoorClosed,
   faDoorOpen,
   faDroplet,
+  faInbox,
   faPen,
   faPlus,
   faThumbTack,
@@ -32,6 +33,7 @@ import {
 import Week from '../../../../models/Week.model';
 import { EnrollmentGetRequest } from '../../../../models/Request.model';
 import { UtilsService } from '../../../../services/utils.service';
+import { SessionService } from '../../../../services/session.service';
 import Team from '../../../../models/Team.model';
 import { Class, School } from '../../../../models/School.model';
 
@@ -59,6 +61,7 @@ export class EnrollmentsSearchComponent implements OnInit {
   private api = inject(ApiService);
   private fb = inject(FormBuilder);
   private utils = inject(UtilsService);
+  private session = inject(SessionService);
 
   faThumbTackSlash = faThumbTackSlash;
   faThumbTack = faThumbTack;
@@ -70,6 +73,14 @@ export class EnrollmentsSearchComponent implements OnInit {
   faDroplet = faDroplet;
   faArrowRotateLeft = faArrowRotateLeft;
   faPlus = faPlus;
+  faInbox = faInbox;
+
+  /**
+   * Questa pagina basta `see_users`, la coda invece richiede
+   * `manage_enrollments`: il pulsante si mostra solo a chi puo' aprirla.
+   */
+  readonly canManageEnrollments = () =>
+    this.session.has('manage_enrollments');
 
   readonly enrollments = signal<EnrollmentSearch[]>([]);
   readonly weeks = signal<Week[]>([]);
