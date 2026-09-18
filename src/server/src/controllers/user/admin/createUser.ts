@@ -17,7 +17,7 @@ const createUserController: RouteController<CreateUserRoute> = async (c) => {
     birthDate,
     birthPlace,
   } = c.req.valid('json');
-  const res = await createUser(
+  await createUser(
     cf,
     password,
     name,

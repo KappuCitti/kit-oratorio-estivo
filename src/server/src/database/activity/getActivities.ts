@@ -1,6 +1,3 @@
-import { createErrorResult, createSuccessResult } from '@/utils/createResult';
-import { dbLogger } from '../logger';
-import { HttpStatusCodes } from '@/codes';
 import { db } from '..';
 import { activityTable } from '../schema/activities';
 import { and, count, eq, like, or, SQL } from 'drizzle-orm';

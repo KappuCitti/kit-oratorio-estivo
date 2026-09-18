@@ -10,15 +10,11 @@ import { cors } from 'hono/cors';
 import { csrf } from 'hono/csrf';
 import { secureHeaders } from 'hono/secure-headers';
 import { HTTPException } from 'hono/http-exception';
-import { parseZodError } from './parseZodError';
 import { httpErrorResponse } from './responses';
 import { HttpStatusCodes } from '@/codes';
 import { prefixJoin } from './joinPrefix';
 import { serveStatic } from 'hono/bun';
 import { DatabaseError } from '@/errors/database';
-
-// Riesportata perche' il resto del codice la importava da qui.
-export { createRouter } from './createRouter';
 
 export default function createApp() {
   const app = createRouter();

@@ -1,7 +1,6 @@
 import { HttpStatusCodes } from '@/codes';
 import { can } from '@/middlewares/hasPermission';
 import { idSchema } from '@/models/common.model';
-import { schoolListSchema } from '@/models/school.model';
 import {
   createJsonResBody,
   createRequiredJsonBody,

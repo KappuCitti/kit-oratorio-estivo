@@ -1,5 +1,4 @@
 import { HttpStatusCodes } from '@/codes';
-import { createErrorResult } from '@/utils/createResult';
 import { db } from '..';
 import { and, eq, gt } from 'drizzle-orm';
 import { hashPassword } from '@/utils/password';

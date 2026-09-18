@@ -1,7 +1,6 @@
 import { int, mysqlTable } from 'drizzle-orm/mysql-core';
 import { eventsTable } from './events';
 import { classTable } from './class';
-import { schoolTable } from './school';
 
 export const eventClassesTable = mysqlTable('event_classes', {
   eventId: int()

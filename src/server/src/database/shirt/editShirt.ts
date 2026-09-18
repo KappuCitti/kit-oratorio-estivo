@@ -1,5 +1,4 @@
 import { HttpStatusCodes } from '@/codes';
-import { createErrorResult } from '@/utils/createResult';
 import { db } from '..';
 import { eq } from 'drizzle-orm';
 import { shirtSizeTable } from '../schema/shirt';

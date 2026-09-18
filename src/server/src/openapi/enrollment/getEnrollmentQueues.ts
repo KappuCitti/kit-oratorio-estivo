@@ -5,10 +5,7 @@ import {
   queryPageSchema,
   querySizeSchema,
 } from '@/models/common.model';
-import {
-  bareEnrollmentSchema,
-  bareQueueEnrollmentSchema,
-} from '@/models/enrollment.model';
+import { bareQueueEnrollmentSchema } from '@/models/enrollment.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';

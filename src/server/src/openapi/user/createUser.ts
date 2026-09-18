@@ -1,7 +1,6 @@
 import { HttpStatusCodes } from '@/codes';
 import { can } from '@/middlewares/hasPermission';
 import { idSchema, phoneSchema } from '@/models/common.model';
-import { adminCreateUserSchema } from '@/models/user.model';
 import {
   createJsonResBody,
   createRequiredJsonBody,

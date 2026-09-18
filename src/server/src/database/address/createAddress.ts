@@ -1,11 +1,8 @@
 import type { BodyAddress } from '@/models/address.model';
-import { dbLogger } from '../logger';
-import { createErrorResult, createSuccessResult } from '@/utils/createResult';
-import { HttpStatusCodes } from '@/codes';
-import { db } from '..';
 import { and, eq } from 'drizzle-orm';
 import { addressTable } from '../schema/address';
 import type { Transaction } from '@/models/common.model';
+import { db } from '..';
 
 export async function createAddressIfNotExists(address: BodyAddress) {
   const existingAddress = await db.query.addresses.findFirst({

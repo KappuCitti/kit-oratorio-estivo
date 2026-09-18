@@ -1,7 +1,5 @@
 import type { ActivityWeek } from '@/models/activity.model';
-import { dbLogger } from '../logger';
 import { HttpStatusCodes } from '@/codes';
-import { createErrorResult, createSuccessResult } from '@/utils/createResult';
 import { activityExists } from './exists';
 import { checkValidWeeks } from '../week/checkValidWeeks';
 import { db } from '..';

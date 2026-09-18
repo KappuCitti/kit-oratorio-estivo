@@ -20,7 +20,13 @@ import week from './week';
  *
  * Anche qui la catena non va interrotta: `.route()` restituisce un tipo che
  * comprende le rotte del sotto-router, ed e' quel tipo che finisce in
- * `ApiType` e quindi nel client.
+ * `ApiType` (src/api-type.ts) e quindi nel client.
+ *
+ * E' il tipo del router v1 e non quello dell'applicazione intera perche' il
+ * prefisso (`/api`) e' configurabile a runtime da env o da config.toml: non
+ * essendo un letterale, montare sotto quel prefisso degraderebbe i percorsi a
+ * `string` e farebbe sparire la tipizzazione. Il prefisso resta quindi
+ * nell'indirizzo di base che il client passa a `hc`.
  */
 export const v1Router = createRouter()
   .route('/', activity)
@@ -36,16 +42,3 @@ export const v1Router = createRouter()
   .route('/', team)
   .route('/', user)
   .route('/', week);
-
-/**
- * Il contratto dell'API, consumato dal client via `hc<ApiType>`.
- *
- * E' il tipo del router v1 e non quello dell'applicazione intera perche' il
- * prefisso (`/api`) e' configurabile a runtime da env o da config.toml: non
- * essendo un letterale, montare sotto quel prefisso degraderebbe i percorsi a
- * `string` e farebbe sparire la tipizzazione. Il prefisso resta quindi
- * nell'indirizzo di base che il client passa a `hc`.
- */
-export type ApiType = typeof v1Router;
-
-export default v1Router;
