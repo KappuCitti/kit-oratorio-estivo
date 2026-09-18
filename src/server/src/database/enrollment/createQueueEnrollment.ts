@@ -5,6 +5,7 @@ import { db } from '..';
 import { enrollmentTable } from '../schema/enrollment';
 import { and, eq, inArray } from 'drizzle-orm';
 import { weekTable } from '../schema/week';
+import { checkRestrictions } from '../week/checkRestrictions';
 import { checkValidWeeks } from '../week/checkValidWeeks';
 import { getWeeksYear } from '../week/getWeeksYear';
 import { dateYear } from '../utils/year';
@@ -76,6 +77,27 @@ export async function createEnrollment(
 
   dbLogger.debug('Getting year');
   const year = await getWeeksYear(weeks);
+
+  // Una sola richiesta in attesa per persona e per anno: altrimenti un doppio
+  // invio del form lascerebbe al responsabile due richieste identiche, e
+  // approvarle entrambe darebbe due iscrizioni.
+  dbLogger.debug('Checking if already requested');
+  const alreadyRequested = !!(await db.query.enrollmentQueue.findFirst({
+    where: and(
+      eq(enrollmentQueueTable.userId, targetId),
+      eq(enrollmentQueueTable.year, year)
+    ),
+  }));
+  if (alreadyRequested)
+    throw new DatabaseError(
+      HttpStatusCodes.CONFLICT,
+      'enrollment_already_requested'
+    );
+
+  // Le regole delle iscrizioni online: periodo aperto e posti disponibili.
+  // Erano colonne in tabella e nessuno le applicava.
+  dbLogger.debug('Checking registration window and places');
+  await checkRestrictions(weeks);
 
   dbLogger.debug('Creating enrollment');
   return await db.transaction(async (tx) => {
