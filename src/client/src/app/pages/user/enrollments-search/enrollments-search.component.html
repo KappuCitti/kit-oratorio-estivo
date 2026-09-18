@@ -1,10 +1,11 @@
 <app-navbar />
 <div class="container min-h-4/5">
   <header class="mb-6">
-    <h1>Le mie iscrizioni</h1>
+    <h1>{{ isParent() ? "Le mie iscrizioni" : "La mia iscrizione" }}</h1>
     <p class="text-secondary">
-      Lo stato delle iscrizioni dei tuoi ragazzi per l'oratorio estivo
-      {{ year }}
+      @if (isParent()) { Lo stato delle iscrizioni dei tuoi ragazzi per
+      l'oratorio estivo {{ year }} } @else { La tua iscrizione all'oratorio
+      estivo {{ year }} }
     </p>
   </header>
 
@@ -41,7 +42,8 @@
                 class="rounded-lg px-2 py-1 text-sm"
                 [class]="{
                   'bg-neon-success': w.isPaid === true,
-                  'bg-neon-warning': w.isPaid !== true
+                  'bg-neon-warning': w.isPaid === false,
+                  'bg-neon-auto': w.isPaid === null
                 }"
                 title="{{ weekOf(w.weekId)?.startDate | date : 'dd/MM/yyyy' }} - {{
                   weekOf(w.weekId)?.endDate | date : 'dd/MM/yyyy'
@@ -52,10 +54,17 @@
                     ? ' - da pagare'
                     : ''
                 }}"
-                >{{ weekNumber(w.weekId) ?? '?' }}ª sett.</span
+                >{{ weekNumber(w.weekId) ?? '?' }}ª sett.@if
+                (weekOf(w.weekId)?.price; as prezzo) { · {{ prezzo }} €
+                }</span
               >
               }
             </p>
+            @if (amountDue(p); as dovuto) {
+            <p class="mt-1 text-sm">
+              Da pagare: <strong>{{ dovuto }} €</strong>
+            </p>
+            }
             }
           </div>
           <div class="flex flex-col items-end gap-2">
@@ -69,7 +78,7 @@
             >
               {{ statusLabel(p.status) }}
             </span>
-            @if (p.status === 'none') {
+            @if (isParent() && p.status === 'none') {
             <a
               class="button-primary text-sm"
               [routerLink]="['/user/enrollments/new']"
@@ -79,7 +88,7 @@
           </div>
         </div>
       </li>
-      } @empty { @if (!loading()) {
+      } @empty { @if (!loading() && isParent()) {
       <li class="flex flex-col items-center justify-center gap-2 h-24">
         <span class="text-secondary">
           Per iscrivere un ragazzo, prima aggiungilo alla tua famiglia

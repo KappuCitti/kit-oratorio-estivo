@@ -117,9 +117,35 @@ export class ApiService {
     return request(api.users.enrollments.$get({ query: { year } }));
   }
 
+  /**
+   * L'iscrizione di chi e' collegato: la vista del ragazzo. Lo stato dei
+   * pagamenti c'e' solo se chi lo gestisce lo consente.
+   */
+  getOwnEnrollment(year: number) {
+    return request(api.users.self.enrollments.$get({ query: { year } }));
+  }
+
+  /** Il genitore decide se il ragazzo vede prezzi e pagamenti. */
+  setShowPayments(id: string, showPayments: boolean) {
+    return request(
+      api.users[':id']['payments-visibility'].$put({
+        param: { id },
+        json: { showPayments },
+      })
+    );
+  }
+
   // Weeks
   getWeeks(year: number | string) {
     return request(api.weeks.$get({ query: { year: Number(year) } }));
+  }
+
+  /** Limite di posti e comportamento quando e' raggiunto. */
+  editWeek(
+    id: number,
+    changes: { maxEnrollments?: number; allowOverbooking?: boolean }
+  ) {
+    return request(api.weeks[':id'].$put({ param: { id }, json: changes }));
   }
 
   // Teams

@@ -62,7 +62,44 @@
       <a class="button-secondary" [routerLink]="['/user/people']">Famiglia</a>
     </div>
   </div>
-  } @else {
+  } @else if (isEnrollable()) { @if (session.user(); as io) {
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-6">
+    <h2 class="mb-4">I miei dati</h2>
+    <div class="flex flex-wrap -mx-2">
+      <p class="sm:w-1/2 w-full px-2 mb-2">
+        <span class="text-secondary">Nome:</span> {{ io.name }} {{ io.surname }}
+      </p>
+      <p class="sm:w-1/2 w-full px-2 mb-2">
+        <span class="text-secondary">Codice fiscale:</span> {{ io.id }}
+      </p>
+      @if (io.birthDate) {
+      <p class="sm:w-1/2 w-full px-2 mb-2">
+        <span class="text-secondary">Data di nascita:</span>
+        {{ io.birthDate | date : "dd/MM/yyyy" }}
+      </p>
+      } @if (io.birthPlace) {
+      <p class="sm:w-1/2 w-full px-2 mb-2">
+        <span class="text-secondary">Luogo di nascita:</span>
+        {{ io.birthPlace }}
+      </p>
+      }
+    </div>
+    <p class="text-secondary text-sm mt-2">
+      Per correggere i tuoi dati chiedi ai tuoi genitori o ai responsabili
+      dell'oratorio.
+    </p>
+  </div>
+  } @if (own(); as mia) {
+  <div class="bg-auto p-4 rounded-lg shadow-lg mb-8">
+    <h2 class="mb-2">Oratorio estivo {{ year }}</h2>
+    <p class="mb-4">{{ statusLabel(mia.status) }}</p>
+    @if (mia.status !== 'none') {
+    <a class="button-secondary" [routerLink]="['/user/enrollments']"
+      >Vedi la mia iscrizione</a
+    >
+    }
+  </div>
+  } } @else {
   <div class="bg-auto p-4 rounded-lg shadow-lg mb-8">
     <p>
       Da qui puoi gestire il tuo profilo.

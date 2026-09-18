@@ -46,6 +46,20 @@
     @for (child of childs(); track child.id) {
     <div class="mb-4">
       <app-family-member [familyMember]="child" [editable]="false" />
+      <label class="flex items-center gap-2 mt-2 cursor-pointer">
+        <input
+          type="checkbox"
+          [checked]="child.showPayments"
+          [disabled]="saving() === child.id"
+          (change)="toggleShowPayments(child, $event)"
+        />
+        <span>
+          Mostra a {{ child.name }} i prezzi e lo stato dei pagamenti
+          <span class="text-secondary text-sm">
+            (tu li vedi sempre)
+          </span>
+        </span>
+      </label>
     </div>
     } @empty { @if (!loading()) {
     <div class="flex flex-col items-center justify-center gap-2 h-24">
@@ -54,7 +68,11 @@
         Aggiungi un ragazzo
       </a>
     </div>
-    } }
+    } } @if (error(); as messaggio) {
+    <div class="bg-neon-error p-3 rounded-lg shadow-lg mt-4 text-center">
+      {{ messaggio }}
+    </div>
+    }
   </div>
 </div>
 

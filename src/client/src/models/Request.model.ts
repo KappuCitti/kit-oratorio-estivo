@@ -74,7 +74,8 @@ export type ManagedPersonCreateRequest = InferRequestType<
 //
 // Erano interfacce scritte a mano, con due errori gia' trovati in passato
 // (`id: number | string`, `schooldId`). Dedotte dal contratto non possono
-// piu' divergere.
+// piu' divergere. Scuole e classi servono ai pulsanti "+" della pagina
+// Impostazioni, non ancora collegati.
 
 export type TeamCreateRequest = InferRequestType<
   typeof api.teams.$post

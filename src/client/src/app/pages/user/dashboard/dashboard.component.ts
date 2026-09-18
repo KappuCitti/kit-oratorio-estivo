@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ManagedEnrollment } from '../../../../models/Enrollment.model';
@@ -7,19 +8,20 @@ import { FooterComponent } from '../../../components/footer/footer.component';
 import { NavbarComponent } from '../../../components/navbar/navbar.component';
 
 /**
- * La pagina iniziale di chi non e' un responsabile.
+ * La pagina iniziale dell'area utente.
  *
- * Prima conteneva solo "Ciao, Lorem Ipsum" e un riquadro vuoto. Ora saluta per
- * nome e riassume l'anno: quanti ragazzi, quanti iscritti, quanti in attesa e
- * quante settimane restano da pagare.
+ * - Il genitore vede il riepilogo dell'anno: quanti ragazzi, quanti iscritti,
+ *   quanti in attesa, quante settimane restano da pagare.
+ * - Il ragazzo vede i propri dati e lo stato della propria iscrizione. Non
+ *   vede nulla dei genitori, e non puo' modificare i propri dati: la pagina
+ *   non offre nessun campo modificabile, e il server non ha una rotta con cui
+ *   farlo.
  *
- * Il riepilogo si mostra solo a chi gestisce dei ragazzi: un ragazzo che accede
- * con il proprio account non ha il permesso di leggere quelle informazioni, e
- * la chiamata finirebbe in un 403.
+ * Prima conteneva solo "Ciao, Lorem Ipsum" e un riquadro vuoto.
  */
 @Component({
   selector: 'app-dashboard',
-  imports: [NavbarComponent, FooterComponent, RouterLink],
+  imports: [NavbarComponent, FooterComponent, RouterLink, DatePipe],
   templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent implements OnInit {
@@ -28,10 +30,14 @@ export class DashboardComponent implements OnInit {
 
   readonly year = new Date().getFullYear();
   readonly people = signal<ManagedEnrollment[]>([]);
+  readonly own = signal<ManagedEnrollment | null>(null);
   readonly loaded = signal(false);
 
   readonly isParent = computed(() =>
     this.session.has('manage_self_child_users')
+  );
+  readonly isEnrollable = computed(
+    () => !this.isParent() && this.session.has('be_enrolled')
   );
 
   readonly enrolled = computed(
@@ -51,17 +57,39 @@ export class DashboardComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    if (!this.isParent()) return;
+    if (this.isParent()) {
+      this.api.getManagedEnrollments(this.year).subscribe({
+        next: (response) => {
+          if (response.body?.success) this.people.set(response.body.data);
+          this.loaded.set(true);
+        },
+        error: (error) => {
+          console.error(error);
+          this.loaded.set(true);
+        },
+      });
+    } else if (this.isEnrollable()) {
+      this.api.getOwnEnrollment(this.year).subscribe({
+        next: (response) => {
+          if (response.body?.success) this.own.set(response.body.data);
+          this.loaded.set(true);
+        },
+        error: (error) => {
+          console.error(error);
+          this.loaded.set(true);
+        },
+      });
+    }
+  }
 
-    this.api.getManagedEnrollments(this.year).subscribe({
-      next: (response) => {
-        if (response.body?.success) this.people.set(response.body.data);
-        this.loaded.set(true);
-      },
-      error: (error) => {
-        console.error(error);
-        this.loaded.set(true);
-      },
-    });
+  statusLabel(status: ManagedEnrollment['status']): string {
+    switch (status) {
+      case 'enrolled':
+        return 'Sei iscritto';
+      case 'pending':
+        return 'La tua iscrizione è in attesa di approvazione';
+      default:
+        return 'Non sei ancora iscritto';
+    }
   }
 }
