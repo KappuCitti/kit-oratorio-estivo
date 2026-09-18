@@ -1,6 +1,6 @@
 import { HttpStatusCodes } from '@/codes';
 import { isLogged } from '@/middlewares/isLogged';
-import { weekSchema } from '@/models/week.model';
+import { weekListItemSchema } from '@/models/week.model';
 import { createJsonResBody } from '@/utils/createOpenApiBody';
 import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
@@ -18,7 +18,7 @@ export const getWeekListRouteDef = createRoute({
   responses: {
     [HttpStatusCodes.OK]: createJsonResBody(
       true,
-      z.array(weekSchema),
+      z.array(weekListItemSchema),
       'List of weeks for the given year'
     ),
     [HttpStatusCodes.INTERNAL_SERVER_ERROR]: createJsonResBody(

@@ -19,6 +19,11 @@ import { weekTable } from '../schema/week';
  * dopo la chiusura delle iscrizioni deve restare possibile.
  *
  * I posti contano solo le iscrizioni confermate, non le richieste in attesa.
+ *
+ * Una settimana piena rifiuta solo se i responsabili l'hanno impostata cosi'
+ * (`allowOverbooking` spento). Altrimenti la richiesta passa: il genitore e'
+ * gia' stato avvisato dal form che potrebbe non essere accettata, e chi la
+ * esamina in coda vede che la settimana e' oltre il limite.
  */
 export async function checkRestrictions(weekIds: number[]) {
   // Confronto per sola data, senza orario: un'iscrizione fatta nel giorno di
@@ -37,6 +42,7 @@ export async function checkRestrictions(weekIds: number[]) {
       maxEnrollments: weekTable.maxEnrollments,
       registrationOpenDate: weekTable.registrationOpenDate,
       registrationCloseDate: weekTable.registrationCloseDate,
+      allowOverbooking: weekTable.allowOverbooking,
     })
     .from(weekTable)
     .where(inArray(weekTable.id, weekIds));
@@ -57,7 +63,7 @@ export async function checkRestrictions(weekIds: number[]) {
       .from(enrollmentWeeksTable)
       .where(eq(enrollmentWeeksTable.weekId, week.id));
 
-    if (iscritti.count >= week.maxEnrollments) {
+    if (iscritti.count >= week.maxEnrollments && !week.allowOverbooking) {
       throw new DatabaseError(HttpStatusCodes.CONFLICT, 'week_full');
     }
   }

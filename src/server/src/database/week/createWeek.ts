@@ -11,7 +11,8 @@ export async function createWeek(
   price: number,
   maxEnrollments: number,
   registrationOpenDate: string,
-  registrationCloseDate: string
+  registrationCloseDate: string,
+  allowOverbooking = false
 ) {
   const conflict = await db.query.weeks.findFirst({
     where: not(
@@ -38,6 +39,7 @@ export async function createWeek(
       maxEnrollments,
       registrationOpenDate: strDate(registrationOpenDate),
       registrationCloseDate: strDate(registrationCloseDate),
+      allowOverbooking,
     })
     .$returningId();
   return week.id;

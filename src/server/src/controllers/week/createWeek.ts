@@ -11,6 +11,7 @@ const createWeekController: RouteController<CreateWeekRoute> = async (c) => {
     maxEnrollments,
     registrationOpenDate,
     registrationCloseDate,
+    allowOverbooking,
   } = await c.req.valid('json');
   const res = await createWeek(
     startDate,
@@ -18,7 +19,8 @@ const createWeekController: RouteController<CreateWeekRoute> = async (c) => {
     price,
     maxEnrollments,
     registrationOpenDate,
-    registrationCloseDate
+    registrationCloseDate,
+    allowOverbooking
   );
   return httpSuccessResponse(c, res);
 };

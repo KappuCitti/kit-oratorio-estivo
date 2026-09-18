@@ -21,6 +21,7 @@ export const createWeekRouteDef = createRoute({
         maxEnrollments: z.number().int().positive(),
         registrationOpenDate: z.string().date(),
         registrationCloseDate: z.string().date(),
+        allowOverbooking: z.boolean().default(false),
       }),
       'Data of the week'
     ),
