@@ -44,3 +44,17 @@ export type QueueEnrollment = Extract<
   QueueResponse,
   { success: true }
 >['data']['elements'][number];
+
+type ManagedResponse = InferResponseType<
+  typeof api.users.enrollments.$get,
+  200
+>;
+
+/**
+ * Lo stato di iscrizione di una persona gestita dal genitore: `enrolled`,
+ * `pending` (richiesta in coda) o `none`.
+ */
+export type ManagedEnrollment = Extract<
+  ManagedResponse,
+  { success: true }
+>['data'][number];

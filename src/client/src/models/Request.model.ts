@@ -53,29 +53,41 @@ export type FamilyCreateRequest = InferRequestType<
 /** Una persona dentro la richiesta di creazione di un nucleo familiare. */
 export type FamilyPersonRequest = FamilyCreateRequest['managed'][number];
 
-export interface TeamCreateRequest {
-  name: string;
-  color: string;
-}
+/** Filtri della coda: ha i propri, non quelli dell'elenco iscrizioni. */
+export type QueueGetRequest = InferRequestType<
+  typeof api.enrollments.queue.$get
+>['query'];
 
-export interface TeamUpdateRequest {
-  // Era `number | string`: il server accetta solo un numero.
-  id: number;
-  name?: string;
-  color?: string;
-  child?: {
-    type: 'SET' | 'ADD';
-    ids: number[];
-  };
-}
-export interface SchoolCreateRequest {
-  name: string;
-  canChooseActivities: boolean;
-}
+// --- Genitore ---
 
-export interface ClassCreateRequest {
-  name: string;
-  // Il server si aspetta `schoolId` (e un numero): era scritto `schooldId`,
-  // quindi la chiamata sarebbe stata rifiutata con 422 appena collegata alla UI.
-  schoolId: number;
-}
+/** Registrazione pubblica. Il ruolo lo decide il server. */
+export type RegisterRequest = InferRequestType<
+  typeof api.user.register.$post
+>['json'];
+
+/** Un ragazzo aggiunto dal genitore al proprio nucleo. */
+export type ManagedPersonCreateRequest = InferRequestType<
+  typeof api.users.$post
+>['json'];
+
+// --- Squadre, scuole e classi ---
+//
+// Erano interfacce scritte a mano, con due errori gia' trovati in passato
+// (`id: number | string`, `schooldId`). Dedotte dal contratto non possono
+// piu' divergere.
+
+export type TeamCreateRequest = InferRequestType<
+  typeof api.teams.$post
+>['json'];
+
+export type TeamUpdateRequest = InferRequestType<
+  (typeof api.teams)[':id']['$put']
+>['json'] & { id: number };
+
+export type SchoolCreateRequest = InferRequestType<
+  typeof api.schools.$post
+>['json'];
+
+export type ClassCreateRequest = InferRequestType<
+  typeof api.classes.$post
+>['json'];

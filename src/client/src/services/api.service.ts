@@ -8,9 +8,12 @@ import {
   EnrollmentGetRequest,
   EnrollmentUpdateRequest,
   FamilyCreateRequest,
+  ManagedPersonCreateRequest,
   PeopleGetRequest,
   PersonUpdateRequest,
   QueueEnrollmentCreateRequest,
+  QueueGetRequest,
+  RegisterRequest,
   SchoolCreateRequest,
   TeamCreateRequest,
   TeamUpdateRequest,
@@ -37,6 +40,11 @@ export class ApiService {
 
   logout() {
     return request(api.user.logout.$post());
+  }
+
+  /** Registrazione pubblica: crea un account da genitore. */
+  register(data: RegisterRequest) {
+    return request(api.user.register.$post({ json: data }));
   }
 
   getUser() {
@@ -87,13 +95,26 @@ export class ApiService {
   }
 
   /** Le richieste in attesa di approvazione. */
-  getEnrollmentQueue(params: EnrollmentGetRequest) {
+  getEnrollmentQueue(params: QueueGetRequest) {
     return request(api.enrollments.queue.$get({ query: params }));
   }
 
   /** Approva una richiesta in coda e la trasforma in iscrizione. */
   approveEnrollment(approval: EnrollmentApprovalRequest) {
     return request(api.enrollments.$post({ json: approval }));
+  }
+
+  /** Rifiuta una richiesta in coda, cancellandola. */
+  rejectEnrollmentRequest(id: number) {
+    return request(api.enrollments.queue[':id'].$delete({ param: { id } }));
+  }
+
+  /**
+   * Lo stato di iscrizione delle persone gestite da chi e' collegato: la
+   * vista del genitore, che non ha accesso a GET /enrollments.
+   */
+  getManagedEnrollments(year: number) {
+    return request(api.users.enrollments.$get({ query: { year } }));
   }
 
   // Weeks
@@ -128,6 +149,11 @@ export class ApiService {
   /** Le persone gestite da chi e' collegato: tipicamente i propri figli. */
   getManagedPeople() {
     return request(api.users.$get());
+  }
+
+  /** Aggiunge un ragazzo al proprio nucleo; il ruolo lo decide il server. */
+  addManagedPerson(person: ManagedPersonCreateRequest) {
+    return request(api.users.$post({ json: person }));
   }
 
   // Rubrica (amministrazione)
