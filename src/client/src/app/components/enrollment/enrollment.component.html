@@ -59,8 +59,10 @@
               : "No, non presto il consenso"
           }}</span>
         </div>
-        <!-- L'uscita autonoma la decidono i responsabili: chi non ha il
-             permesso non vede la casella, e il campo non viene inviato. -->
+        <!-- Consenso a far portare il ragazzo fuori dalla struttura
+             dall'oratorio. Chi non ha il permesso di darlo via software non
+             vede la casella (e il campo non viene inviato): per lui vale il
+             modulo cartaceo, annotato poi da un responsabile. -->
         @if (canGiveExitAuthorization()) {
         <div class="mb-4 sm:w-1/2 w-full px-2">
           <label class="block required">Consenso alle uscite</label>

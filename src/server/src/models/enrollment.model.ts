@@ -114,9 +114,10 @@ export type EnrollmentDetail = z.infer<typeof enrollmentDetailSchema>;
 /**
  * Una richiesta in coda, come la vede chi deve approvarla.
  *
- * Porta la sezione e le note del genitore, che servono a decidere, e
- * l'uscita autonoma: in coda puo' essere nulla, perche' i genitori non hanno
- * il permesso di sceglierla e la decide il responsabile all'approvazione.
+ * Porta la sezione e le note del genitore, che servono a decidere, e il
+ * consenso a portare il ragazzo fuori dalla struttura: in coda puo' essere
+ * nulla, perche' chi non ha il permesso di darlo via software passa dal
+ * modulo cartaceo, e un responsabile lo annota all'approvazione.
  */
 export const bareQueueEnrollmentSchema = bareEnrollmentSchema
   .omit({

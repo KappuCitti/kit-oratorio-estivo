@@ -36,10 +36,12 @@ import { PaginationComponent } from '../../../components/pagination/pagination.c
  * si rifiuta. Prima questa pagina non esisteva, quindi le richieste restavano
  * in coda senza che nessuno potesse vederle.
  *
- * All'approvazione il responsabile completa cio' che il genitore non puo'
- * decidere: la squadra, quali settimane risultano gia' pagate e l'uscita
- * autonoma. Le settimane sono quelle richieste dal genitore e non si cambiano
- * qui: per modificarle si approva e poi si corregge l'iscrizione.
+ * All'approvazione il responsabile completa quello che manca: la squadra,
+ * quali settimane risultano gia' pagate, e il consenso a portare il ragazzo
+ * fuori dalla struttura quando il genitore l'ha dato sul modulo cartaceo
+ * invece che via software. Le settimane sono quelle richieste dal genitore e
+ * non si cambiano qui: per modificarle si approva e poi si corregge
+ * l'iscrizione.
  */
 @Component({
   selector: 'app-enrollments-queue',
@@ -86,8 +88,9 @@ export class EnrollmentsQueueComponent implements OnInit {
   readonly approvalError = signal<string | null>(null);
 
   /**
-   * Come nel form di iscrizione: il server rifiuta `exitAuthorization` da chi
-   * non ha il permesso di concederla, anche quando vale `false`.
+   * Il consenso a far portare il ragazzo fuori dalla struttura. Come nel form
+   * di iscrizione, il server lo rifiuta da chi non ha il permesso di darlo,
+   * anche quando vale `false`.
    */
   readonly canGiveExitAuthorization = () =>
     this.session.has('give_exit_authorization');

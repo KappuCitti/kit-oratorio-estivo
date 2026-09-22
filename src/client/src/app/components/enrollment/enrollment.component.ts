@@ -60,13 +60,19 @@ export class EnrollmentComponent implements OnChanges {
   private session = inject(SessionService);
 
   /**
-   * Chi puo' decidere se il ragazzo esce da solo.
+   * Il consenso a far portare il ragazzo fuori dalla struttura dall'oratorio:
+   * una passeggiata al parco vicino, o il pronto soccorso in caso di
+   * necessita'. Lo da' il genitore, non e' "il ragazzo esce da solo".
    *
    * Il server rifiuta con 403 chi invia `exitAuthorization` senza il permesso
    * `give_exit_authorization` - e lo rifiuta anche quando lo invia a `false`,
-   * perche' la sola presenza del campo e' una decisione. I genitori non hanno
-   * quel permesso: e' una scelta che spetta ai responsabili. La casella quindi
-   * non si mostra a chi non potrebbe usarla, com'e' per il resto dell'interfaccia.
+   * perche' la sola presenza del campo e' una decisione. Chi non ce l'ha passa
+   * dal modulo cartaceo, che un responsabile annota in un secondo momento.
+   *
+   * Il controllo guarda il permesso vero della persona, in qualunque pagina si
+   * trovi: e' cosi' che un responsabile che e' anche genitore puo' darlo
+   * mentre iscrive il proprio figlio dalla coda, che e' il caso per cui questo
+   * permesso esiste.
    */
   readonly canGiveExitAuthorization = computed(() =>
     this.session.has('give_exit_authorization')
