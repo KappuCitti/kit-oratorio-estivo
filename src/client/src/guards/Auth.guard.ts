@@ -1,20 +1,17 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 import type { Permission } from '../models/permissions.generated';
-import { SessionService, areaOfUrl } from '../services/session.service';
+import { SessionService } from '../services/session.service';
 
 /*
  * Il cookie di sessione e' HttpOnly, quindi da JavaScript non e' leggibile:
  * l'unico modo per sapere se la sessione e' valida e' chiederlo al server.
+ * La vecchia versione leggeva `user_token` con CookieService e usciva subito se
+ * era vuoto: con un cookie HttpOnly quel controllo manderebbe sempre al login.
  *
  * Tutte le guard passano da SessionService, che la richiesta la fa una volta
  * sola e la condivide.
- *
- * I permessi si valutano nell'area dell'indirizzo DI DESTINAZIONE (/user o
- * /admin), non in quella corrente: durante la navigazione l'indirizzo non e'
- * ancora cambiato, e usare l'area di partenza lascerebbe entrare in /admin con
- * i permessi raccolti su /user, o viceversa.
  */
 
 /**
@@ -33,72 +30,63 @@ export const LoginGuard: CanActivateFn = () => {
   );
 };
 
-/**
- * Protegge le pagine che richiedono una sessione. Se la pagina appartiene a
- * un'area in cui l'utente non puo' entrare (un genitore su /admin, un
- * responsabile senza famiglia su /user), si torna alla pagina iniziale.
- */
-export const AuthGuard: CanActivateFn = (_route, state) => {
+/** Protegge le pagine che richiedono una sessione, senza guardare i permessi. */
+export const AuthGuard: CanActivateFn = () => {
   const session = inject(SessionService);
   const router = inject(Router);
 
-  return session.load().pipe(
-    map((user) => {
-      if (!user) return router.parseUrl('/login');
-      const area = areaOfUrl(state.url);
-      if (area && !session.canEnter(area))
-        return router.parseUrl(session.landingPath());
-      return true;
-    })
-  );
+  return session
+    .load()
+    .pipe(map((user) => (user ? true : router.parseUrl('/login'))));
 };
 
-function guard(
-  test: (session: SessionService, state: RouterStateSnapshot) => boolean
-): CanActivateFn {
-  return (_route, state) => {
+/**
+ * Protegge una pagina con gli stessi permessi che il server pretende sulle
+ * rotte che quella pagina chiama.
+ *
+ * Chi non li ha non viene lasciato sulla pagina: le voci di menu
+ * corrispondenti sono gia' nascoste dalla navbar, e chi arriva scrivendo
+ * l'indirizzo a mano viene riportato alla propria pagina iniziale. Il server
+ * rifiuterebbe comunque le chiamate, ma mostrare una pagina che non puo'
+ * funzionare sarebbe solo un modo piu' lento di dire di no.
+ *
+ * I permessi sono del tipo generato dal server: scriverne uno inesistente non
+ * compila.
+ */
+export function permissionGuard(...required: Permission[]): CanActivateFn {
+  return () => {
     const session = inject(SessionService);
     const router = inject(Router);
 
     return session.load().pipe(
       map((user) => {
         if (!user) return router.parseUrl('/login');
-        if (test(session, state)) return true;
+        if (session.hasAll(...required)) return true;
         return router.parseUrl(session.landingPath());
       })
     );
   };
 }
 
-function areaOf(session: SessionService, state: RouterStateSnapshot) {
-  return areaOfUrl(state.url) ?? session.defaultArea();
-}
-
 /**
- * Protegge una pagina con gli stessi permessi che il server pretende sulle
- * rotte che quella pagina chiama, valutati nell'area della pagina.
+ * Come `permissionGuard`, ma basta uno dei permessi.
  *
- * Chi non li ha non viene lasciato sulla pagina: le voci di menu
- * corrispondenti sono gia' nascoste dalla navbar, e chi arriva scrivendo
- * l'indirizzo a mano viene riportato alla propria pagina iniziale.
- *
- * I permessi sono del tipo generato dal server: scriverne uno inesistente non
- * compila.
- */
-export function permissionGuard(...required: Permission[]): CanActivateFn {
-  return guard((session, state) => {
-    const area = areaOf(session, state);
-    return required.every((p) => session.hasIn(area, p));
-  });
-}
-
-/**
- * Come `permissionGuard`, ma basta uno dei permessi: serve alle pagine che
- * mostrano cose diverse al genitore e al ragazzo.
+ * Serve alle pagine che mostrano cose diverse a chi le apre: "Le mie
+ * iscrizioni" vale sia per il genitore, che vede quelle dei figli
+ * (`manage_self_child_users`), sia per il ragazzo, che vede la propria
+ * (`be_enrolled`).
  */
 export function anyPermissionGuard(...required: Permission[]): CanActivateFn {
-  return guard((session, state) => {
-    const area = areaOf(session, state);
-    return required.some((p) => session.hasIn(area, p));
-  });
+  return () => {
+    const session = inject(SessionService);
+    const router = inject(Router);
+
+    return session.load().pipe(
+      map((user) => {
+        if (!user) return router.parseUrl('/login');
+        if (session.hasAny(...required)) return true;
+        return router.parseUrl(session.landingPath());
+      })
+    );
+  };
 }

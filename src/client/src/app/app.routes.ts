@@ -69,7 +69,6 @@ const commonRoutes: Routes = [
       import('./pages/user/enrollments-create/enrollments-create.component').then(
         (m) => m.EnrollmentsCreateComponent
       ),
-    // POST /enrollments/queue: solo chi gestisce dei ragazzi.
     canActivate: [AuthGuard, permissionGuard('manage_self_child_users')],
   },
   {

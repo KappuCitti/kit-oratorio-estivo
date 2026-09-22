@@ -1,5 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
+import { filter, map } from 'rxjs/operators';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
@@ -12,18 +14,29 @@ import { SessionService } from '../../../services/session.service';
 })
 export class FooterComponent {
   private session = inject(SessionService);
+  private router = inject(Router);
 
   faHeart = faHeart;
   faGithub = faGithub;
 
+  private readonly url = toSignal(
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      map((e) => e.urlAfterRedirects)
+    ),
+    { initialValue: this.router.url }
+  );
+
   /**
-   * Il passaggio all'altra area, solo per chi e' sia responsabile sia genitore
-   * o ragazzo. Prima "Dashboard admin" compariva a chiunque, genitori compresi,
-   * e portava a una pagina che la guard rifiutava.
+   * Il collegamento all'altra meta' del sito, per chi ha pagine da
+   * responsabile: porta a quella dove non si trova in questo momento.
+   *
+   * Prima era un "Dashboard admin" fisso, mostrato a chiunque: un genitore lo
+   * vedeva e ci finiva contro, perche' quelle pagine non sono sue.
    */
   readonly switchLink = computed(() => {
-    if (!this.session.hasBothAreas()) return null;
-    return this.session.area() === 'admin'
+    if (!this.session.has('see_users')) return null;
+    return this.url().startsWith('/admin')
       ? { url: '/user/dashboard', label: 'Dashboard utente' }
       : { url: '/admin/dashboard', label: 'Dashboard admin' };
   });
