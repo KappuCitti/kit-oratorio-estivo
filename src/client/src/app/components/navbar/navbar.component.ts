@@ -1,6 +1,7 @@
 import { NgClass } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import {
   FontAwesomeModule,
   IconDefinition,
@@ -31,12 +32,19 @@ interface Page {
   icon: IconDefinition;
   title: string;
   /**
-   * Permesso richiesto nell'area corrente; con una lista ne basta uno. Se
-   * manca, la voce vale per chiunque sia collegato.
+   * Permesso richiesto; con una lista ne basta uno. Se manca, la voce vale per
+   * chiunque sia collegato.
    */
   permission?: Permission | Permission[];
   /** Funzione non ancora realizzata: la voce si vede ma non e' cliccabile. */
   disabled?: boolean;
+  /**
+   * Questa voce ha una pagina solo sotto /admin: su /user quell'indirizzo non
+   * esiste. Non basta escluderla col permesso, perche' un responsabile che e'
+   * anche genitore quel permesso ce l'ha comunque: e' un fatto sulla rotta, non
+   * su chi e' collegato.
+   */
+  adminOnly?: boolean;
 }
 
 @Component({
@@ -69,16 +77,26 @@ export class NavbarComponent {
   readonly isDropdownOpen = signal(false);
 
   /**
-   * In quale area si trova l'utente: quella della pagina aperta.
-   *
-   * Per un po' e' stata dedotta dai permessi (`see_users`), e cosi' chi e'
-   * responsabile e anche genitore vedeva il menu di amministrazione anche su
-   * /user. Ora segue l'indirizzo, ma senza il vecchio difetto di quando lo
-   * faceva gia': SessionService non concede permessi in un'area in cui
-   * l'utente non puo' entrare, quindi scrivere a mano un indirizzo /admin non
-   * fa comparire nessuna voce (e la guard riporta comunque indietro).
+   * Il router notifica la navigazione con un flusso di eventi (e' un'API a
+   * Observable): lo si porta nel mondo dei signal una volta sola, con
+   * `toSignal`, senza operatori RxJS di mezzo. Il resto - riconoscere
+   * l'evento giusto, leggere l'indirizzo - resta nel mondo dei signal, dentro
+   * i `computed` qui sotto.
    */
-  readonly isAdminArea = computed(() => this.session.area() === 'admin');
+  private readonly navigation = toSignal(this.router.events, {
+    initialValue: null,
+  });
+
+  /**
+   * In quale zona del sito ci si trova: lo dice l'indirizzo, non i permessi.
+   * Chi e' responsabile e anche genitore vede quindi il menu giusto per la
+   * pagina che ha aperto, non sempre quello da responsabile.
+   */
+  readonly isAdminArea = computed(() => {
+    const event = this.navigation();
+    const url = event instanceof NavigationEnd ? event.urlAfterRedirects : this.router.url;
+    return url.startsWith('/admin');
+  });
   readonly baseURL = computed(() => (this.isAdminArea() ? '/admin' : '/user'));
 
   /**
@@ -107,18 +125,21 @@ export class NavbarComponent {
         icon: this.faHighlighter,
         title: 'Presenze',
         permission: 'manage_attendances',
+        adminOnly: true,
       },
       {
         url: `${base}/teams`,
         icon: this.faFlag,
         title: 'Squadre',
         permission: 'manage_teams',
+        adminOnly: true,
       },
       {
         url: `${base}/settings`,
         icon: this.faGears,
         title: 'Impostazioni',
         permission: 'manage_classes',
+        adminOnly: true,
       },
       // La stessa voce serve due pagine diverse: la rubrica di tutte le
       // persone per i responsabili, il proprio nucleo familiare per i
@@ -133,13 +154,16 @@ export class NavbarComponent {
       },
 
       // Funzioni dichiarate nel README ma non ancora realizzate: nessuna di
-      // queste rotte esiste, quindi restano non cliccabili.
+      // queste rotte esiste, quindi restano non cliccabili. Sono comunque
+      // gestione lato oratorio (adminOnly): un genitore non ha motivo di
+      // vederle come segnaposto nella propria area.
       {
         url: `${base}/trips`,
         icon: this.faMountainSun,
         title: 'Eventi',
         permission: 'manage_events',
         disabled: true,
+        adminOnly: true,
       },
       {
         url: `${base}/staff`,
@@ -147,6 +171,7 @@ export class NavbarComponent {
         title: 'Staff',
         permission: 'manage_users',
         disabled: true,
+        adminOnly: true,
       },
       {
         url: `${base}/leaderboard`,
@@ -154,6 +179,7 @@ export class NavbarComponent {
         title: 'Classifica',
         permission: 'manage_teams',
         disabled: true,
+        adminOnly: true,
       },
       {
         url: `${base}/games`,
@@ -161,6 +187,7 @@ export class NavbarComponent {
         title: 'Giochi',
         permission: 'manage_activities',
         disabled: true,
+        adminOnly: true,
       },
       {
         url: `${base}/music`,
@@ -168,10 +195,12 @@ export class NavbarComponent {
         title: 'Musica',
         permission: 'manage_activities',
         disabled: true,
+        adminOnly: true,
       },
     ];
 
     return all.filter((page) => {
+      if (page.adminOnly && !admin) return false;
       if (!page.permission) return true;
       const richiesti = Array.isArray(page.permission)
         ? page.permission
