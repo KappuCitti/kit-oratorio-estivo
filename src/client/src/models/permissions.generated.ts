@@ -44,40 +44,6 @@ export const PERMISSIONS = [
 
 export type Permission = (typeof PERMISSIONS)[number];
 
-export const AREAS = ['user', 'admin'] as const;
-
-export type Area = (typeof AREAS)[number];
-
-/**
- * In quale area vale ciascun permesso: su /user solo quelli dell'area utente,
- * su /admin solo quelli dell'area admin. Vedi PERMISSION_AREAS sul server.
- */
-export const PERMISSION_AREAS = {
-  be_enrolled: ['user'],
-  be_managed: ['user'],
-  be_selected: ['user'],
-  give_exit_authorization: ['admin'],
-  login: ['user', 'admin'],
-  manage_activities: ['admin'],
-  manage_attendances: ['admin'],
-  manage_classes: ['admin'],
-  manage_enrollments: ['admin'],
-  manage_events: ['admin'],
-  manage_personal_info: ['user'],
-  manage_roles: ['admin'],
-  manage_self_child_users: ['user'],
-  manage_teams: ['admin'],
-  manage_users: ['admin'],
-  manage_weeks: ['admin'],
-  register: ['user'],
-  register_child_users: ['user'],
-  see_activities: ['user', 'admin'],
-  see_classes: ['user', 'admin'],
-  see_personal_info: ['user', 'admin'],
-  see_stats: ['admin'],
-  see_users: ['admin'],
-} as const satisfies Record<Permission, readonly Area[]>;
-
 /**
  * Il permesso che il server richiede su ciascuna rotta protetta.
  *

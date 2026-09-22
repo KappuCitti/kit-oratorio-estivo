@@ -411,7 +411,6 @@ declare const v1Router: import("@hono/zod-openapi").OpenAPIHono<Bindings, import
 						displayName: string;
 						permissions: ("be_enrolled" | "be_managed" | "be_selected" | "give_exit_authorization" | "login" | "manage_activities" | "manage_attendances" | "manage_classes" | "manage_enrollments" | "manage_events" | "manage_personal_info" | "manage_roles" | "manage_self_child_users" | "manage_teams" | "manage_users" | "manage_weeks" | "register" | "register_child_users" | "see_activities" | "see_classes" | "see_personal_info" | "see_stats" | "see_users")[];
 					};
-					areas: ("user" | "admin")[];
 					name: string;
 					surname: string;
 					gender: "M" | "F" | null;
